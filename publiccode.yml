@@ -1,0 +1,77 @@
+publiccodeYmlVersion: 0.4.0
+name: jeap-governance-service
+applicationSuite: jEAP
+softwareVersion: 1.0.0
+releaseDate: 2026-01-28
+url: "https://github.com/jeap-admin-ch/jeap-governance-service.git"
+landingURL: "https://github.com/jeap-admin-ch/jeap"
+platforms:
+  - web
+categories:
+  - application-development
+developmentStatus: stable
+softwareType: library
+organisation:
+  uri: https://ld.admin.ch/office/V.1.7
+  name: Federal Office of Information Technology, Systems and Telecommunication
+description:
+  en:
+    localisedName: jeap-governance-service
+    shortDescription: A jEAP service and library which provides a quick overview of system and service compliance with defined policies.
+    longDescription: |
+      The jEAP Governance Service is a compliance monitoring solution designed to help 
+      development teams and administrators maintain adherence to organizational policies and best practices 
+      across microservices and systems within the jEAP ecosystem.
+      
+      ## Purpose
+      
+      This service acts as a centralized compliance dashboard and policy enforcement framework, providing 
+      visibility into compliance status across all managed services. A scheduled evaluation process 
+      regularly checks services against defined rules and reports on compliance violations.
+      
+      ## Key Features
+      
+      - **Developer Feedback:** Teams receive clear information on whether their services comply with 
+        organizational policies
+      - **Flexible Rule Management:** Administrators can temporarily deactivate individual rules for 
+        specific systems or services when exceptions are needed
+      - **Extensible Rules Engine:** New compliance rules can be easily added through a plugin mechanism, 
+        allowing teams to provide their own custom rules
+      
+      ## Architecture
+      
+      The service follows a modular, extensible architecture:
+      
+      - **Data Source Integration:** Automatically collects compliance-relevant information from various 
+        sources including the Arch Repo service, Deployment Log service, Prometheus/Grafana metrics, and 
+        project-specific data providers
+      - **Scheduled Evaluation:** A cron job periodically evaluates all services against configured rules
+      - **Plugin-Based Configuration:** Teams can configure the service and provide custom rules through a 
+        flexible plugin mechanism
+      
+      ## Use Cases
+      
+      - Ensuring microservices meet requirements (e.g., authentication, compliance with requirements from architecture, ..)
+      - Validating deployment configurations against established standards
+      - Monitoring technical debt and deprecated dependency usage
+      - Enforcing documentation and metadata requirements
+      - Tracking observability and monitoring coverage
+      
+      The Governance Service helps maintain high-quality, compliant services across the jEAP platform 
+      while providing the flexibility teams need to manage exceptions and evolve policies over time.
+    features:
+      - Developers receive feedback on whether they are complying with the rules.
+      - An administrator can temporarily deactivate individual rules for individual systems or services
+      - New rules can be easily added
+
+legal:
+  license: Apache-2.0
+maintenance:
+  type: internal
+  contacts:
+    - name: Federal Office of Information Technology, Systems and Telecommunication FOITT
+      email: jeap-community@bit.admin.ch
+localisation:
+  localisationReady: false
+  availableLanguages:
+    - en
