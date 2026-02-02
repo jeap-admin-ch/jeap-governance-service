@@ -7,7 +7,7 @@
     <parent>
         <groupId>ch.admin.bit.jeap</groupId>
         <artifactId>jeap-governance-service</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>jeap-governance-web</artifactId>
@@ -16,11 +16,11 @@
     <dependencies>
         <dependency>
             <groupId>ch.admin.bit.jeap</groupId>
-            <artifactId>jeap-governance-persistence</artifactId>
+            <artifactId>jeap-governance-docgen</artifactId>
         </dependency>
         <dependency>
             <groupId>ch.admin.bit.jeap</groupId>
-            <artifactId>jeap-governance-docgen</artifactId>
+            <artifactId>jeap-governance-dataimport</artifactId>
         </dependency>
         <dependency>
             <groupId>ch.admin.bit.jeap</groupId>
@@ -75,6 +75,16 @@
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wiremock</groupId>
+            <artifactId>wiremock-standalone</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

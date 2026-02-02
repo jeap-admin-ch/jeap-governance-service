@@ -1,0 +1,22 @@
+{
+  "properties": [
+    {
+      "name": "jeap.governance.dataimport.cron-expression",
+      "description": "Cron expression to schedule the data import job",
+      "defaultValue": "0 15 6,10,14,18 * * MON-FRI",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jeap.governance.dataimport.lock-at-least",
+      "description": "Minimum duration for which the lock should be held during the data import job",
+      "defaultValue": "PT30M",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jeap.governance.dataimport.lock-at-most",
+      "description": "Maximum duration for which the lock can be held during the data import job",
+      "defaultValue": "PT2H",
+      "type": "java.lang.String"
+    }
+  ]
+}

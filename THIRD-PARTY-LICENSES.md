@@ -15,11 +15,13 @@ Apache License Version 2.0
  * pactbroker - [au.com.dius.pact.core:pactbroker](https://github.com/pact-foundation/pact-jvm)
  * support - [au.com.dius.pact.core:support](https://github.com/pact-foundation/pact-jvm)
  * ch.admin.bit.jeap:jeap-governance-archrepo - [ch.admin.bit.jeap:jeap-governance-archrepo](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-archrepo)
+ * ch.admin.bit.jeap:jeap-governance-dataimport - [ch.admin.bit.jeap:jeap-governance-dataimport](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-dataimport)
  * ch.admin.bit.jeap:jeap-governance-deploymentlog - [ch.admin.bit.jeap:jeap-governance-deploymentlog](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-deploymentlog)
  * ch.admin.bit.jeap:jeap-governance-docgen - [ch.admin.bit.jeap:jeap-governance-docgen](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-docgen)
  * ch.admin.bit.jeap:jeap-governance-domain - [ch.admin.bit.jeap:jeap-governance-domain](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-domain)
  * ch.admin.bit.jeap:jeap-governance-pactbroker - [ch.admin.bit.jeap:jeap-governance-pactbroker](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-pactbroker)
  * ch.admin.bit.jeap:jeap-governance-persistence - [ch.admin.bit.jeap:jeap-governance-persistence](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-persistence)
+ * ch.admin.bit.jeap:jeap-governance-plugin-api - [ch.admin.bit.jeap:jeap-governance-plugin-api](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-plugin-api)
  * ch.admin.bit.jeap:jeap-governance-prometheus - [ch.admin.bit.jeap:jeap-governance-prometheus](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-prometheus)
  * ch.admin.bit.jeap:jeap-governance-rules - [ch.admin.bit.jeap:jeap-governance-rules](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-rules)
  * ch.admin.bit.jeap:jeap-governance-web - [ch.admin.bit.jeap:jeap-governance-web](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-web)
@@ -45,6 +47,9 @@ Apache License Version 2.0
  * colormath - [com.github.ajalt:colormath](https://github.com/ajalt/colormath)
  * mordant - [com.github.ajalt:mordant](https://github.com/ajalt/mordant)
  * Caffeine cache - [com.github.ben-manes.caffeine:caffeine](https://github.com/ben-manes/caffeine)
+ * docker-java-api - [com.github.docker-java:docker-java-api](https://github.com/docker-java/docker-java)
+ * docker-java-transport - [com.github.docker-java:docker-java-transport](https://github.com/docker-java/docker-java)
+ * docker-java-transport-zerodep - [com.github.docker-java:docker-java-transport-zerodep](https://github.com/docker-java/docker-java)
  * Generex - [com.github.mifmif:generex](https://github.com/mifmif/Generex/tree/master)
  * JCIP Annotations under Apache License - [com.github.stephenc.jcip:jcip-annotations](http://stephenc.github.com/jcip-annotations)
  * WireMock - [com.github.tomakehurst:wiremock-jre8-standalone](http://wiremock.org)
@@ -74,6 +79,7 @@ Apache License Version 2.0
  * Apache Commons Codec - [commons-codec:commons-codec](https://commons.apache.org/proper/commons-codec/)
  * Apache Commons Collections - [commons-collections:commons-collections](http://commons.apache.org/collections/)
  * Apache Commons IO - [commons-io:commons-io](https://commons.apache.org/proper/commons-io/)
+ * Apache Commons Logging - [commons-logging:commons-logging](http://commons.apache.org/proper/commons-logging/)
  * Apache Commons Logging - [commons-logging:commons-logging](https://commons.apache.org/proper/commons-logging/)
  * compress4j - [io.github.compress4j:compress4j](https://github.com/compress4j/compress4j)
  * java-diff-utils - [io.github.java-diff-utils:java-diff-utils](https://github.com/java-diff-utils/java-diff-utils/java-diff-utils)
@@ -125,6 +131,10 @@ Apache License Version 2.0
  * Prometheus Metrics Exposition Text Formats - [io.prometheus:prometheus-metrics-exposition-textformats](http://github.com/prometheus/client_java/client_java/prometheus-metrics-exposition-textformats)
  * Prometheus Metrics Model - [io.prometheus:prometheus-metrics-model](http://github.com/prometheus/client_java/client_java/prometheus-metrics-model)
  * Prometheus Metrics Tracer Common - [io.prometheus:prometheus-metrics-tracer-common](http://github.com/prometheus/client_java/client_java/prometheus-metrics-tracer/prometheus-metrics-tracer-common)
+ * json-path - [io.rest-assured:json-path](https://rest-assured.io/)
+ * REST Assured - [io.rest-assured:rest-assured](https://rest-assured.io/)
+ * rest-assured-common - [io.rest-assured:rest-assured-common](https://rest-assured.io/)
+ * xml-path - [io.rest-assured:xml-path](https://rest-assured.io/xml-path/)
  * Jandex: Core - [io.smallrye:jandex](https://smallrye.io)
  * swagger-annotations-jakarta - [io.swagger.core.v3:swagger-annotations-jakarta](https://github.com/swagger-api/swagger-core/modules/swagger-annotations-jakarta)
  * swagger-core-jakarta - [io.swagger.core.v3:swagger-core-jakarta](https://github.com/swagger-api/swagger-core/modules/swagger-core-jakarta)
@@ -140,6 +150,7 @@ Apache License Version 2.0
  * Jakarta Bean Validation API - [jakarta.validation:jakarta.validation-api](https://beanvalidation.org)
  * Byte Buddy (without dependencies) - [net.bytebuddy:byte-buddy](https://bytebuddy.net/byte-buddy)
  * Byte Buddy agent - [net.bytebuddy:byte-buddy-agent](https://bytebuddy.net/byte-buddy-agent)
+ * Java Native Access - [net.java.dev.jna:jna](https://github.com/java-native-access/jna)
  * net.javacrumbs.shedlock:shedlock-core - [net.javacrumbs.shedlock:shedlock-core](http://nexus.sonatype.org/oss-repository-hosting.html/shedlock-parent/shedlock-core)
  * net.javacrumbs.shedlock:shedlock-provider-jdbc-template - [net.javacrumbs.shedlock:shedlock-provider-jdbc-template](http://nexus.sonatype.org/oss-repository-hosting.html/shedlock-parent/providers/jdbc/shedlock-provider-jdbc-template)
  * net.javacrumbs.shedlock:shedlock-spring - [net.javacrumbs.shedlock:shedlock-spring](http://nexus.sonatype.org/oss-repository-hosting.html/shedlock-parent/spring/shedlock-spring)
@@ -151,8 +162,13 @@ Apache License Version 2.0
  * Apache Commons Compress - [org.apache.commons:commons-compress](https://commons.apache.org/proper/commons-compress/)
  * Apache Commons Lang - [org.apache.commons:commons-lang3](https://commons.apache.org/proper/commons-lang/)
  * Apache Commons Text - [org.apache.commons:commons-text](https://commons.apache.org/proper/commons-text)
+ * Apache Groovy - [org.apache.groovy:groovy](https://groovy-lang.org)
+ * Apache Groovy - [org.apache.groovy:groovy-json](https://groovy-lang.org)
+ * Apache Groovy - [org.apache.groovy:groovy-xml](https://groovy-lang.org)
+ * Apache HttpClient - [org.apache.httpcomponents:httpclient](http://hc.apache.org/httpcomponents-client)
  * Apache HttpClient - [org.apache.httpcomponents:httpclient](http://hc.apache.org/httpcomponents-client-ga)
  * Apache HttpCore - [org.apache.httpcomponents:httpcore](http://hc.apache.org/httpcomponents-core-ga)
+ * Apache HttpClient Mime - [org.apache.httpcomponents:httpmime](http://hc.apache.org/httpcomponents-client)
  * Apache HttpClient Mime - [org.apache.httpcomponents:httpmime](http://hc.apache.org/httpcomponents-client-ga)
  * Apache HttpClient - [org.apache.httpcomponents.client5:httpclient5](https://hc.apache.org/httpcomponents-client-5.5.x/5.5.2/httpclient5/)
  * Apache HttpClient Fluent - [org.apache.httpcomponents.client5:httpclient5-fluent](https://hc.apache.org/httpcomponents-client-5.5.x/5.5.2/httpclient5-fluent/)
@@ -169,12 +185,14 @@ Apache License Version 2.0
  * Evo Inflector - [org.atteo:evo-inflector](http://atteo.org/static/evo-inflector)
  * attoparser - [org.attoparser:attoparser](https://www.attoparser.org)
  * Awaitility - [org.awaitility:awaitility](http://awaitility.org)
+ * TagSoup - [org.ccil.cowan.tagsoup:tagsoup](http://home.ccil.org/~cowan/XML/tagsoup/)
  * flyway-core - [org.flywaydb:flyway-core](https://flywaydb.org/flyway-core)
  * flyway-database-postgresql - [org.flywaydb:flyway-database-postgresql](https://flywaydb.org/flyway-database-postgresql)
  * Hibernate Commons Annotations - [org.hibernate.common:hibernate-commons-annotations](http://hibernate.org)
  * Hibernate Validator Engine - [org.hibernate.validator:hibernate-validator](https://hibernate.org/validator)
  * JBoss Logging 3 - [org.jboss.logging:jboss-logging](http://www.jboss.org)
  * IntelliJ IDEA Annotations - [org.jetbrains:annotations](http://www.jetbrains.org)
+ * JetBrains Java Annotations - [org.jetbrains:annotations](https://github.com/JetBrains/java-annotations)
  * Kotlin Reflect - [org.jetbrains.kotlin:kotlin-reflect](https://kotlinlang.org/)
  * Kotlin Stdlib - [org.jetbrains.kotlin:kotlin-stdlib](https://kotlinlang.org/)
  * Kotlin Stdlib Common - [org.jetbrains.kotlin:kotlin-stdlib-common](https://kotlinlang.org/)
@@ -247,6 +265,7 @@ Apache License Version 2.0
  * thymeleaf-spring6 - [org.thymeleaf:thymeleaf-spring6](http://www.thymeleaf.org/thymeleaf-lib/thymeleaf-spring6)
  * unbescape - [org.unbescape:unbescape](http://www.unbescape.org)
  * Swagger UI - [org.webjars:swagger-ui](https://www.webjars.org)
+ * WireMock - [org.wiremock:wiremock-standalone](http://wiremock.org)
  * org.xmlunit:xmlunit-core - [org.xmlunit:xmlunit-core](https://www.xmlunit.org/)
  * SnakeYAML - [org.yaml:snakeyaml](https://bitbucket.org/snakeyaml/snakeyaml)
  * AWS Java SDK :: Annotations - [software.amazon.awssdk:annotations](https://aws.amazon.com/sdkforjava/core/annotations)
@@ -296,6 +315,7 @@ BSD License 3
  * Protocol Buffers [Core] - [com.google.protobuf:protobuf-java](https://developers.google.com/protocol-buffers/protobuf-java/)
  * ANTLR 4 Runtime - [org.antlr:antlr4-runtime](https://www.antlr.org/antlr4-runtime/)
  * Hamcrest - [org.hamcrest:hamcrest](http://hamcrest.org/JavaHamcrest/)
+ * Hamcrest Core - [org.hamcrest:hamcrest-core](http://hamcrest.org/JavaHamcrest/)
  * asm - [org.ow2.asm:asm](http://asm.ow2.io/)
 
 CDDL
@@ -340,6 +360,7 @@ Eclipse Public License, Version 1.0
  * Logback Classic Module - [ch.qos.logback:logback-classic](http://logback.qos.ch/logback-classic)
  * Logback Core Module - [ch.qos.logback:logback-core](http://logback.qos.ch/logback-core)
  * H2 Database Engine - [com.h2database:h2](https://h2database.com)
+ * JUnit - [junit:junit](http://junit.org)
 
 GNU General Public License, version 2 (GPL2), with the classpath exception
 -------------------------------
@@ -363,6 +384,11 @@ GPLv2+CE
 
  * JavaMail API (compat) - [javax.mail:mail](http://kenai.com/projects/javamail/mail)
 
+LGPL-2.1-or-later
+-------------------------------
+
+ * Java Native Access - [net.java.dev.jna:jna](https://github.com/java-native-access/jna)
+
 MIT License
 -------------------------------
 
@@ -377,8 +403,13 @@ MIT License
  * mockito-junit-jupiter - [org.mockito:mockito-junit-jupiter](https://github.com/mockito/mockito)
  * Project Lombok - [org.projectlombok:lombok](https://projectlombok.org)
  * reactive-streams - [org.reactivestreams:reactive-streams](http://www.reactive-streams.org/)
+ * Duct Tape - [org.rnorth.duct-tape:duct-tape](https://github.com/rnorth/duct-tape)
  * JUL to SLF4J bridge - [org.slf4j:jul-to-slf4j](http://www.slf4j.org)
  * SLF4J API Module - [org.slf4j:slf4j-api](http://www.slf4j.org)
+ * Testcontainers :: Database-Commons - [org.testcontainers:database-commons](https://java.testcontainers.org)
+ * Testcontainers :: JDBC - [org.testcontainers:jdbc](https://java.testcontainers.org)
+ * Testcontainers :: JDBC :: PostgreSQL - [org.testcontainers:postgresql](https://java.testcontainers.org)
+ * Testcontainers Core - [org.testcontainers:testcontainers](https://java.testcontainers.org)
  * webjars-locator-lite - [org.webjars:webjars-locator-lite](https://webjars.org)
 
 Mozilla Public License, Version 2.0

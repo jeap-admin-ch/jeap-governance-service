@@ -1,0 +1,74 @@
+{
+  "properties": [
+    {
+      "name": "jeap.governance.archrepo.import.apidocversion.enabled",
+      "description": "Flag to enable/disable the import of API documentation versions from the ArchRepo",
+      "defaultValue": true,
+      "type": "java.lang.Boolean"
+    },
+    {
+      "name": "jeap.governance.archrepo.import.databaseschemaversion.enabled",
+      "description": "Flag to enable/disable the import of database schema versions from the ArchRepo",
+      "defaultValue": true,
+      "type": "java.lang.Boolean"
+    },
+    {
+      "name": "jeap.governance.archrepo.import.reactiongraph.enabled",
+      "description": "Flag to enable/disable the import of reactions graphs from the ArchRepo",
+      "defaultValue": true,
+      "type": "java.lang.Boolean"
+    },
+    {
+      "name": "jeap.governance.archrepo.import.restapirelationwithoutpact.enabled",
+      "description": "Flag to enable/disable the import of REST api relations without pact from the ArchRepo",
+      "defaultValue": true,
+      "type": "java.lang.Boolean"
+    }
+  ],
+  "hints": [
+    {
+      "name": "jeap.governance.archrepo.import.apidocversion.enabled",
+      "values": [
+        {
+          "value": true
+        },
+        {
+          "value": false
+        }
+      ]
+    },
+    {
+      "name": "jeap.governance.archrepo.import.databaseschemaversion.enabled",
+      "values": [
+        {
+          "value": true
+        },
+        {
+          "value": false
+        }
+      ]
+    },
+    {
+      "name": "jeap.governance.archrepo.import.reactiongraph.enabled",
+      "values": [
+        {
+          "value": true
+        },
+        {
+          "value": false
+        }
+      ]
+    },
+    {
+      "name": "jeap.governance.archrepo.import.restapirelationwithoutpact.enabled",
+      "values": [
+        {
+          "value": true
+        },
+        {
+          "value": false
+        }
+      ]
+    }
+  ]
+}

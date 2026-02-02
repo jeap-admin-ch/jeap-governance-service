@@ -1,0 +1,24 @@
+jeap:
+  governance:
+    dataimport:
+      # This is done to let the tests run without scheduling issues
+      cron-expression: "-"
+      lock-at-least: PT0.001S
+      lock-at-most: PT0.002S
+  monitor:
+    prometheus:
+      secure: false
+
+logging:
+  level:
+    ch.admin.bit.jeap.governance: DEBUG
+
+spring:
+  application:
+    name: jeap-governance-service-test
+  jpa:
+    show-sql: false # enable SQL logging for tests
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
