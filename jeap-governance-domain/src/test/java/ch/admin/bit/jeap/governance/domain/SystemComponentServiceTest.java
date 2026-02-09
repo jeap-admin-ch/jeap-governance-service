@@ -6,8 +6,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.UUID;
-
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -23,7 +21,7 @@ class SystemComponentServiceTest {
 
     @Test
     void testDeleteById() {
-        UUID systemComponentId = UUID.randomUUID();
+        Long systemComponentId = 42L;
 
         systemComponentService.deleteById(systemComponentId);
 

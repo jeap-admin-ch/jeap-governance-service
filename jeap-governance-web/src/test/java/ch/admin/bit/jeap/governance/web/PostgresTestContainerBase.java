@@ -1,4 +1,4 @@
-package ch.admin.bit.jeap.governance.archrepo.persistence;
+package ch.admin.bit.jeap.governance.web;
 
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;

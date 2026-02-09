@@ -14,7 +14,6 @@ import org.springframework.context.annotation.Import;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,7 +35,6 @@ class SystemRepositoryImplTest extends PostgresTestContainerBase {
     @Test
     void findByName_shouldReturnSystem_whenExists() {
         System system = System.builder()
-                .id(UUID.randomUUID())
                 .name("My system")
                 .systemComponents(List.of())
                 .state(State.OK)
@@ -62,19 +60,16 @@ class SystemRepositoryImplTest extends PostgresTestContainerBase {
     @Test
     void findByName_shouldReturnSystem_whenExists_withSystemComponents() {
         System system = System.builder()
-                .id(UUID.randomUUID())
                 .name("My system")
                 .systemComponents(List.of())
                 .state(State.OK)
                 .build();
         SystemComponent component1 = SystemComponent.builder()
-                .id(UUID.randomUUID())
                 .name("Component 1")
                 .type(ComponentType.SELF_CONTAINED_SYSTEM)
                 .state(State.OK)
                 .build();
         SystemComponent component2 = SystemComponent.builder()
-                .id(UUID.randomUUID())
                 .name("Component 2")
                 .type(ComponentType.BACKEND_SERVICE)
                 .state(State.OK)
@@ -101,7 +96,6 @@ class SystemRepositoryImplTest extends PostgresTestContainerBase {
     @Test
     void update() {
         System system = System.builder()
-                .id(UUID.randomUUID())
                 .name("My system")
                 .systemComponents(List.of())
                 .state(State.OK)
@@ -118,7 +112,6 @@ class SystemRepositoryImplTest extends PostgresTestContainerBase {
         assertTrue(result.isPresent());
         System systemResult = result.get();
         systemResult.addSystemComponent(SystemComponent.builder()
-                .id(UUID.randomUUID())
                 .name("Component 1")
                 .type(ComponentType.SELF_CONTAINED_SYSTEM)
                 .state(State.OK)
@@ -138,7 +131,6 @@ class SystemRepositoryImplTest extends PostgresTestContainerBase {
     @Test
     void delete() {
         System system = System.builder()
-                .id(UUID.randomUUID())
                 .name("My system")
                 .systemComponents(List.of())
                 .state(State.OK)
@@ -168,19 +160,16 @@ class SystemRepositoryImplTest extends PostgresTestContainerBase {
     @Test
     void delete_withSystemComponents() {
         System system = System.builder()
-                .id(UUID.randomUUID())
                 .name("My system")
                 .systemComponents(List.of())
                 .state(State.OK)
                 .build();
         SystemComponent component1 = SystemComponent.builder()
-                .id(UUID.randomUUID())
                 .name("Component 1")
                 .type(ComponentType.SELF_CONTAINED_SYSTEM)
                 .state(State.OK)
                 .build();
         SystemComponent component2 = SystemComponent.builder()
-                .id(UUID.randomUUID())
                 .name("Component 2")
                 .type(ComponentType.BACKEND_SERVICE)
                 .state(State.OK)

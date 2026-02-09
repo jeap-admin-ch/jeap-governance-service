@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -45,7 +44,6 @@ public class ReactionGraphsOneByOneSynchronizer {
         } else {
             log.info("Creating new ReactionGraphsLastModifiedAt for system component {} with lastModifiedAt: {}", systemComponent.getName(), reactionGraphDto.getLastModifiedAt());
             ReactionGraph newVersion = ReactionGraph.builder()
-                    .id(UUID.randomUUID())
                     .systemComponent(systemComponent)
                     .lastModifiedAt(reactionGraphDto.getLastModifiedAt())
                     .build();

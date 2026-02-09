@@ -1,11 +1,10 @@
 package ch.admin.bit.jeap.governance.archrepo.domain;
 
 import java.util.Optional;
-import java.util.UUID;
 
 public interface ReactionGraphRepository {
 
-    Optional<ReactionGraph> findByComponentId(UUID componentId);
+    Optional<ReactionGraph> findByComponentId(Long componentId);
 
     Optional<ReactionGraph> findByComponentName(String componentName);
 

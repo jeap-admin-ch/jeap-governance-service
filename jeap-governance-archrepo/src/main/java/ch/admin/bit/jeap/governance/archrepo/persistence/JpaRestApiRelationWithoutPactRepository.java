@@ -6,15 +6,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
-import java.util.UUID;
 
-public interface JpaRestApiRelationWithoutPactRepository extends CrudRepository<RestApiRelationWithoutPact, UUID> {
+public interface JpaRestApiRelationWithoutPactRepository extends CrudRepository<RestApiRelationWithoutPact, Long> {
 
-    List<RestApiRelationWithoutPact> findByProviderSystemComponentId(UUID id);
+    List<RestApiRelationWithoutPact> findByProviderSystemComponentId(Long id);
 
-    List<RestApiRelationWithoutPact> findByConsumerSystemComponentId(UUID id);
+    List<RestApiRelationWithoutPact> findByConsumerSystemComponentId(Long id);
 
     @Modifying
     @Query("DELETE FROM RestApiRelationWithoutPact a WHERE a.providerSystemComponent.id = :id")
-    void deleteAllByProviderSystemComponentId(UUID id);
+    void deleteAllByProviderSystemComponentId(Long id);
 }

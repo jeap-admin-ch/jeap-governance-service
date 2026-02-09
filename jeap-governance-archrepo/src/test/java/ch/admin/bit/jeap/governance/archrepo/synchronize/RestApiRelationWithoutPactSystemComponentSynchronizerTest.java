@@ -17,7 +17,6 @@ import java.util.Optional;
 import static ch.admin.bit.jeap.governance.archrepo.TestUtility.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -51,7 +50,6 @@ class RestApiRelationWithoutPactSystemComponentSynchronizerTest {
         assertEquals(SYSTEM_COMPONENT_B1, addedRelation.getConsumerSystemComponent());
         assertEquals("GET", addedRelation.getMethod());
         assertEquals("/api/resource", addedRelation.getPath());
-        assertNotNull(addedRelation.getId());
 
         verify(restApiRelationWithoutPactRepository).add(addedRelation);
         verify(restApiRelationWithoutPactRepository).deleteAllByProviderSystemComponentId(SYSTEM_COMPONENT_A1.getId());

@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -19,7 +18,7 @@ public class SystemComponentRepositoryImpl implements SystemComponentRepository 
 
     @Override
     @Transactional
-    public void deleteById(UUID systemComponentId) {
+    public void deleteById(Long systemComponentId) {
         Optional<SystemComponent> byId = jpaComponentRepository.findById(systemComponentId);
         if (byId.isEmpty()) {
             log.info("SystemComponent with id {} not found for deletion.", systemComponentId);

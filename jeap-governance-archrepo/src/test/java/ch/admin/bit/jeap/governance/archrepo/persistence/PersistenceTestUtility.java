@@ -9,20 +9,17 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 @UtilityClass
 public class PersistenceTestUtility {
 
     static TwoSystemComponents createAndPersistSystemWithTwoSystemComponents(String systemName, TestEntityManager entityManager) {
         SystemComponent systemComponent1 = SystemComponent.builder()
-                .id(UUID.randomUUID())
                 .name(systemName + "-Test Component1")
                 .state(State.OK)
                 .type(ComponentType.BACKEND_SERVICE)
                 .build();
         SystemComponent systemComponent2 = SystemComponent.builder()
-                .id(UUID.randomUUID())
                 .name(systemName + "-Test Component2")
                 .state(State.OK)
                 .type(ComponentType.BACKEND_SERVICE)
@@ -41,7 +38,6 @@ public class PersistenceTestUtility {
 
     static SystemComponent createAndPersistSystemWithOneSystemComponent(String systemName, TestEntityManager entityManager) {
         SystemComponent systemComponent = SystemComponent.builder()
-                .id(UUID.randomUUID())
                 .name(systemName + "-Test Component")
                 .state(State.OK)
                 .type(ComponentType.BACKEND_SERVICE)
@@ -52,16 +48,15 @@ public class PersistenceTestUtility {
 
     static System createAndPersistSystemWithSystemComponents(TestEntityManager entityManager, String systemName, SystemComponent... systemComponents) {
         System system = System.builder()
-                .id(UUID.randomUUID())
                 .name(systemName)
                 .systemComponents(systemComponents == null ? List.of() : List.of(systemComponents))
                 .state(State.OK)
                 .aliases(Set.of("a " + systemName))
                 .build();
 
-        entityManager.persist(system);
+        System savedSystem = entityManager.persist(system);
         entityManager.flush();
-        return system;
+        return savedSystem;
     }
 
     public record TwoSystemComponents(SystemComponent first, SystemComponent second) {

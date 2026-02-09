@@ -4,19 +4,27 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // for jpa
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity(name = "System")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
 public class System {
     @Getter
     @Id
-    @NonNull
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "system_seq")
+    @SequenceGenerator(
+            name = "system_seq",
+            sequenceName = "system_id_seq"
+    )
     @EqualsAndHashCode.Include
-    private UUID id;
+    private Long id;
 
     @NonNull
     @Getter
@@ -43,11 +51,19 @@ public class System {
     @Getter
     private ZonedDateTime createdAt;
 
+    private System(String name, Set<String> strings, List<SystemComponent> modifiableList, State state, ZonedDateTime zonedDateTime) {
+        this.name = name;
+        this.aliases = strings;
+        this.systemComponents = modifiableList;
+        this.state = state;
+        this.createdAt = zonedDateTime;
+    }
+
     @Builder
-    private static System build(UUID id, String name, Set<String> aliases, List<SystemComponent> systemComponents, State state, ZonedDateTime createdAt) {
+    private static System build(String name, Set<String> aliases, List<SystemComponent> systemComponents, State state, ZonedDateTime createdAt) {
         //This list might be read only, we need a "normal" list
         List<SystemComponent> modifiableList = new ArrayList<>(systemComponents);
-        System system = new System(id, name, copyAliases(aliases), modifiableList, state, createdAt == null ? ZonedDateTime.now() : createdAt);
+        System system = new System(name, copyAliases(aliases), modifiableList, state, createdAt == null ? ZonedDateTime.now() : createdAt);
         //Set the system for each service
         systemComponents.forEach(x -> x.setSystem(system));
         return system;

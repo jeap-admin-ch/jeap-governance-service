@@ -15,6 +15,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.utility.DockerImageName;
 
 import java.util.List;
 
@@ -29,27 +31,38 @@ public abstract class ArchRepoMockIntegrationTestBase {
 
     protected static WireMockServer wireMockServer;
 
+    private static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
+            DockerImageName.parse("postgres:16-alpine").asCompatibleSubstituteFor("postgres:16-alpine")
+    );
+
     @Autowired
     protected ObjectMapper objectMapper;
 
     @BeforeAll
-    static void startWireMock() {
+    static void startInfrastructure() {
         wireMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig()
                 .dynamicPort());
         wireMockServer.start();
         WireMock.configureFor(wireMockServer.port());
+
+        postgres.start();
     }
 
     @AfterAll
-    static void stopWireMock() {
+    static void stopInfrastructure() {
         if (wireMockServer != null) {
             wireMockServer.stop();
         }
+        postgres.stop();
     }
 
     @DynamicPropertySource
     static void configureArchRepoUrl(DynamicPropertyRegistry registry) {
         registry.add("jeap.governance.archrepo.url", wireMockServer::baseUrl);
+
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
     }
 
     @BeforeEach

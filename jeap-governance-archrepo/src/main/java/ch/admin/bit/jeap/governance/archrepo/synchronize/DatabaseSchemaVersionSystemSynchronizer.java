@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -51,7 +50,6 @@ public class DatabaseSchemaVersionSystemSynchronizer {
     private void addToSystemComponent(DatabaseSchemaVersionDto databaseSchemaVersionDto, SystemComponent systemComponent) {
         log.info("Creating new DatabaseSchema version {} for system component {} with version: {}", databaseSchemaVersionDto.getVersion(), systemComponent.getName(), databaseSchemaVersionDto.getVersion());
         DatabaseSchemaVersion newVersion = DatabaseSchemaVersion.builder()
-                .id(UUID.randomUUID())
                 .systemComponent(systemComponent)
                 .version(databaseSchemaVersionDto.getVersion())
                 .build();

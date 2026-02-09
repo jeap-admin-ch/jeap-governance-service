@@ -10,7 +10,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import static ch.admin.bit.jeap.governance.archrepo.persistence.PersistenceTestUtility.createAndPersistSystemWithTwoSystemComponents;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,7 +37,6 @@ class DatabaseSchemaVersionRepositoryImplTest extends PostgresTestContainerBase 
         SystemComponent systemComponent = PersistenceTestUtility.createAndPersistSystemWithOneSystemComponent(entityManager);
 
         DatabaseSchemaVersion databaseSchemaVersion = DatabaseSchemaVersion.builder()
-                .id(UUID.randomUUID())
                 .systemComponent(systemComponent)
                 .version("1.0.0")
                 .build();
@@ -58,7 +56,6 @@ class DatabaseSchemaVersionRepositoryImplTest extends PostgresTestContainerBase 
     void findByComponentId() {
         SystemComponent systemComponent = PersistenceTestUtility.createAndPersistSystemWithOneSystemComponent(entityManager);
         DatabaseSchemaVersion databaseSchemaVersion = DatabaseSchemaVersion.builder()
-                .id(UUID.randomUUID())
                 .systemComponent(systemComponent)
                 .version("1.0.0")
                 .build();
@@ -84,7 +81,6 @@ class DatabaseSchemaVersionRepositoryImplTest extends PostgresTestContainerBase 
     void delete() {
         SystemComponent systemComponent = PersistenceTestUtility.createAndPersistSystemWithOneSystemComponent(entityManager);
         DatabaseSchemaVersion databaseSchemaVersion = DatabaseSchemaVersion.builder()
-                .id(UUID.randomUUID())
                 .systemComponent(systemComponent)
                 .version("1.0.0")
                 .build();
@@ -110,17 +106,14 @@ class DatabaseSchemaVersionRepositoryImplTest extends PostgresTestContainerBase 
         SystemComponent systemComponent21 = systemComponentsSystem2.first();
 
         DatabaseSchemaVersion databaseSchemaVersion11 = DatabaseSchemaVersion.builder()
-                .id(UUID.randomUUID())
                 .systemComponent(systemComponent11)
                 .version("1.0.0")
                 .build();
         DatabaseSchemaVersion databaseSchemaVersion12 = DatabaseSchemaVersion.builder()
-                .id(UUID.randomUUID())
                 .systemComponent(systemComponent12)
                 .version("1.0.0")
                 .build();
         DatabaseSchemaVersion databaseSchemaVersion21 = DatabaseSchemaVersion.builder()
-                .id(UUID.randomUUID())
                 .systemComponent(systemComponent21)
                 .version("1.0.0")
                 .build();

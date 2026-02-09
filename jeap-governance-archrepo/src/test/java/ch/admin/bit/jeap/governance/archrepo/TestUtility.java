@@ -9,7 +9,6 @@ import lombok.experimental.UtilityClass;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.UUID;
 
 @UtilityClass
 public class TestUtility {
@@ -33,7 +32,6 @@ public class TestUtility {
 
     public static System createSystem(String systemName) {
         return System.builder()
-                .id(UUID.randomUUID())
                 .name(systemName)
                 .state(State.OK)
                 .systemComponents(new ArrayList<>())
@@ -43,7 +41,6 @@ public class TestUtility {
 
     public static SystemComponent createSystemComponent(System system, String componentName) {
         SystemComponent systemComponent = SystemComponent.builder()
-                .id(UUID.randomUUID())
                 .name(componentName)
                 .state(State.OK)
                 .type(ComponentType.BACKEND_SERVICE)

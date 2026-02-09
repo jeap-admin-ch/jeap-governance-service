@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -15,12 +14,12 @@ public class RestApiRelationWithoutPactRepositoryImpl implements RestApiRelation
     private final JpaRestApiRelationWithoutPactRepository jpaRepository;
 
     @Override
-    public List<RestApiRelationWithoutPact> findAllByProviderSystemComponentId(UUID id) {
+    public List<RestApiRelationWithoutPact> findAllByProviderSystemComponentId(Long id) {
         return jpaRepository.findByProviderSystemComponentId(id);
     }
 
     @Override
-    public List<RestApiRelationWithoutPact> findAllByConsumerSystemComponentId(UUID id) {
+    public List<RestApiRelationWithoutPact> findAllByConsumerSystemComponentId(Long id) {
         return jpaRepository.findByConsumerSystemComponentId(id);
     }
 
@@ -35,7 +34,7 @@ public class RestApiRelationWithoutPactRepositoryImpl implements RestApiRelation
     }
 
     @Override
-    public void deleteAllByProviderSystemComponentId(UUID id) {
+    public void deleteAllByProviderSystemComponentId(Long id) {
         jpaRepository.deleteAllByProviderSystemComponentId(id);
     }
 }

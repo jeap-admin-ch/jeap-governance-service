@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         "jeap.governance.archrepo.url=http://localhost:8080",
         "jeap.governance.archrepo.import.restapirelationwithoutpact.enabled=false"
 })
-class RestApiRelationWithoutPactImporterDisabledIT {
+class RestApiRelationWithoutPactImporterDisabledIT extends PostgresTestContainerBase {
 
     @Autowired
     private ApplicationContext context;

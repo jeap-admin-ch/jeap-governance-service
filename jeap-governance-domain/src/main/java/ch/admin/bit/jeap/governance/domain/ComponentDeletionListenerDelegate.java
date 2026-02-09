@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -21,7 +20,7 @@ public class ComponentDeletionListenerDelegate {
         log.info("Initialized ComponentDeletionListenerDelegate with these listeners: {}", listeners);
     }
 
-    public void notifyPreComponentDeletion(UUID systemComponentId) {
+    public void notifyPreComponentDeletion(Long systemComponentId) {
         for (ComponentDeletionListener listener : listeners) {
             try {
                 listener.preComponentDeletion(systemComponentId);

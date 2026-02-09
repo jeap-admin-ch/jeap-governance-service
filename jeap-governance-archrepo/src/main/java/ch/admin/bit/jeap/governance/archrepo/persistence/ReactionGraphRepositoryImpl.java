@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -15,7 +14,7 @@ public class ReactionGraphRepositoryImpl implements ReactionGraphRepository {
     private final JpaReactionGraphRepository jpaRepository;
 
     @Override
-    public Optional<ReactionGraph> findByComponentId(UUID componentId) {
+    public Optional<ReactionGraph> findByComponentId(Long componentId) {
         return jpaRepository.findBySystemComponentId(componentId);
     }
 

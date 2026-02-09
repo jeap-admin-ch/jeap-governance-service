@@ -12,8 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
-import java.util.function.Consumer;
+import java.util.function.LongConsumer;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -24,30 +23,21 @@ public class ArchRepoModelSystemUpdater {
 
     private final EntityFactory entityFactory;
 
-    System updateSystem(System existingSystem, ArchRepoSystemDto archRepoSystem, Consumer<UUID> systemComponentDeletionCallback) {
+    System updateSystem(System existingSystem, ArchRepoSystemDto archRepoSystem, LongConsumer systemComponentDeletionCallback) {
         log.debug("Synchronize system {}", existingSystem.getName());
         existingSystem.setAliases(archRepoSystem.getAliases());
         List<ArchRepoSystemComponentDto> systemComponentDtos = archRepoSystem.getSystemComponents();
 
         // Update existing services
-        systemComponentDtos.stream()
-                .filter(systemComponent -> existingSystem.getSystemComponentByName(systemComponent.getName()).isPresent())
-                .forEach(systemComponent -> update(existingSystem, systemComponent));
+        systemComponentDtos.stream().filter(systemComponent -> existingSystem.getSystemComponentByName(systemComponent.getName()).isPresent()).forEach(systemComponent -> update(existingSystem, systemComponent));
 
         // Delete removed services (copyOf to avoid concurrent mod. exceptions when removing services)
         List<SystemComponent> services = List.copyOf(existingSystem.getSystemComponents());
-        Set<String> systemComponentNames = systemComponentDtos.stream()
-                .map(ArchRepoSystemComponentDto::getName)
-                .collect(toSet());
-        services.stream()
-                .filter(existingSystemComponent -> !systemComponentNames.contains(existingSystemComponent.getName()))
-                .forEach(systemComponent -> deleteSystemComponent(existingSystem, systemComponent, systemComponentDeletionCallback));
+        Set<String> systemComponentNames = systemComponentDtos.stream().map(ArchRepoSystemComponentDto::getName).collect(toSet());
+        services.stream().filter(existingSystemComponent -> !systemComponentNames.contains(existingSystemComponent.getName())).forEach(systemComponent -> deleteSystemComponent(existingSystem, systemComponent, systemComponentDeletionCallback));
 
         // Add new services
-        systemComponentDtos.stream()
-                .filter(systemComponent -> existingSystem.getSystemComponentByName(systemComponent.getName()).isEmpty())
-                .map(this::createNewSystemComponent)
-                .forEach(existingSystem::addSystemComponent);
+        systemComponentDtos.stream().filter(systemComponent -> existingSystem.getSystemComponentByName(systemComponent.getName()).isEmpty()).map(this::createNewSystemComponent).forEach(existingSystem::addSystemComponent);
 
         return existingSystem;
     }
@@ -56,13 +46,11 @@ public class ArchRepoModelSystemUpdater {
         String name = archRepoSystem.getName();
         Set<String> aliases = archRepoSystem.getAliases();
         System system = entityFactory.createNewSystem(name, aliases);
-        archRepoSystem.getSystemComponents().stream()
-                .map(this::createNewSystemComponent)
-                .forEach(system::addSystemComponent);
+        archRepoSystem.getSystemComponents().stream().map(this::createNewSystemComponent).forEach(system::addSystemComponent);
         return system;
     }
 
-    private void deleteSystemComponent(System system, SystemComponent systemComponent, Consumer<UUID> systemComponentDeletionCallback) {
+    private void deleteSystemComponent(System system, SystemComponent systemComponent, LongConsumer systemComponentDeletionCallback) {
         log.info("Delete systemComponent with name: {} and id: {} as its not in the arch repo", systemComponent.getName(), systemComponent.getId());
         systemComponentDeletionCallback.accept(systemComponent.getId());
         // just to make sure system component is removed from system

@@ -10,13 +10,14 @@ import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
-import java.util.function.Consumer;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.LongConsumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -31,6 +32,7 @@ class ArchRepoModelSystemUpdaterTest {
     private static final String OLD_COMPONENT = "Old Component";
     private static final String NEW_COMPONENT = "New Component";
     private static final String EXISTING_COMPONENT = "Existing Component";
+    private static final AtomicLong SYSTEM_COMPONENT_ID_GENERATOR = new AtomicLong();
 
     private final EntityFactory entityFactory = new EntityFactory();
 
@@ -41,20 +43,7 @@ class ArchRepoModelSystemUpdaterTest {
         String systemComponentName1 = "Component 1";
         String systemComponentName2 = "Component 2";
         Set<String> aliases = Set.of("SysA", "System Alpha");
-        var archRepoSystem = ArchRepoSystemDto.builder()
-                .name("System A")
-                .aliases(aliases)
-                .systemComponents(Arrays.asList(
-                        ArchRepoSystemComponentDto.builder()
-                                .name(systemComponentName1)
-                                .type(ArchRepoSystemComponentType.BACKEND_SERVICE)
-                                .build(),
-                        ArchRepoSystemComponentDto.builder()
-                                .name(systemComponentName2)
-                                .type(ArchRepoSystemComponentType.SELF_CONTAINED_SYSTEM)
-                                .build()
-                ))
-                .build();
+        var archRepoSystem = ArchRepoSystemDto.builder().name("System A").aliases(aliases).systemComponents(Arrays.asList(ArchRepoSystemComponentDto.builder().name(systemComponentName1).type(ArchRepoSystemComponentType.BACKEND_SERVICE).build(), ArchRepoSystemComponentDto.builder().name(systemComponentName2).type(ArchRepoSystemComponentType.SELF_CONTAINED_SYSTEM).build())).build();
 
         System newSystem = archRepoModelSystemUpdater.createNewSystem(archRepoSystem);
 
@@ -83,22 +72,12 @@ class ArchRepoModelSystemUpdaterTest {
     @Test
     void updateSystem_OneExistingSystemComponent() {
         System existingSystem = entityFactory.createNewSystem("System A", null);
-        existingSystem.addSystemComponent(
-                entityFactory.createNewSystemComponent(EXISTING_COMPONENT, ComponentType.SELF_CONTAINED_SYSTEM)
-        );
-        Consumer<UUID> systemComponentDeletionCallback = mock(Consumer.class);
+        existingSystem.addSystemComponent(createNewSystemComponent(EXISTING_COMPONENT, ComponentType.SELF_CONTAINED_SYSTEM));
+        LongConsumer systemComponentDeletionCallback = mock(LongConsumer.class);
 
         Set<String> aliases = Set.of("SysA", "System Alpha");
-        var archRepoSystem = ArchRepoSystemDto.builder()
-                .name("System A")
-                .aliases(aliases)
-                .systemComponents(Arrays.asList(
-                        ArchRepoSystemComponentDto.builder()
-                                .name(EXISTING_COMPONENT)
-                                .type(ArchRepoSystemComponentType.BACKEND_SERVICE) // We change the type on purpose
-                                .build()
-                ))
-                .build();
+        var archRepoSystem = ArchRepoSystemDto.builder().name("System A").aliases(aliases).systemComponents(Arrays.asList(ArchRepoSystemComponentDto.builder().name(EXISTING_COMPONENT).type(ArchRepoSystemComponentType.BACKEND_SERVICE) // We change the type on purpose
+                .build())).build();
 
         System updatedSystem = archRepoModelSystemUpdater.updateSystem(existingSystem, archRepoSystem, systemComponentDeletionCallback);
         assertEquals("System A", updatedSystem.getName());
@@ -118,19 +97,10 @@ class ArchRepoModelSystemUpdaterTest {
     @Test
     void updateSystem_OneNewSystemComponent() {
         System existingSystem = entityFactory.createNewSystem("System A", null);
-        Consumer<UUID> systemComponentDeletionCallback = mock(Consumer.class);
+        LongConsumer systemComponentDeletionCallback = mock(LongConsumer.class);
 
         Set<String> aliases = Set.of("SysA", "System Alpha");
-        var archRepoSystem = ArchRepoSystemDto.builder()
-                .name("System A")
-                .aliases(aliases)
-                .systemComponents(Arrays.asList(
-                        ArchRepoSystemComponentDto.builder()
-                                .name(NEW_COMPONENT)
-                                .type(ArchRepoSystemComponentType.SELF_CONTAINED_SYSTEM)
-                                .build()
-                ))
-                .build();
+        var archRepoSystem = ArchRepoSystemDto.builder().name("System A").aliases(aliases).systemComponents(Arrays.asList(ArchRepoSystemComponentDto.builder().name(NEW_COMPONENT).type(ArchRepoSystemComponentType.SELF_CONTAINED_SYSTEM).build())).build();
 
         System updatedSystem = archRepoModelSystemUpdater.updateSystem(existingSystem, archRepoSystem, systemComponentDeletionCallback);
         assertEquals("System A", updatedSystem.getName());
@@ -149,18 +119,14 @@ class ArchRepoModelSystemUpdaterTest {
 
     @Test
     void updateSystem_OneOldSystemComponent() {
-        SystemComponent oldComponent = entityFactory.createNewSystemComponent(OLD_COMPONENT, ComponentType.BACKEND_SERVICE);
+        SystemComponent oldComponent = createNewSystemComponent(OLD_COMPONENT, ComponentType.BACKEND_SERVICE);
         System existingSystem = entityFactory.createNewSystem("System A", null);
         existingSystem.addSystemComponent(oldComponent);
 
-        Consumer<UUID> systemComponentDeletionCallback = mock(Consumer.class);
+        LongConsumer systemComponentDeletionCallback = mock(LongConsumer.class);
 
         Set<String> aliases = Set.of("SysA", "System Alpha");
-        var archRepoSystem = ArchRepoSystemDto.builder()
-                .name("System A")
-                .aliases(aliases)
-                .systemComponents(List.of())
-                .build();
+        var archRepoSystem = ArchRepoSystemDto.builder().name("System A").aliases(aliases).systemComponents(List.of()).build();
 
         System updatedSystem = archRepoModelSystemUpdater.updateSystem(existingSystem, archRepoSystem, systemComponentDeletionCallback);
         assertEquals("System A", updatedSystem.getName());
@@ -176,30 +142,16 @@ class ArchRepoModelSystemUpdaterTest {
 
     @Test
     void updateSystem_OneNewOneExistingAndOneOldSystemComponent() {
-        SystemComponent oldComponent = entityFactory.createNewSystemComponent(OLD_COMPONENT, ComponentType.BACKEND_SERVICE);
+        SystemComponent oldComponent = createNewSystemComponent(OLD_COMPONENT, ComponentType.BACKEND_SERVICE);
         System existingSystem = entityFactory.createNewSystem("System A", null);
-        existingSystem.addSystemComponent(
-                entityFactory.createNewSystemComponent(EXISTING_COMPONENT, ComponentType.SELF_CONTAINED_SYSTEM)
-        );
+        existingSystem.addSystemComponent(createNewSystemComponent(EXISTING_COMPONENT, ComponentType.SELF_CONTAINED_SYSTEM));
         existingSystem.addSystemComponent(oldComponent);
 
-        Consumer<UUID> systemComponentDeletionCallback = mock(Consumer.class);
+        LongConsumer systemComponentDeletionCallback = mock(LongConsumer.class);
 
         Set<String> aliases = Set.of("SysA", "System Alpha");
-        var archRepoSystem = ArchRepoSystemDto.builder()
-                .name("System A")
-                .aliases(aliases)
-                .systemComponents(Arrays.asList(
-                        ArchRepoSystemComponentDto.builder()
-                                .name(EXISTING_COMPONENT)
-                                .type(ArchRepoSystemComponentType.BACKEND_SERVICE) // We change the type on purpose
-                                .build(),
-                        ArchRepoSystemComponentDto.builder()
-                                .name(NEW_COMPONENT)
-                                .type(ArchRepoSystemComponentType.SELF_CONTAINED_SYSTEM)
-                                .build()
-                ))
-                .build();
+        var archRepoSystem = ArchRepoSystemDto.builder().name("System A").aliases(aliases).systemComponents(Arrays.asList(ArchRepoSystemComponentDto.builder().name(EXISTING_COMPONENT).type(ArchRepoSystemComponentType.BACKEND_SERVICE) // We change the type on purpose
+                .build(), ArchRepoSystemComponentDto.builder().name(NEW_COMPONENT).type(ArchRepoSystemComponentType.SELF_CONTAINED_SYSTEM).build())).build();
 
         System updatedSystem = archRepoModelSystemUpdater.updateSystem(existingSystem, archRepoSystem, systemComponentDeletionCallback);
         assertEquals("System A", updatedSystem.getName());
@@ -229,6 +181,12 @@ class ArchRepoModelSystemUpdaterTest {
 
         verify(systemComponentDeletionCallback).accept(oldComponent.getId());
         verifyNoMoreInteractions(systemComponentDeletionCallback);
+    }
+
+    private SystemComponent createNewSystemComponent(String existingComponent, ComponentType componentType) {
+        SystemComponent systemComponent = entityFactory.createNewSystemComponent(existingComponent, componentType);
+        ReflectionTestUtils.setField(systemComponent, "id", SYSTEM_COMPONENT_ID_GENERATOR.incrementAndGet());
+        return systemComponent;
     }
 
     @BeforeEach

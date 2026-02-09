@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -27,7 +26,7 @@ class RestApiRelationWithoutPactComponentDeletionListenerTest {
 
     @Test
     void preComponentDeletion_Provider() {
-        UUID systemComponentId = UUID.randomUUID();
+        Long systemComponentId = 42L;
         RestApiRelationWithoutPact entity = mock(RestApiRelationWithoutPact.class);
 
         when(repository.findAllByProviderSystemComponentId(systemComponentId)).thenReturn(List.of(entity));
@@ -43,7 +42,7 @@ class RestApiRelationWithoutPactComponentDeletionListenerTest {
 
     @Test
     void preComponentDeletion_Consumer() {
-        UUID systemComponentId = UUID.randomUUID();
+        Long systemComponentId = 42L;
         RestApiRelationWithoutPact entity = mock(RestApiRelationWithoutPact.class);
 
         when(repository.findAllByProviderSystemComponentId(systemComponentId)).thenReturn(List.of());
@@ -58,7 +57,7 @@ class RestApiRelationWithoutPactComponentDeletionListenerTest {
 
     @Test
     void preComponentDeletion_ProviderAndConsumer() {
-        UUID systemComponentId = UUID.randomUUID();
+        Long systemComponentId = 42L;
         RestApiRelationWithoutPact entity1 = mock(RestApiRelationWithoutPact.class);
         RestApiRelationWithoutPact entity2 = mock(RestApiRelationWithoutPact.class);
 

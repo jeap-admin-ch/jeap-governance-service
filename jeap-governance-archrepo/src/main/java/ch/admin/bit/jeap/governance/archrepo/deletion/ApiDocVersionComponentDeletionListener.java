@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -22,7 +21,7 @@ public class ApiDocVersionComponentDeletionListener implements ComponentDeletion
 
     @Override
     @Transactional
-    public void preComponentDeletion(UUID systemComponentId) {
+    public void preComponentDeletion(Long systemComponentId) {
         log.debug("Deleting ApiDocVersion entities related to system component with ID: {}", systemComponentId);
         Optional<ApiDocVersion> byComponentId = repository.findByComponentId(systemComponentId);
         byComponentId.ifPresent(repository::delete);

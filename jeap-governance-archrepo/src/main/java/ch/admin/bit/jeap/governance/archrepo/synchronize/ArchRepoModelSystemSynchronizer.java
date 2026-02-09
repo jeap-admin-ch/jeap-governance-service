@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -59,7 +58,7 @@ public class ArchRepoModelSystemSynchronizer {
                 });
     }
 
-    void deleteSystemComponent(UUID systemComponentId) {
+    void deleteSystemComponent(Long systemComponentId) {
         systemComponentService.deleteById(systemComponentId);
     }
 }

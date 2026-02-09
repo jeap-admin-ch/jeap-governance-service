@@ -10,7 +10,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 
 import java.util.List;
-import java.util.UUID;
 
 import static ch.admin.bit.jeap.governance.archrepo.persistence.PersistenceTestUtility.createAndPersistSystemWithTwoSystemComponents;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,7 +40,6 @@ class RestApiRelationWithoutPactRepositoryImplTest extends PostgresTestContainer
 
 
         RestApiRelationWithoutPact restApiRelationWithoutPact = RestApiRelationWithoutPact.builder()
-                .id(UUID.randomUUID())
                 .providerSystemComponent(systemComponent1)
                 .consumerSystemComponent(systemComponent2)
                 .method("GET")
@@ -65,14 +63,12 @@ class RestApiRelationWithoutPactRepositoryImplTest extends PostgresTestContainer
         SystemComponent systemComponent1 = systemComponents.first();
         SystemComponent systemComponent2 = systemComponents.second();
         RestApiRelationWithoutPact restApiRelationWithoutPact1 = RestApiRelationWithoutPact.builder()
-                .id(UUID.randomUUID())
                 .providerSystemComponent(systemComponent1)
                 .consumerSystemComponent(systemComponent2)
                 .method("GET")
                 .path("/api/test")
                 .build();
         RestApiRelationWithoutPact restApiRelationWithoutPact2 = RestApiRelationWithoutPact.builder()
-                .id(UUID.randomUUID())
                 .providerSystemComponent(systemComponent2)
                 .consumerSystemComponent(systemComponent1)
                 .method("GET")
@@ -94,14 +90,12 @@ class RestApiRelationWithoutPactRepositoryImplTest extends PostgresTestContainer
         SystemComponent systemComponent1 = systemComponents.first();
         SystemComponent systemComponent2 = systemComponents.second();
         RestApiRelationWithoutPact restApiRelationWithoutPact1 = RestApiRelationWithoutPact.builder()
-                .id(UUID.randomUUID())
                 .providerSystemComponent(systemComponent1)
                 .consumerSystemComponent(systemComponent2)
                 .method("GET")
                 .path("/api/test")
                 .build();
         RestApiRelationWithoutPact restApiRelationWithoutPact2 = RestApiRelationWithoutPact.builder()
-                .id(UUID.randomUUID())
                 .providerSystemComponent(systemComponent2)
                 .consumerSystemComponent(systemComponent1)
                 .method("GET")
@@ -145,7 +139,6 @@ class RestApiRelationWithoutPactRepositoryImplTest extends PostgresTestContainer
 
 
         RestApiRelationWithoutPact restApiRelationWithoutPact = RestApiRelationWithoutPact.builder()
-                .id(UUID.randomUUID())
                 .providerSystemComponent(systemComponent1)
                 .consumerSystemComponent(systemComponent2)
                 .method("GET")
@@ -173,28 +166,24 @@ class RestApiRelationWithoutPactRepositoryImplTest extends PostgresTestContainer
         SystemComponent systemComponent21 = systemComponentsSystem2.first();
 
         RestApiRelationWithoutPact restApiRelationWithoutPact1112 = RestApiRelationWithoutPact.builder()
-                .id(UUID.randomUUID())
                 .providerSystemComponent(systemComponent11)
                 .consumerSystemComponent(systemComponent12)
                 .method("GET")
                 .path("/api/test")
                 .build();
         RestApiRelationWithoutPact restApiRelationWithoutPact1121 = RestApiRelationWithoutPact.builder()
-                .id(UUID.randomUUID())
                 .providerSystemComponent(systemComponent11)
                 .consumerSystemComponent(systemComponent21)
                 .method("GET")
                 .path("/api/test")
                 .build();
         RestApiRelationWithoutPact restApiRelationWithoutPact1211 = RestApiRelationWithoutPact.builder()
-                .id(UUID.randomUUID())
                 .providerSystemComponent(systemComponent12)
                 .consumerSystemComponent(systemComponent11)
                 .method("GET")
                 .path("/api/test")
                 .build();
         RestApiRelationWithoutPact restApiRelationWithoutPact1221 = RestApiRelationWithoutPact.builder()
-                .id(UUID.randomUUID())
                 .providerSystemComponent(systemComponent12)
                 .consumerSystemComponent(systemComponent21)
                 .method("GET")

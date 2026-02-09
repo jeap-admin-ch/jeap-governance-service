@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestPropertySource;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -21,11 +20,6 @@ import static ch.admin.bit.jeap.governance.web.ImportModelHelper.COMPONENT_C1_NA
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@TestPropertySource(properties = {
-        "spring.datasource.url=jdbc:h2:mem:testdb",
-        "spring.datasource.driver-class-name=org.h2.Driver",
-        "spring.jpa.hibernate.ddl-auto=create-drop"
-})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class DataImportReactionGraphIT extends ArchRepoMockIntegrationTestBase {
 

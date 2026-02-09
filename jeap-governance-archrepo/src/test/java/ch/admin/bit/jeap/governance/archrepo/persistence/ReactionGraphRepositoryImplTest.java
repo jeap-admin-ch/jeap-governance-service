@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Import;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
@@ -40,7 +39,6 @@ class ReactionGraphRepositoryImplTest extends PostgresTestContainerBase {
         SystemComponent systemComponent = PersistenceTestUtility.createAndPersistSystemWithOneSystemComponent(entityManager);
 
         ReactionGraph reactionGraph = ReactionGraph.builder()
-                .id(UUID.randomUUID())
                 .systemComponent(systemComponent)
                 .lastModifiedAt(LAST_MODIFIED_AT)
                 .build();
@@ -61,7 +59,6 @@ class ReactionGraphRepositoryImplTest extends PostgresTestContainerBase {
     void update() {
         SystemComponent systemComponent = PersistenceTestUtility.createAndPersistSystemWithOneSystemComponent(entityManager);
         ReactionGraph reactionGraph = ReactionGraph.builder()
-                .id(UUID.randomUUID())
                 .systemComponent(systemComponent)
                 .lastModifiedAt(LAST_MODIFIED_AT)
                 .build();
@@ -84,7 +81,6 @@ class ReactionGraphRepositoryImplTest extends PostgresTestContainerBase {
     void findByComponentId() {
         SystemComponent systemComponent = PersistenceTestUtility.createAndPersistSystemWithOneSystemComponent(entityManager);
         ReactionGraph reactionGraph = ReactionGraph.builder()
-                .id(UUID.randomUUID())
                 .systemComponent(systemComponent)
                 .lastModifiedAt(LAST_MODIFIED_AT)
                 .build();
@@ -110,7 +106,6 @@ class ReactionGraphRepositoryImplTest extends PostgresTestContainerBase {
     void findByComponentName() {
         SystemComponent systemComponent = PersistenceTestUtility.createAndPersistSystemWithOneSystemComponent(entityManager);
         ReactionGraph reactionGraph = ReactionGraph.builder()
-                .id(UUID.randomUUID())
                 .systemComponent(systemComponent)
                 .lastModifiedAt(LAST_MODIFIED_AT)
                 .build();
@@ -136,7 +131,6 @@ class ReactionGraphRepositoryImplTest extends PostgresTestContainerBase {
     void delete() {
         SystemComponent systemComponent = PersistenceTestUtility.createAndPersistSystemWithOneSystemComponent(entityManager);
         ReactionGraph reactionGraph = ReactionGraph.builder()
-                .id(UUID.randomUUID())
                 .systemComponent(systemComponent)
                 .lastModifiedAt(LAST_MODIFIED_AT)
                 .build();

@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -27,7 +26,7 @@ class ApiDocVersionComponentDeletionListenerTest {
 
     @Test
     void preComponentDeletion() {
-        UUID systemComponentId = UUID.randomUUID();
+        Long systemComponentId = 42L;
         ApiDocVersion entity = mock(ApiDocVersion.class);
 
         when(repository.findByComponentId(systemComponentId)).thenReturn(Optional.of(entity));
@@ -41,7 +40,7 @@ class ApiDocVersionComponentDeletionListenerTest {
 
     @Test
     void preComponentDeletion_NoEntity() {
-        UUID systemComponentId = UUID.randomUUID();
+        Long systemComponentId = 42L;
 
         when(repository.findByComponentId(systemComponentId)).thenReturn(Optional.empty());
 

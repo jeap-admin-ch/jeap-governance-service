@@ -14,7 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
-import java.util.UUID;
 
 import static ch.admin.bit.jeap.governance.archrepo.TestUtility.COMPONENT_NAME_A1;
 import static ch.admin.bit.jeap.governance.archrepo.TestUtility.SYSTEM_COMPONENT_A1;
@@ -52,7 +51,6 @@ class ReactionGraphOneByOneSynchronizerTest {
         ReactionGraph addedEntity = captor.getValue();
         assertEquals(SYSTEM_COMPONENT_A1, addedEntity.getSystemComponent());
         assertEquals(addedEntity.getLastModifiedAt(), dto.getLastModifiedAt());
-        assertNotNull(addedEntity.getId());
         assertNotNull(addedEntity.getCreatedAt());
 
         verify(reactionGraphRepository).findByComponentName(COMPONENT_NAME_A1);
@@ -65,7 +63,6 @@ class ReactionGraphOneByOneSynchronizerTest {
         when(systemComponentRepository.findByName(COMPONENT_NAME_A1)).thenReturn(Optional.of(SYSTEM_COMPONENT_A1));
 
         ReactionGraph existingEntity = ReactionGraph.builder()
-                .id(UUID.randomUUID())
                 .systemComponent(SYSTEM_COMPONENT_A1)
                 .lastModifiedAt(ZonedDateTime.now().minus(1, ChronoUnit.DAYS))
                 .build();
@@ -80,9 +77,7 @@ class ReactionGraphOneByOneSynchronizerTest {
         ReactionGraph updatedEntity = captor.getValue();
         assertEquals(SYSTEM_COMPONENT_A1, updatedEntity.getSystemComponent());
         assertEquals(updatedEntity.getLastModifiedAt(), dto.getLastModifiedAt());
-        assertNotNull(updatedEntity.getId());
         assertNotNull(updatedEntity.getCreatedAt());
-
 
         verify(reactionGraphRepository).findByComponentName(COMPONENT_NAME_A1);
         verifyNoMoreInteractions(reactionGraphRepository);
@@ -94,7 +89,6 @@ class ReactionGraphOneByOneSynchronizerTest {
         when(systemComponentRepository.findByName(COMPONENT_NAME_A1)).thenReturn(Optional.of(SYSTEM_COMPONENT_A1));
 
         ReactionGraph existingEntity = ReactionGraph.builder()
-                .id(UUID.randomUUID())
                 .systemComponent(SYSTEM_COMPONENT_A1)
                 .lastModifiedAt(dto.getLastModifiedAt())
                 .build();

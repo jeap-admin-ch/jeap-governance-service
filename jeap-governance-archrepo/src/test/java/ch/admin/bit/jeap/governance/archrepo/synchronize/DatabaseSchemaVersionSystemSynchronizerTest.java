@@ -57,7 +57,6 @@ class DatabaseSchemaVersionSystemSynchronizerTest {
         DatabaseSchemaVersion addedEntity = captor.getValue();
         assertEquals(SYSTEM_COMPONENT_A1, addedEntity.getSystemComponent());
         assertEquals(VERSION_1_0_0, addedEntity.getVersion());
-        assertNotNull(addedEntity.getId());
         assertNotNull(addedEntity.getCreatedAt());
 
         verify(databaseSchemaVersionRepository).deleteAllBySystemId(SYSTEM_A.getId());

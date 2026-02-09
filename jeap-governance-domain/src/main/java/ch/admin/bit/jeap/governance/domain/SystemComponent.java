@@ -1,14 +1,9 @@
 package ch.admin.bit.jeap.governance.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.ZonedDateTime;
-import java.util.UUID;
 
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // for jpa
@@ -16,10 +11,14 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class SystemComponent {
     @Id
-    @NonNull
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "system_component_seq")
+    @SequenceGenerator(
+            name = "system_component_seq",
+            sequenceName = "system_component_id_seq"
+    )
     @EqualsAndHashCode.Include
     @Getter
-    private UUID id;
+    private Long id;
 
     @NonNull
     @Getter
@@ -46,8 +45,7 @@ public class SystemComponent {
     @Getter
     private ZonedDateTime createdAt;
 
-    private SystemComponent(UUID id, String name, State state, ComponentType type, ZonedDateTime createdAt) {
-        this.id = id;
+    private SystemComponent(String name, State state, ComponentType type, ZonedDateTime createdAt) {
         this.name = name;
         this.state = state;
         this.type = type;
@@ -55,9 +53,9 @@ public class SystemComponent {
     }
 
     @Builder
-    private static SystemComponent build(UUID id, String name, State state, ComponentType type, ZonedDateTime createdAt) {
+    private static SystemComponent build(String name, State state, ComponentType type, ZonedDateTime createdAt) {
         // System is set afterward when a service is added to a system
-        return new SystemComponent(id, name, state, type, createdAt == null ? ZonedDateTime.now() : createdAt);
+        return new SystemComponent(name, state, type, createdAt == null ? ZonedDateTime.now() : createdAt);
     }
 
     public void update(ComponentType type) {

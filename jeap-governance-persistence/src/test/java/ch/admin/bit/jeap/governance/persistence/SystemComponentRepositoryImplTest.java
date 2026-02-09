@@ -14,7 +14,6 @@ import org.springframework.context.annotation.Import;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,7 +35,6 @@ class SystemComponentRepositoryImplTest extends PostgresTestContainerBase {
     @Test
     void findByName() {
         SystemComponent systemComponent = SystemComponent.builder()
-                .id(UUID.randomUUID())
                 .name("Test Component")
                 .state(State.OK)
                 .type(ComponentType.BACKEND_SERVICE)
@@ -67,7 +65,6 @@ class SystemComponentRepositoryImplTest extends PostgresTestContainerBase {
     @Test
     void deleteById() {
         SystemComponent systemComponent = SystemComponent.builder()
-                .id(UUID.randomUUID())
                 .name("Test Component")
                 .state(State.OK)
                 .type(ComponentType.BACKEND_SERVICE)
@@ -91,12 +88,11 @@ class SystemComponentRepositoryImplTest extends PostgresTestContainerBase {
 
     @Test
     void deleteById_NotExistingComponent() {
-        assertDoesNotThrow(() -> repository.deleteById(UUID.randomUUID()));
+        assertDoesNotThrow(() -> repository.deleteById(42L));
     }
 
     private System createAndPersistSystemWithSystemComponent(SystemComponent systemComponent) {
         System system = System.builder()
-                .id(UUID.randomUUID())
                 .name("Test System")
                 .systemComponents(systemComponent == null ? List.of() : List.of(systemComponent))
                 .state(State.OK)

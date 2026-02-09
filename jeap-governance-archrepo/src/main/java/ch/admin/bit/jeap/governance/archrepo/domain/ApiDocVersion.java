@@ -1,10 +1,7 @@
 package ch.admin.bit.jeap.governance.archrepo.domain;
 
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.ZonedDateTime;
@@ -18,10 +15,14 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ApiDocVersion {
     @Id
-    @NonNull
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ar_api_doc_version_seq")
+    @SequenceGenerator(
+            name = "ar_api_doc_version_seq",
+            sequenceName = "ar_api_doc_version_id_seq"
+    )
     @EqualsAndHashCode.Include
     @Getter
-    private UUID id;
+    private Long id;
 
     @NonNull
     @Getter
@@ -34,8 +35,14 @@ public class ApiDocVersion {
     @Getter
     private ZonedDateTime createdAt;
 
+    private ApiDocVersion(String version, SystemComponent systemComponent, ZonedDateTime zonedDateTime) {
+        this.version = version;
+        this.systemComponent = systemComponent;
+        this.createdAt = zonedDateTime;
+    }
+
     @Builder
     private static ApiDocVersion build(UUID id, String version, SystemComponent systemComponent, ZonedDateTime createdAt) {
-        return new ApiDocVersion(id, version, systemComponent, createdAt == null ? ZonedDateTime.now() : createdAt);
+        return new ApiDocVersion(version, systemComponent, createdAt == null ? ZonedDateTime.now() : createdAt);
     }
 }

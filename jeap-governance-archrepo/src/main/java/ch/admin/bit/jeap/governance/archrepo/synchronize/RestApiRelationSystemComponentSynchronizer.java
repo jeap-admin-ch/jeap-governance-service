@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -55,7 +54,6 @@ public class RestApiRelationSystemComponentSynchronizer {
     private void addToSystemComponent(SystemComponent providerSystemComponent, SystemComponent consumerSystemComponent, RestApiRelationWithoutPactDto restApiRelationDto) {
         log.info("Creating new REST API relation: {} -> {} {} {}", providerSystemComponent.getName(), consumerSystemComponent.getName(), restApiRelationDto.getMethod(), restApiRelationDto.getPath());
         RestApiRelationWithoutPact newRelation = RestApiRelationWithoutPact.builder()
-                .id(UUID.randomUUID())
                 .providerSystemComponent(providerSystemComponent)
                 .consumerSystemComponent(consumerSystemComponent)
                 .method(restApiRelationDto.getMethod())

@@ -1,7 +1,5 @@
 package ch.admin.bit.jeap.governance.plugin.api.datasource;
 
-import java.util.UUID;
-
 /**
  * Interface for data source connectors used in the governance service.
  * <p>
@@ -16,6 +14,6 @@ public interface ComponentDeletionListener {
      *
      * @param systemComponentId the unique identifier of the component to be deleted
      */
-    void preComponentDeletion(UUID systemComponentId);
+    void preComponentDeletion(Long systemComponentId);
 
 }

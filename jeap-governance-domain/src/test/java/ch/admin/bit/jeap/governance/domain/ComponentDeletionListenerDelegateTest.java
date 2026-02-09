@@ -4,7 +4,6 @@ import ch.admin.bit.jeap.governance.plugin.api.datasource.ComponentDeletionListe
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -21,7 +20,7 @@ class ComponentDeletionListenerDelegateTest {
 
         ComponentDeletionListenerDelegate delegate = new ComponentDeletionListenerDelegate(listeners);
 
-        UUID systemComponentId = UUID.randomUUID();
+        Long systemComponentId = 42L;
 
         delegate.notifyPreComponentDeletion(systemComponentId);
 
@@ -38,7 +37,7 @@ class ComponentDeletionListenerDelegateTest {
 
         ComponentDeletionListenerDelegate delegate = new ComponentDeletionListenerDelegate(listeners);
 
-        UUID systemComponentId = UUID.randomUUID();
+        Long systemComponentId = 42L;
 
         delegate.notifyPreComponentDeletion(systemComponentId);
 

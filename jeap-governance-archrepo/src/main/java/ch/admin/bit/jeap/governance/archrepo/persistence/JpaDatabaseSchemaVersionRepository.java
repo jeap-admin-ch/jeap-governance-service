@@ -6,13 +6,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
-import java.util.UUID;
 
-public interface JpaDatabaseSchemaVersionRepository extends CrudRepository<DatabaseSchemaVersion, UUID> {
+public interface JpaDatabaseSchemaVersionRepository extends CrudRepository<DatabaseSchemaVersion, Long> {
 
-    Optional<DatabaseSchemaVersion> findBySystemComponentId(UUID id);
+    Optional<DatabaseSchemaVersion> findBySystemComponentId(Long id);
 
     @Modifying
     @Query("DELETE FROM DatabaseSchemaVersion a WHERE a.systemComponent.system.id = :systemId")
-    void deleteAllBySystemId(UUID systemId);
+    void deleteAllBySystemId(Long systemId);
 }

@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -15,7 +14,7 @@ public class ApiDocVersionRepositoryImpl implements ApiDocVersionRepository {
     private final JpaApiDocVersionRepository jpaRepository;
 
     @Override
-    public Optional<ApiDocVersion> findByComponentId(UUID id) {
+    public Optional<ApiDocVersion> findByComponentId(Long id) {
         return jpaRepository.findBySystemComponentId(id);
     }
 
@@ -30,7 +29,7 @@ public class ApiDocVersionRepositoryImpl implements ApiDocVersionRepository {
     }
 
     @Override
-    public void deleteAllBySystemId(UUID systemId) {
+    public void deleteAllBySystemId(Long systemId) {
         jpaRepository.deleteAllBySystemId(systemId);
     }
 }

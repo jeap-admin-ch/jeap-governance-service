@@ -13,8 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
-import java.util.function.Consumer;
+import java.util.function.LongConsumer;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -67,7 +66,7 @@ class ArchRepoModelSystemSynchronizerTest {
                 .name(systemName)
                 .build();
         System updatedSystem = mock(System.class);
-        when(archRepoModelSystemUpdater.updateSystem(eq(existingSystem), eq(archRepoSystem), any(Consumer.class))).thenReturn(updatedSystem);
+        when(archRepoModelSystemUpdater.updateSystem(eq(existingSystem), eq(archRepoSystem), any(LongConsumer.class))).thenReturn(updatedSystem);
 
 
         archRepoModelSystemSynchronizer.synchronizeSystemWithArchRepo(archRepoSystem);
@@ -75,7 +74,7 @@ class ArchRepoModelSystemSynchronizerTest {
         verify(systemRepository).findByName(systemName);
         verify(systemRepository).update(updatedSystem);
         verifyNoMoreInteractions(systemRepository);
-        verify(archRepoModelSystemUpdater).updateSystem(eq(existingSystem), eq(archRepoSystem), any(Consumer.class));
+        verify(archRepoModelSystemUpdater).updateSystem(eq(existingSystem), eq(archRepoSystem), any(LongConsumer.class));
         verifyNoMoreInteractions(archRepoModelSystemUpdater);
     }
 
@@ -105,7 +104,7 @@ class ArchRepoModelSystemSynchronizerTest {
 
     @Test
     void deleteSystemComponent() {
-        UUID systemComponentId = UUID.randomUUID();
+        Long systemComponentId = 42L;
         archRepoModelSystemSynchronizer.deleteSystemComponent(systemComponentId);
 
         verify(systemComponentService).deleteById(systemComponentId);

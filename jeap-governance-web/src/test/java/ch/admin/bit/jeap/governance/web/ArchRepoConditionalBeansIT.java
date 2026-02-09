@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource(properties = {
         "jeap.governance.archrepo.url=http://localhost:8080"
 })
-class ArchRepoConditionalBeansIT {
+class ArchRepoConditionalBeansIT extends PostgresTestContainerBase {
 
     @Autowired
     private ApplicationContext context;

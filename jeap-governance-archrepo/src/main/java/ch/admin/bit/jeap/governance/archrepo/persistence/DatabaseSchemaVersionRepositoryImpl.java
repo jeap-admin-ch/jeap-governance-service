@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -15,7 +14,7 @@ public class DatabaseSchemaVersionRepositoryImpl implements DatabaseSchemaVersio
     private final JpaDatabaseSchemaVersionRepository jpaRepository;
 
     @Override
-    public Optional<DatabaseSchemaVersion> findByComponentId(UUID id) {
+    public Optional<DatabaseSchemaVersion> findByComponentId(Long id) {
         return jpaRepository.findBySystemComponentId(id);
     }
 
@@ -30,7 +29,7 @@ public class DatabaseSchemaVersionRepositoryImpl implements DatabaseSchemaVersio
     }
 
     @Override
-    public void deleteAllBySystemId(UUID systemId) {
+    public void deleteAllBySystemId(Long systemId) {
         jpaRepository.deleteAllBySystemId(systemId);
     }
 }
