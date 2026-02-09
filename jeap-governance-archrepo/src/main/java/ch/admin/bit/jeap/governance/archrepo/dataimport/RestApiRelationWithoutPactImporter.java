@@ -18,7 +18,7 @@ import static ch.admin.bit.jeap.governance.archrepo.dataimport.ImportOrder.REST_
 @Order(REST_API_RELATION_IMPORT_ORDER)
 @RequiredArgsConstructor
 @Slf4j
-@ConditionalOnProperty("jeap.governance.archrepo.import.restapirelationwithoutpact.enabled")
+@ConditionalOnProperty(name = "jeap.governance.archrepo.import.restapirelationwithoutpact.enabled", havingValue = "true", matchIfMissing = true)
 public class RestApiRelationWithoutPactImporter implements DataSourceImporter {
 
     private final ArchRepoConnector archRepoConnector;
@@ -29,7 +29,7 @@ public class RestApiRelationWithoutPactImporter implements DataSourceImporter {
         log.info("Start synchronization with arch repo");
         List<RestApiRelationWithoutPactDto> restApiRelationDtos = archRepoConnector.getRestRelationWithoutPact();
         log.debug("Got model from arch repo: {}", restApiRelationDtos);
-        restApiRelationWithoutPactSynchronizer.synchronizeModelWithArchRepo(restApiRelationDtos);
+        restApiRelationWithoutPactSynchronizer.synchronizeWithArchRepo(restApiRelationDtos);
         log.info("Finished synchronization with arch repo");
     }
 }

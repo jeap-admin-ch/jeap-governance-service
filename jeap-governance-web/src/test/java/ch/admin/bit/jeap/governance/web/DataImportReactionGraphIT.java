@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class DataImportReactionGraphIT extends ArchRepoMockIntegrationTestBase {
+class DataImportReactionGraphIT extends GovernanceIntegrationTestBase {
 
     @Autowired
     private JpaReactionGraphRepository repository;
@@ -39,7 +39,7 @@ class DataImportReactionGraphIT extends ArchRepoMockIntegrationTestBase {
                 new ReactionGraphDto(COMPONENT_B1_NAME, ZonedDateTime.now()),
                 new ReactionGraphDto(COMPONENT_C1_NAME, ZonedDateTime.now())
         );
-        stubReactionGraphs(reactionGraphDtos);
+        stubArchRepoReactionGraphs(reactionGraphDtos);
 
         dataImportScheduler.update();
 
@@ -57,7 +57,7 @@ class DataImportReactionGraphIT extends ArchRepoMockIntegrationTestBase {
                 new ReactionGraphDto(COMPONENT_B1_NAME, ZonedDateTime.now()),
                 new ReactionGraphDto(COMPONENT_C1_NAME, ZonedDateTime.now()) // System C will be deleted later
         );
-        stubReactionGraphs(reactionGraphDtos);
+        stubArchRepoReactionGraphs(reactionGraphDtos);
 
         dataImportScheduler.update();
 
@@ -84,7 +84,7 @@ class DataImportReactionGraphIT extends ArchRepoMockIntegrationTestBase {
                 new ReactionGraphDto(COMPONENT_B1_NAME, ZonedDateTime.now()),
                 new ReactionGraphDto(COMPONENT_C1_NAME, ZonedDateTime.now()) // System C will be added later
         );
-        stubReactionGraphs(reactionGraphDtos);
+        stubArchRepoReactionGraphs(reactionGraphDtos);
 
         dataImportScheduler.update();
 

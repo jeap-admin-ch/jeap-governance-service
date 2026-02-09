@@ -22,32 +22,24 @@ public class ReactionGraphsOneByOneSynchronizer {
     private final ReactionGraphRepository reactionGraphRepository;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void synchronizeReactionGraphsLastModifiedAtWithArchRepo(ReactionGraphDto reactionGraphDto) {
+    public void synchronize(ReactionGraphDto reactionGraphDto) {
         Optional<SystemComponent> systemComponentOptional = systemComponentRepository.findByName(reactionGraphDto.getComponent());
         if (systemComponentOptional.isEmpty()) {
             // We do throw an exception here because the system component must exist
             throw new ArchRepoSynchronizeException("System component not found: " + reactionGraphDto.getComponent());
         }
-        synchronizeReactionGraphsLastModifiedAtWithArchRepo(systemComponentOptional.get(), reactionGraphDto);
+        synchronize(systemComponentOptional.get(), reactionGraphDto);
     }
 
-    private void synchronizeReactionGraphsLastModifiedAtWithArchRepo(SystemComponent systemComponent, ReactionGraphDto reactionGraphDto) {
-        Optional<ReactionGraph> existingReactionGraphsLastModifiedAtOptional = reactionGraphRepository.findByComponentName(reactionGraphDto.getComponent());
+    private void synchronize(SystemComponent systemComponent, ReactionGraphDto reactionGraphDto) {
+        Optional<ReactionGraph> existingReactionGraphOptional = reactionGraphRepository.findByComponentName(reactionGraphDto.getComponent());
 
-        if (existingReactionGraphsLastModifiedAtOptional.isPresent()) {
-            ReactionGraph existingReactionGraph = existingReactionGraphsLastModifiedAtOptional.get();
-            if (!existingReactionGraph.getLastModifiedAt().equals(reactionGraphDto.getLastModifiedAt())) {
-                log.info("Updating ReactionGraphsLastModifiedAt for system component {} with new lastModifiedAt: {}", systemComponent.getName(), reactionGraphDto.getLastModifiedAt());
-                existingReactionGraph.updateLastModifiedAt(reactionGraphDto.getLastModifiedAt());
-                reactionGraphRepository.update(existingReactionGraph);
-            }
-        } else {
-            log.info("Creating new ReactionGraphsLastModifiedAt for system component {} with lastModifiedAt: {}", systemComponent.getName(), reactionGraphDto.getLastModifiedAt());
-            ReactionGraph newVersion = ReactionGraph.builder()
-                    .systemComponent(systemComponent)
-                    .lastModifiedAt(reactionGraphDto.getLastModifiedAt())
-                    .build();
-            reactionGraphRepository.add(newVersion);
-        }
+        existingReactionGraphOptional.ifPresent(reactionGraphRepository::delete);
+        log.info("Creating new ReactionGraph for system component {} with lastModifiedAt: {}", systemComponent.getName(), reactionGraphDto.getLastModifiedAt());
+        ReactionGraph newVersion = ReactionGraph.builder()
+                .systemComponent(systemComponent)
+                .lastModifiedAt(reactionGraphDto.getLastModifiedAt())
+                .build();
+        reactionGraphRepository.add(newVersion);
     }
 }

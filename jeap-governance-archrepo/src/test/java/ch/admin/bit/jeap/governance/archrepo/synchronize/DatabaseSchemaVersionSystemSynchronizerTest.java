@@ -45,11 +45,11 @@ class DatabaseSchemaVersionSystemSynchronizerTest {
     private DatabaseSchemaVersionSystemSynchronizer synchronizer;
 
     @Test
-    void synchronizeDatabaseSchemaVersionWithArchRepo() {
+    void synchronizeWithArchRepo() {
         DatabaseSchemaVersionDto dto = new DatabaseSchemaVersionDto(SYSTEM_NAME_A, COMPONENT_NAME_A1, VERSION_1_0_0);
         when(systemRepository.findByName(SYSTEM_NAME_A)).thenReturn(Optional.of(SYSTEM_A));
 
-        synchronizer.synchronizeDatabaseSchemaVersionWithArchRepo(SYSTEM_NAME_A, List.of(dto));
+        synchronizer.synchronizeWithArchRepo(SYSTEM_NAME_A, List.of(dto));
 
         ArgumentCaptor<DatabaseSchemaVersion> captor = ArgumentCaptor.forClass(DatabaseSchemaVersion.class);
         verify(databaseSchemaVersionRepository).add(captor.capture());
@@ -65,24 +65,24 @@ class DatabaseSchemaVersionSystemSynchronizerTest {
     }
 
     @Test
-    void synchronizeDatabaseSchemaVersionWithArchRepo_ThrowExceptionWhenSystemNotFound() {
+    void synchronizeWithArchRepo_ThrowExceptionWhenSystemNotFound() {
         DatabaseSchemaVersionDto dto = new DatabaseSchemaVersionDto(SYSTEM_NAME_A, COMPONENT_NAME_A1, VERSION_1_0_0);
         when(systemRepository.findByName(SYSTEM_NAME_A)).thenReturn(Optional.empty());
 
         List<DatabaseSchemaVersionDto> dtos = List.of(dto);
-        assertThatThrownBy(() -> synchronizer.synchronizeDatabaseSchemaVersionWithArchRepo(SYSTEM_NAME_A, dtos)).isInstanceOf(ArchRepoSynchronizeException.class);
+        assertThatThrownBy(() -> synchronizer.synchronizeWithArchRepo(SYSTEM_NAME_A, dtos)).isInstanceOf(ArchRepoSynchronizeException.class);
 
         verifyNoInteractions(databaseSchemaVersionRepository);
     }
 
     @Test
-    void synchronizeDatabaseSchemaVersionWithArchRepo_SeveralEntries() {
+    void synchronizeWithArchRepo_SeveralEntries() {
         DatabaseSchemaVersionDto dtoA1 = new DatabaseSchemaVersionDto(SYSTEM_NAME_A, COMPONENT_NAME_A1, VERSION_1_0_1);
         DatabaseSchemaVersionDto dtoANonExisting = new DatabaseSchemaVersionDto(SYSTEM_NAME_A, COMPONENT_NAME_A_NON_EXISTING, VERSION_1_0_0);
         DatabaseSchemaVersionDto dtoA2 = new DatabaseSchemaVersionDto(SYSTEM_NAME_A, COMPONENT_NAME_A2, VERSION_1_0_0);
         when(systemRepository.findByName(SYSTEM_NAME_A)).thenReturn(Optional.of(SYSTEM_A));
 
-        synchronizer.synchronizeDatabaseSchemaVersionWithArchRepo(SYSTEM_NAME_A, List.of(dtoA1, dtoANonExisting, dtoA2));
+        synchronizer.synchronizeWithArchRepo(SYSTEM_NAME_A, List.of(dtoA1, dtoANonExisting, dtoA2));
 
         verify(databaseSchemaVersionRepository).deleteAllBySystemId(SYSTEM_A.getId());
         verify(databaseSchemaVersionRepository, times(2)).add(any());

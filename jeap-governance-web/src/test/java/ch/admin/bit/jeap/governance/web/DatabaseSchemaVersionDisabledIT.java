@@ -19,7 +19,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @TestPropertySource(properties = {
         "jeap.governance.archrepo.url=http://localhost:8080",
-        "jeap.governance.archrepo.import.databaseschemaversion.enabled=false"
+        "jeap.governance.archrepo.import.databaseschemaversion.enabled=false",
+        "jeap.governance.environment=DEV",
+        "jeap.governance.deploymentlog.enabled=false"
 })
 class DatabaseSchemaVersionDisabledIT extends PostgresTestContainerBase {
 

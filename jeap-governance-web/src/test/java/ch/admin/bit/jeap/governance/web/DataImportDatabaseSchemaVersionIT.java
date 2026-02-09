@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class DataImportDatabaseSchemaVersionIT extends ArchRepoMockIntegrationTestBase {
+class DataImportDatabaseSchemaVersionIT extends GovernanceIntegrationTestBase {
 
     @Autowired
     private JpaDatabaseSchemaVersionRepository repository;
@@ -34,7 +34,7 @@ class DataImportDatabaseSchemaVersionIT extends ArchRepoMockIntegrationTestBase 
                 new DatabaseSchemaVersionDto(SYSTEM_B_NAME, COMPONENT_B1_NAME, "0.0.1"),
                 new DatabaseSchemaVersionDto(SYSTEM_C_NAME, COMPONENT_C1_NAME, "0.0.1")
         );
-        stubDatabaseSchemaVersions(databaseSchemaVersionDtos);
+        stubArchRepoDatabaseSchemaVersions(databaseSchemaVersionDtos);
 
         dataImportScheduler.update();
 
@@ -52,7 +52,7 @@ class DataImportDatabaseSchemaVersionIT extends ArchRepoMockIntegrationTestBase 
                 new DatabaseSchemaVersionDto(SYSTEM_B_NAME, COMPONENT_B1_NAME, "0.0.1"),
                 new DatabaseSchemaVersionDto(SYSTEM_C_NAME, COMPONENT_C1_NAME, "0.0.1") // System C will be deleted later
         );
-        stubDatabaseSchemaVersions(databaseSchemaVersionDtos);
+        stubArchRepoDatabaseSchemaVersions(databaseSchemaVersionDtos);
 
         dataImportScheduler.update();
 
@@ -79,7 +79,7 @@ class DataImportDatabaseSchemaVersionIT extends ArchRepoMockIntegrationTestBase 
                 new DatabaseSchemaVersionDto(SYSTEM_B_NAME, COMPONENT_B1_NAME, "0.0.1"),
                 new DatabaseSchemaVersionDto(SYSTEM_C_NAME, COMPONENT_C1_NAME, "0.0.1") // System C will be added later
         );
-        stubDatabaseSchemaVersions(databaseSchemaVersionDtos);
+        stubArchRepoDatabaseSchemaVersions(databaseSchemaVersionDtos);
 
         dataImportScheduler.update();
 

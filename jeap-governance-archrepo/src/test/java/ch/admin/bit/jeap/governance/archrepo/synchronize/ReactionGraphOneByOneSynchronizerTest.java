@@ -37,13 +37,13 @@ class ReactionGraphOneByOneSynchronizerTest {
     private ReactionGraphsOneByOneSynchronizer synchronizer;
 
     @Test
-    void synchronizeReactionGraphsLastModifiedAtWithArchRepo_NewEntry() {
+    void synchronize_NewEntry() {
         ReactionGraphDto dto = new ReactionGraphDto(COMPONENT_NAME_A1, ZonedDateTime.now());
         when(systemComponentRepository.findByName(COMPONENT_NAME_A1)).thenReturn(Optional.of(SYSTEM_COMPONENT_A1));
 
         when(reactionGraphRepository.findByComponentName(COMPONENT_NAME_A1)).thenReturn(Optional.empty());
 
-        synchronizer.synchronizeReactionGraphsLastModifiedAtWithArchRepo(dto);
+        synchronizer.synchronize(dto);
 
         ArgumentCaptor<ReactionGraph> captor = ArgumentCaptor.forClass(ReactionGraph.class);
         verify(reactionGraphRepository).add(captor.capture());
@@ -58,7 +58,7 @@ class ReactionGraphOneByOneSynchronizerTest {
     }
 
     @Test
-    void synchronizeReactionGraphsLastModifiedAtWithArchRepo_UpdateExistingEntry() {
+    void ssynchronize_ReplaceExistingEntry() {
         ReactionGraphDto dto = new ReactionGraphDto(COMPONENT_NAME_A1, ZonedDateTime.now());
         when(systemComponentRepository.findByName(COMPONENT_NAME_A1)).thenReturn(Optional.of(SYSTEM_COMPONENT_A1));
 
@@ -69,44 +69,28 @@ class ReactionGraphOneByOneSynchronizerTest {
 
         when(reactionGraphRepository.findByComponentName(COMPONENT_NAME_A1)).thenReturn(Optional.of(existingEntity));
 
-        synchronizer.synchronizeReactionGraphsLastModifiedAtWithArchRepo(dto);
+        synchronizer.synchronize(dto);
 
         ArgumentCaptor<ReactionGraph> captor = ArgumentCaptor.forClass(ReactionGraph.class);
-        verify(reactionGraphRepository).update(captor.capture());
+        verify(reactionGraphRepository).add(captor.capture());
 
-        ReactionGraph updatedEntity = captor.getValue();
-        assertEquals(SYSTEM_COMPONENT_A1, updatedEntity.getSystemComponent());
-        assertEquals(updatedEntity.getLastModifiedAt(), dto.getLastModifiedAt());
-        assertNotNull(updatedEntity.getCreatedAt());
+        ReactionGraph addedEntity = captor.getValue();
+        assertEquals(SYSTEM_COMPONENT_A1, addedEntity.getSystemComponent());
+        assertEquals(addedEntity.getLastModifiedAt(), dto.getLastModifiedAt());
+        assertNotNull(addedEntity.getCreatedAt());
 
         verify(reactionGraphRepository).findByComponentName(COMPONENT_NAME_A1);
+        verify(reactionGraphRepository).delete(existingEntity);
+        verify(reactionGraphRepository).add(addedEntity);
         verifyNoMoreInteractions(reactionGraphRepository);
     }
 
     @Test
-    void synchronizeReactionGraphsLastModifiedAtWithArchRepo_UnchangedExistingEntry() {
-        ReactionGraphDto dto = new ReactionGraphDto(COMPONENT_NAME_A1, ZonedDateTime.now());
-        when(systemComponentRepository.findByName(COMPONENT_NAME_A1)).thenReturn(Optional.of(SYSTEM_COMPONENT_A1));
-
-        ReactionGraph existingEntity = ReactionGraph.builder()
-                .systemComponent(SYSTEM_COMPONENT_A1)
-                .lastModifiedAt(dto.getLastModifiedAt())
-                .build();
-
-        when(reactionGraphRepository.findByComponentName(COMPONENT_NAME_A1)).thenReturn(Optional.of(existingEntity));
-
-        synchronizer.synchronizeReactionGraphsLastModifiedAtWithArchRepo(dto);
-
-        verify(reactionGraphRepository).findByComponentName(COMPONENT_NAME_A1);
-        verifyNoMoreInteractions(reactionGraphRepository);
-    }
-
-    @Test
-    void synchronizeReactionGraphsLastModifiedAtWithArchRepo_ThrowExceptionWhenSystemNotFound() {
+    void ssynchronize_ThrowExceptionWhenSystemNotFound() {
         ReactionGraphDto dto = new ReactionGraphDto(COMPONENT_NAME_A1, ZonedDateTime.now());
         when(systemComponentRepository.findByName(COMPONENT_NAME_A1)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> synchronizer.synchronizeReactionGraphsLastModifiedAtWithArchRepo(dto)).isInstanceOf(ArchRepoSynchronizeException.class);
+        assertThatThrownBy(() -> synchronizer.synchronize(dto)).isInstanceOf(ArchRepoSynchronizeException.class);
 
         verifyNoInteractions(reactionGraphRepository);
     }

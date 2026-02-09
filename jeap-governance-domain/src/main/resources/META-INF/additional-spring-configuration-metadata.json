@@ -1,0 +1,38 @@
+{
+  "properties": [
+    {
+      "name": "jeap.governance.environment",
+      "description": "Environment (DEV, REF, ABN, PROD).",
+      "optional": false,
+      "type": "ch.admin.bit.jeap.governance.domain.GovernanceServiceEnvironment"
+    }
+  ],
+  "hints": [
+    {
+      "name": "jeap.governance.environment",
+      "values": [
+        {
+          "value": "DEV",
+          "description": "Development environment"
+        },
+        {
+          "value": "REF",
+          "description": "Reference environment"
+        },
+        {
+          "value": "ABN",
+          "description": "Acceptance environment"
+        },
+        {
+          "value": "PROD",
+          "description": "Production environment"
+        }
+      ],
+      "providers": [
+        {
+          "name": "any"
+        }
+      ]
+    }
+  ]
+}

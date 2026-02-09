@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
-@ConditionalOnProperty("jeap.governance.archrepo.import.restapirelationwithoutpact.enabled")
+@ConditionalOnProperty(name="jeap.governance.archrepo.import.restapirelationwithoutpact.enabled", havingValue = "true", matchIfMissing = true)
 @Slf4j
 public class RestApiRelationWithoutPactComponentDeletionListener implements ComponentDeletionListener {
 

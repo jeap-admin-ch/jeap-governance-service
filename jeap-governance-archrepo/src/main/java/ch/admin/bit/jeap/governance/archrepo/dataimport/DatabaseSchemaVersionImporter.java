@@ -18,7 +18,7 @@ import static ch.admin.bit.jeap.governance.archrepo.dataimport.ImportOrder.DATA_
 @Order(DATA_BASE_SCHEMA_VERSION_ORDER)
 @RequiredArgsConstructor
 @Slf4j
-@ConditionalOnProperty("jeap.governance.archrepo.import.databaseschemaversion.enabled")
+@ConditionalOnProperty(name="jeap.governance.archrepo.import.databaseschemaversion.enabled", havingValue = "true", matchIfMissing = true)
 public class DatabaseSchemaVersionImporter implements DataSourceImporter {
 
     private final ArchRepoConnector archRepoConnector;
@@ -29,7 +29,7 @@ public class DatabaseSchemaVersionImporter implements DataSourceImporter {
         log.info("Start synchronization with arch repo");
         List<DatabaseSchemaVersionDto> databaseSchemaVersionDtos = archRepoConnector.getDatabaseSchemaVersions();
         log.debug("Got model from arch repo: {}", databaseSchemaVersionDtos);
-        databaseSchemaVersionSynchronizer.synchronizeModelWithArchRepo(databaseSchemaVersionDtos);
+        databaseSchemaVersionSynchronizer.synchronizeWithArchRepo(databaseSchemaVersionDtos);
         log.info("Finished synchronization with arch repo");
     }
 }

@@ -35,7 +35,7 @@ class DatabaseSchemaVersionImporterTest {
 
         databaseSchemaVersionImporter.importData();
 
-        verify(databaseSchemaVersionSynchronizer).synchronizeModelWithArchRepo(databaseSchemaVersionDtos);
+        verify(databaseSchemaVersionSynchronizer).synchronizeWithArchRepo(databaseSchemaVersionDtos);
         verifyNoMoreInteractions(databaseSchemaVersionSynchronizer);
 
         verify(archRepoConnector).getDatabaseSchemaVersions();

@@ -29,7 +29,7 @@ public class ArchRepoSystemImporter implements DataSourceImporter {
         log.info("Start synchronization with arch repo");
         ArchRepoModelDto archRepoModel = archRepoConnector.getModelFromArchRepo();
         log.debug("Got model from arch repo: {}", archRepoModel);
-        archRepoModelSynchronizer.synchronizeModelWithArchRepo(archRepoModel);
+        archRepoModelSynchronizer.synchronizeWithArchRepo(archRepoModel);
         log.info("Finished synchronization with arch repo");
     }
 }

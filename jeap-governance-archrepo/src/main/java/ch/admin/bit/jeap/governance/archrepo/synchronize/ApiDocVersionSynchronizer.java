@@ -22,7 +22,7 @@ public class ApiDocVersionSynchronizer {
         Map<String, List<ApiDocVersionDto>> apiDocVersionsBySystem = groupBySystem(apiDocVersionDtos);
         for (Map.Entry<String, List<ApiDocVersionDto>> entry : apiDocVersionsBySystem.entrySet()) {
             try {
-                apiDocVersionSystemSynchronizer.synchronizeApiDocVersionWithArchRepo(entry.getKey(), entry.getValue());
+                apiDocVersionSystemSynchronizer.synchronizeWithArchRepo(entry.getKey(), entry.getValue());
             } catch (Exception e) {
                 // Log and continue with next system to avoid blocking the whole synchronization in case of errors
                 log.error("Error synchronizing ApiDocVersions for system {}: {}. Proceeding import", entry.getKey(), e.getMessage(), e);

@@ -18,7 +18,7 @@ import static ch.admin.bit.jeap.governance.archrepo.dataimport.ImportOrder.API_D
 @Order(API_DOC_VERSION_IMPORT_ORDER)
 @RequiredArgsConstructor
 @Slf4j
-@ConditionalOnProperty("jeap.governance.archrepo.import.apidocversion.enabled")
+@ConditionalOnProperty(name = "jeap.governance.archrepo.import.apidocversion.enabled", havingValue = "true", matchIfMissing = true)
 public class ApiDocVersionImporter implements DataSourceImporter {
 
     private final ArchRepoConnector archRepoConnector;

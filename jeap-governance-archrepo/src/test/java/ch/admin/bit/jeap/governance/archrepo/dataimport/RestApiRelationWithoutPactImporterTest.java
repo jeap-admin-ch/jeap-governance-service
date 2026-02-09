@@ -33,7 +33,7 @@ class RestApiRelationWithoutPactImporterTest {
 
         restApiRelationWithoutPactImporter.importData();
 
-        verify(restApiRelationWithoutPactSynchronizer).synchronizeModelWithArchRepo(List.of(dto));
+        verify(restApiRelationWithoutPactSynchronizer).synchronizeWithArchRepo(List.of(dto));
         verifyNoMoreInteractions(restApiRelationWithoutPactSynchronizer);
     }
 }

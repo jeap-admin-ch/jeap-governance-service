@@ -34,52 +34,52 @@ class RestApiRelationWithoutPactSynchronizerTest {
     private RestApiRelationWithoutPactSynchronizer synchronizer;
 
     @Test
-    void synchronizeModelWithArchRepo_oneRelation() {
+    void synchronizeWithArchRepo_oneRelation() {
         RestApiRelationWithoutPactDto relationDto = new RestApiRelationWithoutPactDto(SYSTEM_NAME_A, COMPONENT_NAME_A1, SYSTEM_NAME_B, COMPONENT_NAME_B1, "GET", "/api/resource");
         List<RestApiRelationWithoutPactDto> restApiRelationDtos = List.of(relationDto);
-        synchronizer.synchronizeModelWithArchRepo(restApiRelationDtos);
+        synchronizer.synchronizeWithArchRepo(restApiRelationDtos);
 
 
-        verify(restApiRelationSystemComponentSynchronizer).synchronizeRestApiRelationWithArchRepo(new ComponentTechnicalIdentifier(SYSTEM_NAME_B, COMPONENT_NAME_B1), List.of(relationDto));
+        verify(restApiRelationSystemComponentSynchronizer).synchronizeWithArchRepo(new ComponentTechnicalIdentifier(SYSTEM_NAME_B, COMPONENT_NAME_B1), List.of(relationDto));
         verifyNoMoreInteractions(restApiRelationSystemComponentSynchronizer);
     }
 
     @Test
-    void synchronizeModelWithArchRepo_severalRelations() {
+    void synchronizeWithArchRepo_severalRelations() {
         RestApiRelationWithoutPactDto relationDtoA1B1 = new RestApiRelationWithoutPactDto(SYSTEM_NAME_A, COMPONENT_NAME_A1, SYSTEM_NAME_B, COMPONENT_NAME_B1, "GET", "/api/resource");
         RestApiRelationWithoutPactDto relationDtoA1B2 = new RestApiRelationWithoutPactDto(SYSTEM_NAME_A, COMPONENT_NAME_A1, SYSTEM_NAME_B, COMPONENT_NAME_B2, "GET", "/api/resource");
         RestApiRelationWithoutPactDto relationDtoA2B1 = new RestApiRelationWithoutPactDto(SYSTEM_NAME_A, COMPONENT_NAME_A2, SYSTEM_NAME_B, COMPONENT_NAME_B1, "GET", "/api/resource");
         RestApiRelationWithoutPactDto relationDtoA2B2 = new RestApiRelationWithoutPactDto(SYSTEM_NAME_A, COMPONENT_NAME_A2, SYSTEM_NAME_B, COMPONENT_NAME_B2, "GET", "/api/resource");
         List<RestApiRelationWithoutPactDto> restApiRelationDtos = List.of(relationDtoA1B1, relationDtoA1B2, relationDtoA2B1, relationDtoA2B2);
 
-        synchronizer.synchronizeModelWithArchRepo(restApiRelationDtos);
+        synchronizer.synchronizeWithArchRepo(restApiRelationDtos);
 
 
-        verify(restApiRelationSystemComponentSynchronizer).synchronizeRestApiRelationWithArchRepo(new ComponentTechnicalIdentifier(SYSTEM_NAME_B, COMPONENT_NAME_B1), List.of(relationDtoA1B1, relationDtoA2B1));
-        verify(restApiRelationSystemComponentSynchronizer).synchronizeRestApiRelationWithArchRepo(new ComponentTechnicalIdentifier(SYSTEM_NAME_B, COMPONENT_NAME_B2), List.of(relationDtoA1B2, relationDtoA2B2));
+        verify(restApiRelationSystemComponentSynchronizer).synchronizeWithArchRepo(new ComponentTechnicalIdentifier(SYSTEM_NAME_B, COMPONENT_NAME_B1), List.of(relationDtoA1B1, relationDtoA2B1));
+        verify(restApiRelationSystemComponentSynchronizer).synchronizeWithArchRepo(new ComponentTechnicalIdentifier(SYSTEM_NAME_B, COMPONENT_NAME_B2), List.of(relationDtoA1B2, relationDtoA2B2));
         verifyNoMoreInteractions(restApiRelationSystemComponentSynchronizer);
     }
 
     @Test
-    void synchronizeModelWithArchRepo_ProceedImportOnExceptionAndThrowAtTheEnd() {
+    void synchronizeWithArchRepo_ProceedImportOnExceptionAndThrowAtTheEnd() {
         RestApiRelationWithoutPactDto relationDtoA1B1 = new RestApiRelationWithoutPactDto(SYSTEM_NAME_A, COMPONENT_NAME_A1, SYSTEM_NAME_B, COMPONENT_NAME_B1, "GET", "/api/resource");
         RestApiRelationWithoutPactDto relationDtoA1B2 = new RestApiRelationWithoutPactDto(SYSTEM_NAME_A, COMPONENT_NAME_A1, SYSTEM_NAME_B, COMPONENT_NAME_B2, "GET", "/api/resource");
         List<RestApiRelationWithoutPactDto> restApiRelationDtos = List.of(relationDtoA1B1, relationDtoA1B2);
 
-        doThrow(new RuntimeException("Some exception")).when(restApiRelationSystemComponentSynchronizer).synchronizeRestApiRelationWithArchRepo(new ComponentTechnicalIdentifier(SYSTEM_NAME_B, COMPONENT_NAME_B1), List.of(relationDtoA1B1));
+        doThrow(new RuntimeException("Some exception")).when(restApiRelationSystemComponentSynchronizer).synchronizeWithArchRepo(new ComponentTechnicalIdentifier(SYSTEM_NAME_B, COMPONENT_NAME_B1), List.of(relationDtoA1B1));
 
-        assertThatThrownBy(() -> synchronizer.synchronizeModelWithArchRepo(restApiRelationDtos)).isInstanceOf(ArchRepoSynchronizeException.class);
+        assertThatThrownBy(() -> synchronizer.synchronizeWithArchRepo(restApiRelationDtos)).isInstanceOf(ArchRepoSynchronizeException.class);
 
-        verify(restApiRelationSystemComponentSynchronizer).synchronizeRestApiRelationWithArchRepo(new ComponentTechnicalIdentifier(SYSTEM_NAME_B, COMPONENT_NAME_B1), List.of(relationDtoA1B1));
-        verify(restApiRelationSystemComponentSynchronizer).synchronizeRestApiRelationWithArchRepo(new ComponentTechnicalIdentifier(SYSTEM_NAME_B, COMPONENT_NAME_B2), List.of(relationDtoA1B2));
+        verify(restApiRelationSystemComponentSynchronizer).synchronizeWithArchRepo(new ComponentTechnicalIdentifier(SYSTEM_NAME_B, COMPONENT_NAME_B1), List.of(relationDtoA1B1));
+        verify(restApiRelationSystemComponentSynchronizer).synchronizeWithArchRepo(new ComponentTechnicalIdentifier(SYSTEM_NAME_B, COMPONENT_NAME_B2), List.of(relationDtoA1B2));
         verifyNoMoreInteractions(restApiRelationSystemComponentSynchronizer);
     }
 
 
     @Test
-    void synchronizeModelWithArchRepo_NoInteractionsWhenEmptyList() {
+    void synchronizeWithArchRepo_NoInteractionsWhenEmptyList() {
         List<RestApiRelationWithoutPactDto> restApiRelationDtos = new ArrayList<>();
-        synchronizer.synchronizeModelWithArchRepo(restApiRelationDtos);
+        synchronizer.synchronizeWithArchRepo(restApiRelationDtos);
 
         verifyNoInteractions(restApiRelationSystemComponentSynchronizer);
     }

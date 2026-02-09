@@ -28,32 +28,32 @@ class ReactionGraphSynchronizerTest {
     private ReactionGraphSynchronizer synchronizer;
 
     @Test
-    void synchronizeModelWithArchRepo_TwoCalls() {
+    void synchronizeWithArchRepo_TwoCalls() {
         ReactionGraphDto dto1 = new ReactionGraphDto(COMPONENT_NAME_A1, ZonedDateTime.now());
         ReactionGraphDto dto2 = new ReactionGraphDto(COMPONENT_NAME_A2, ZonedDateTime.now());
         List<ReactionGraphDto> dtos = List.of(dto1, dto2);
 
-        synchronizer.synchronizeModelWithArchRepo(dtos);
+        synchronizer.synchronizeWithArchRepo(dtos);
 
-        verify(oneByOneSynchronizer).synchronizeReactionGraphsLastModifiedAtWithArchRepo(dto1);
-        verify(oneByOneSynchronizer).synchronizeReactionGraphsLastModifiedAtWithArchRepo(dto2);
+        verify(oneByOneSynchronizer).synchronize(dto1);
+        verify(oneByOneSynchronizer).synchronize(dto2);
         verifyNoMoreInteractions(oneByOneSynchronizer);
     }
 
     @Test
-    void synchronizeModelWithArchRepo_severalCalls_ExceptionInFirst() {
+    void synchronizeWithArchRepo_severalCalls_ExceptionInFirst() {
         ReactionGraphDto dto1 = new ReactionGraphDto(COMPONENT_NAME_A1, ZonedDateTime.now());
         ReactionGraphDto dto2 = new ReactionGraphDto(COMPONENT_NAME_A2, ZonedDateTime.now());
         ReactionGraphDto dto3 = new ReactionGraphDto(COMPONENT_NAME_B1, ZonedDateTime.now());
         List<ReactionGraphDto> dtos = List.of(dto1, dto2, dto3);
 
-        doThrow(new RuntimeException("Something happened")).when(oneByOneSynchronizer).synchronizeReactionGraphsLastModifiedAtWithArchRepo(dto1);
+        doThrow(new RuntimeException("Something happened")).when(oneByOneSynchronizer).synchronize(dto1);
 
-        assertThatThrownBy(() -> synchronizer.synchronizeModelWithArchRepo(dtos)).isInstanceOf(ArchRepoSynchronizeException.class);
+        assertThatThrownBy(() -> synchronizer.synchronizeWithArchRepo(dtos)).isInstanceOf(ArchRepoSynchronizeException.class);
 
-        verify(oneByOneSynchronizer).synchronizeReactionGraphsLastModifiedAtWithArchRepo(dto1);
-        verify(oneByOneSynchronizer).synchronizeReactionGraphsLastModifiedAtWithArchRepo(dto2);
-        verify(oneByOneSynchronizer).synchronizeReactionGraphsLastModifiedAtWithArchRepo(dto3);
+        verify(oneByOneSynchronizer).synchronize(dto1);
+        verify(oneByOneSynchronizer).synchronize(dto2);
+        verify(oneByOneSynchronizer).synchronize(dto3);
         verifyNoMoreInteractions(oneByOneSynchronizer);
     }
 }

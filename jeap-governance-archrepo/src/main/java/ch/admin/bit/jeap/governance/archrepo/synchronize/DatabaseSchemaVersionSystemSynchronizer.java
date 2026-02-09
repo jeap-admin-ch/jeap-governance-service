@@ -24,7 +24,7 @@ public class DatabaseSchemaVersionSystemSynchronizer {
     private final DatabaseSchemaVersionRepository databaseSchemaVersionRepository;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void synchronizeDatabaseSchemaVersionWithArchRepo(String systemName, List<DatabaseSchemaVersionDto> databaseSchemaVersionDtos) {
+    public void synchronizeWithArchRepo(String systemName, List<DatabaseSchemaVersionDto> databaseSchemaVersionDtos) {
         Optional<System> systemOptional = systemRepository.findByName(systemName);
         if (systemOptional.isEmpty()) {
             // We do throw an exception here because the system must exist

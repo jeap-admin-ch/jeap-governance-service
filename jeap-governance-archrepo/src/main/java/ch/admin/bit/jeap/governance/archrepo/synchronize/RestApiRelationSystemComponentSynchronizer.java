@@ -24,7 +24,7 @@ public class RestApiRelationSystemComponentSynchronizer {
     private final RestApiRelationWithoutPactRepository restApiRelationWithoutPactRepository;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void synchronizeRestApiRelationWithArchRepo(ComponentTechnicalIdentifier providerKey, List<RestApiRelationWithoutPactDto> restApiRelationDtos) {
+    public void synchronizeWithArchRepo(ComponentTechnicalIdentifier providerKey, List<RestApiRelationWithoutPactDto> restApiRelationDtos) {
         Optional<SystemComponent> providerSystemComponentOptional = systemComponentRepository.findByName(providerKey.componentName());
         if (providerSystemComponentOptional.isEmpty()) {
             // We do throw an exception here because the provider must exist for relations to be valid

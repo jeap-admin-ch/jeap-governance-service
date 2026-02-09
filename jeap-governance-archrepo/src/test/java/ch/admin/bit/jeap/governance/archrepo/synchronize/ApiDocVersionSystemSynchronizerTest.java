@@ -45,11 +45,11 @@ class ApiDocVersionSystemSynchronizerTest {
     private ApiDocVersionSystemSynchronizer synchronizer;
 
     @Test
-    void synchronizeApiDocVersionWithArchRepo() {
+    void synchronizeWithArchRepo() {
         ApiDocVersionDto dto = new ApiDocVersionDto(SYSTEM_NAME_A, COMPONENT_NAME_A1, VERSION_1_0_0);
         when(systemRepository.findByName(SYSTEM_NAME_A)).thenReturn(Optional.of(SYSTEM_A));
 
-        synchronizer.synchronizeApiDocVersionWithArchRepo(SYSTEM_NAME_A, List.of(dto));
+        synchronizer.synchronizeWithArchRepo(SYSTEM_NAME_A, List.of(dto));
 
         ArgumentCaptor<ApiDocVersion> captor = ArgumentCaptor.forClass(ApiDocVersion.class);
         verify(apiDocVersionRepository).add(captor.capture());
@@ -65,25 +65,25 @@ class ApiDocVersionSystemSynchronizerTest {
     }
 
     @Test
-    void synchronizeApiDocVersionWithArchRepo_ThrowExceptionWhenSystemNotFound() {
+    void synchronizeWithArchRepo_ThrowExceptionWhenSystemNotFound() {
         ApiDocVersionDto dto = new ApiDocVersionDto(SYSTEM_NAME_A, COMPONENT_NAME_A1, VERSION_1_0_0);
         when(systemRepository.findByName(SYSTEM_NAME_A)).thenReturn(Optional.empty());
 
         List<ApiDocVersionDto> dtos = List.of(dto);
-        assertThatThrownBy(() -> synchronizer.synchronizeApiDocVersionWithArchRepo(SYSTEM_NAME_A, dtos)).isInstanceOf(ArchRepoSynchronizeException.class);
+        assertThatThrownBy(() -> synchronizer.synchronizeWithArchRepo(SYSTEM_NAME_A, dtos)).isInstanceOf(ArchRepoSynchronizeException.class);
 
         verifyNoInteractions(apiDocVersionRepository);
     }
 
     @Test
-    void synchronizeApiDocVersionWithArchRepo_SeveralEntries() {
+    void synchronizeWithArchRepo_SeveralEntries() {
         ApiDocVersionDto dtoA1 = new ApiDocVersionDto(SYSTEM_NAME_A, COMPONENT_NAME_A1, VERSION_1_0_1);
         ApiDocVersionDto dtoANonExisting = new ApiDocVersionDto(SYSTEM_NAME_A, COMPONENT_NAME_A_NON_EXISTING, VERSION_1_0_0);
         ApiDocVersionDto dtoA2 = new ApiDocVersionDto(SYSTEM_NAME_A, COMPONENT_NAME_A2, VERSION_1_0_0);
         when(systemRepository.findByName(SYSTEM_NAME_A)).thenReturn(Optional.of(SYSTEM_A));
 
 
-        synchronizer.synchronizeApiDocVersionWithArchRepo(SYSTEM_NAME_A, List.of(dtoA1, dtoANonExisting, dtoA2));
+        synchronizer.synchronizeWithArchRepo(SYSTEM_NAME_A, List.of(dtoA1, dtoANonExisting, dtoA2));
 
         verify(apiDocVersionRepository).deleteAllBySystemId(SYSTEM_A.getId());
         verify(apiDocVersionRepository, times(2)).add(any());

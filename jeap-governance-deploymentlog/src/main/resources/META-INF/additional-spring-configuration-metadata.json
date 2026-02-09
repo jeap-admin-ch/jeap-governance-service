@@ -1,0 +1,49 @@
+{
+  "properties": [
+    {
+      "name": "jeap.governance.deploymentlog.enabled",
+      "description": "Flag to enable/disable the import of from the deployment log.",
+      "defaultValue": true,
+      "optional": false,
+      "type": "java.lang.Boolean"
+    },
+    {
+      "name": "jeap.governance.deploymentlog.url",
+      "description": "URL of the deployment log to import data from.",
+      "optional": false,
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jeap.governance.deploymentlog.username",
+      "description": "Username for basic authentication when connecting to the deployment log.",
+      "optional": false,
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jeap.governance.deploymentlog.password",
+      "description": "Password for basic authentication when connecting to the deployment log.",
+      "optional": false,
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jeap.governance.deploymentlog.timeout",
+      "description": "Deployment log connection timeout duration.",
+      "optional": false,
+      "defaultValue": "PT5M",
+      "type": "java.time.Duration"
+    }
+  ],
+  "hints": [
+    {
+      "name": "jeap.governance.deploymentlog.enabled",
+      "values": [
+        {
+          "value": true
+        },
+        {
+          "value": false
+        }
+      ]
+    }
+  ]
+}

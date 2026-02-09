@@ -25,7 +25,7 @@ public class ApiDocVersionSystemSynchronizer {
     private final ApiDocVersionRepository apiDocVersionRepository;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void synchronizeApiDocVersionWithArchRepo(String systemName, List<ApiDocVersionDto> apiDocVersionDtos) {
+    public void synchronizeWithArchRepo(String systemName, List<ApiDocVersionDto> apiDocVersionDtos) {
         Optional<System> systemOptional = systemRepository.findByName(systemName);
         if (systemOptional.isEmpty()) {
             // We do throw an exception here because the system must exist

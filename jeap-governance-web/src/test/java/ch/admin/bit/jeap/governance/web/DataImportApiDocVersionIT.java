@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class DataImportApiDocVersionIT extends ArchRepoMockIntegrationTestBase {
+class DataImportApiDocVersionIT extends GovernanceIntegrationTestBase {
 
     @Autowired
     private JpaApiDocVersionRepository repository;
@@ -34,7 +34,7 @@ class DataImportApiDocVersionIT extends ArchRepoMockIntegrationTestBase {
                 new ApiDocVersionDto(SYSTEM_B_NAME, COMPONENT_B1_NAME, "0.0.1"),
                 new ApiDocVersionDto(SYSTEM_C_NAME, COMPONENT_C1_NAME, "0.0.1")
         );
-        stubApiDocVersions(apiDocVersionDtos);
+        stubArchRepoApiDocVersions(apiDocVersionDtos);
 
         dataImportScheduler.update();
 
@@ -52,7 +52,7 @@ class DataImportApiDocVersionIT extends ArchRepoMockIntegrationTestBase {
                 new ApiDocVersionDto(SYSTEM_B_NAME, COMPONENT_B1_NAME, "0.0.1"),
                 new ApiDocVersionDto(SYSTEM_C_NAME, COMPONENT_C1_NAME, "0.0.1") // System C will be deleted later
         );
-        stubApiDocVersions(apiDocVersionDtos);
+        stubArchRepoApiDocVersions(apiDocVersionDtos);
 
         dataImportScheduler.update();
 
@@ -79,7 +79,7 @@ class DataImportApiDocVersionIT extends ArchRepoMockIntegrationTestBase {
                 new ApiDocVersionDto(SYSTEM_B_NAME, COMPONENT_B1_NAME, "0.0.1"),
                 new ApiDocVersionDto(SYSTEM_C_NAME, COMPONENT_C1_NAME, "0.0.1") // System C will be added later
         );
-        stubApiDocVersions(apiDocVersionDtos);
+        stubArchRepoApiDocVersions(apiDocVersionDtos);
 
         dataImportScheduler.update();
 

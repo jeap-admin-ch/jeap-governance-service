@@ -17,11 +17,11 @@ public class ArchRepoModelSynchronizer {
 
     private final ArchRepoModelSystemSynchronizer archRepoModelSystemSynchronizer;
 
-    public void synchronizeModelWithArchRepo(ArchRepoModelDto archRepoModel) {
+    public void synchronizeWithArchRepo(ArchRepoModelDto archRepoModel) {
         List<ArchRepoSystemDto> archRepoSystems = archRepoModel.getSystems();
         Set<String> allArchRepoSystemNames = new HashSet<>();
         for (ArchRepoSystemDto archRepoSystem : archRepoSystems) {
-            archRepoModelSystemSynchronizer.synchronizeSystemWithArchRepo(archRepoSystem);
+            archRepoModelSystemSynchronizer.synchronizeWithArchRepo(archRepoSystem);
             allArchRepoSystemNames.add(archRepoSystem.getName());
         }
 

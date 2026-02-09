@@ -33,7 +33,7 @@ class ArchRepoSystemImporterTest {
 
         archRepoSystemImporter.importData();
 
-        verify(archRepoModelSynchronizer).synchronizeModelWithArchRepo(archRepoModel);
+        verify(archRepoModelSynchronizer).synchronizeWithArchRepo(archRepoModel);
         verifyNoMoreInteractions(archRepoModelSynchronizer);
 
         verify(archRepoConnector).getModelFromArchRepo();

@@ -1,6 +1,17 @@
 {
   "properties": [
     {
+      "name": "jeap.governance.archrepo.url",
+      "description": "URL of the ArchRepo to import data from",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jeap.governance.archrepo.timeout",
+      "description": "Timeout for requests to the ArchRepo",
+      "defaultValue": "PT5M",
+      "type": "java.time.Duration"
+    },
+    {
       "name": "jeap.governance.archrepo.import.apidocversion.enabled",
       "description": "Flag to enable/disable the import of API documentation versions from the ArchRepo",
       "defaultValue": true,

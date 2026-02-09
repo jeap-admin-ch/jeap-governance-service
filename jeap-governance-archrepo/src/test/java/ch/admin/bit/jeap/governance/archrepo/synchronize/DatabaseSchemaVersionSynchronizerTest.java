@@ -30,46 +30,46 @@ class DatabaseSchemaVersionSynchronizerTest {
     private DatabaseSchemaVersionSynchronizer synchronizer;
 
     @Test
-    void synchronizeModelWithArchRepo_oneSystem() {
+    void synchronizeWithArchRepo_oneSystem() {
         DatabaseSchemaVersionDto dto1 = new DatabaseSchemaVersionDto(SYSTEM_NAME_A, COMPONENT_NAME_A1, "1.0.0");
         DatabaseSchemaVersionDto dto2 = new DatabaseSchemaVersionDto(SYSTEM_NAME_A, COMPONENT_NAME_A2, "1.2.0");
         List<DatabaseSchemaVersionDto> dtos = List.of(dto1, dto2);
 
-        synchronizer.synchronizeModelWithArchRepo(dtos);
+        synchronizer.synchronizeWithArchRepo(dtos);
 
-        verify(systemSynchronizer).synchronizeDatabaseSchemaVersionWithArchRepo(SYSTEM_NAME_A, List.of(dto1, dto2));
+        verify(systemSynchronizer).synchronizeWithArchRepo(SYSTEM_NAME_A, List.of(dto1, dto2));
         verifyNoMoreInteractions(systemSynchronizer);
     }
 
     @Test
-    void synchronizeModelWithArchRepo_severalSystems() {
+    void synchronizeWithArchRepo_severalSystems() {
         DatabaseSchemaVersionDto dtoA1 = new DatabaseSchemaVersionDto(SYSTEM_NAME_A, COMPONENT_NAME_A1, "1.0.0");
         DatabaseSchemaVersionDto dtoA2 = new DatabaseSchemaVersionDto(SYSTEM_NAME_A, COMPONENT_NAME_A2, "1.2.0");
         DatabaseSchemaVersionDto dtoB1 = new DatabaseSchemaVersionDto(SYSTEM_NAME_B, COMPONENT_NAME_B1, "1.2.0");
 
         List<DatabaseSchemaVersionDto> dtos = List.of(dtoA1, dtoA2, dtoB1);
 
-        synchronizer.synchronizeModelWithArchRepo(dtos);
+        synchronizer.synchronizeWithArchRepo(dtos);
 
-        verify(systemSynchronizer).synchronizeDatabaseSchemaVersionWithArchRepo(SYSTEM_NAME_A, List.of(dtoA1, dtoA2));
-        verify(systemSynchronizer).synchronizeDatabaseSchemaVersionWithArchRepo(SYSTEM_NAME_B, List.of(dtoB1));
+        verify(systemSynchronizer).synchronizeWithArchRepo(SYSTEM_NAME_A, List.of(dtoA1, dtoA2));
+        verify(systemSynchronizer).synchronizeWithArchRepo(SYSTEM_NAME_B, List.of(dtoB1));
         verifyNoMoreInteractions(systemSynchronizer);
     }
 
     @Test
-    void synchronizeModelWithArchRepo_severalSystems_ExceptionInFirst() {
+    void synchronizeWithArchRepo_severalSystems_ExceptionInFirst() {
         DatabaseSchemaVersionDto dtoA1 = new DatabaseSchemaVersionDto(SYSTEM_NAME_A, COMPONENT_NAME_A1, "1.0.0");
         DatabaseSchemaVersionDto dtoA2 = new DatabaseSchemaVersionDto(SYSTEM_NAME_A, COMPONENT_NAME_A2, "1.2.0");
         DatabaseSchemaVersionDto dtoB1 = new DatabaseSchemaVersionDto(SYSTEM_NAME_B, COMPONENT_NAME_B1, "1.2.0");
 
         List<DatabaseSchemaVersionDto> dtos = List.of(dtoA1, dtoA2, dtoB1);
 
-        doThrow(new RuntimeException("Something happened")).when(systemSynchronizer).synchronizeDatabaseSchemaVersionWithArchRepo(SYSTEM_NAME_A, List.of(dtoA1, dtoA2));
+        doThrow(new RuntimeException("Something happened")).when(systemSynchronizer).synchronizeWithArchRepo(SYSTEM_NAME_A, List.of(dtoA1, dtoA2));
 
-        assertThatThrownBy(() -> synchronizer.synchronizeModelWithArchRepo(dtos)).isInstanceOf(ArchRepoSynchronizeException.class);
+        assertThatThrownBy(() -> synchronizer.synchronizeWithArchRepo(dtos)).isInstanceOf(ArchRepoSynchronizeException.class);
 
-        verify(systemSynchronizer).synchronizeDatabaseSchemaVersionWithArchRepo(SYSTEM_NAME_A, List.of(dtoA1, dtoA2));
-        verify(systemSynchronizer).synchronizeDatabaseSchemaVersionWithArchRepo(SYSTEM_NAME_B, List.of(dtoB1));
+        verify(systemSynchronizer).synchronizeWithArchRepo(SYSTEM_NAME_A, List.of(dtoA1, dtoA2));
+        verify(systemSynchronizer).synchronizeWithArchRepo(SYSTEM_NAME_B, List.of(dtoB1));
         verifyNoMoreInteractions(systemSynchronizer);
     }
 }

@@ -1,6 +1,6 @@
 <mxfile host="confluence.bit.admin.ch" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0" version="29.2.6">
   <diagram id="6quZliqbsYP06nI_W_fp" name="ArchRepo Domain Model">
-    <mxGraphModel dx="2652" dy="917" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1436" dy="629" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -13,7 +13,7 @@
         <mxCell id="d8Eak7cNOWqgoXhCGxEU-3" parent="1" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;&lt;Entity&gt;&gt;&#xa;ApiDocVersion" vertex="1">
           <mxGeometry height="118" width="240" x="-130" y="5" as="geometry" />
         </mxCell>
-        <mxCell id="d8Eak7cNOWqgoXhCGxEU-4" parent="d8Eak7cNOWqgoXhCGxEU-3" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" value="- id: UUID&#xa;- version: String&#xa;- systemComponent: SystemComponent&#xa;- createdAt: ZonedDateTime" vertex="1">
+        <mxCell id="d8Eak7cNOWqgoXhCGxEU-4" parent="d8Eak7cNOWqgoXhCGxEU-3" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" value="- id: Long&lt;br&gt;- version: String&lt;br&gt;- systemComponent: SystemComponent&lt;br&gt;- createdAt: ZonedDateTime" vertex="1">
           <mxGeometry height="70" width="240" y="40" as="geometry" />
         </mxCell>
         <mxCell id="d8Eak7cNOWqgoXhCGxEU-5" parent="d8Eak7cNOWqgoXhCGxEU-3" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" value="" vertex="1">
@@ -22,7 +22,7 @@
         <mxCell id="d8Eak7cNOWqgoXhCGxEU-7" parent="1" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;&lt;Entity&gt;&gt;&#xa;DatabaseSchemaVersion" vertex="1">
           <mxGeometry height="118" width="240" x="-90" y="260" as="geometry" />
         </mxCell>
-        <mxCell id="d8Eak7cNOWqgoXhCGxEU-8" parent="d8Eak7cNOWqgoXhCGxEU-7" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" value="- id: UUID&#xa;- version: String&#xa;- systemComponent: SystemComponent&#xa;- createdAt: ZonedDateTime" vertex="1">
+        <mxCell id="d8Eak7cNOWqgoXhCGxEU-8" parent="d8Eak7cNOWqgoXhCGxEU-7" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" value="- id: Long&lt;br&gt;- version: String&lt;br&gt;- systemComponent: SystemComponent&lt;br&gt;- createdAt: ZonedDateTime" vertex="1">
           <mxGeometry height="70" width="240" y="40" as="geometry" />
         </mxCell>
         <mxCell id="d8Eak7cNOWqgoXhCGxEU-9" parent="d8Eak7cNOWqgoXhCGxEU-7" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" value="" vertex="1">
@@ -31,7 +31,7 @@
         <mxCell id="d8Eak7cNOWqgoXhCGxEU-12" parent="1" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;&lt;Entity&gt;&gt;&#xa;ReactionGraph" vertex="1">
           <mxGeometry height="118" width="280" x="210" y="260" as="geometry" />
         </mxCell>
-        <mxCell id="d8Eak7cNOWqgoXhCGxEU-13" parent="d8Eak7cNOWqgoXhCGxEU-12" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" value="- id: UUID&#xa;- lastModifiedAt: ZonedDateTime&#xa;- systemComponent: SystemComponent&#xa;- createdAt: ZonedDateTime" vertex="1">
+        <mxCell id="d8Eak7cNOWqgoXhCGxEU-13" parent="d8Eak7cNOWqgoXhCGxEU-12" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" value="- id: Long&lt;br&gt;- lastModifiedAt: ZonedDateTime&lt;br&gt;- systemComponent: SystemComponent&lt;br&gt;- createdAt: ZonedDateTime" vertex="1">
           <mxGeometry height="70" width="280" y="40" as="geometry" />
         </mxCell>
         <mxCell id="d8Eak7cNOWqgoXhCGxEU-14" parent="d8Eak7cNOWqgoXhCGxEU-12" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" value="" vertex="1">
@@ -40,7 +40,7 @@
         <mxCell id="d8Eak7cNOWqgoXhCGxEU-17" parent="1" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;&lt;Entity&gt;&gt;&#xa;RestApiRelationWithoutPact" vertex="1">
           <mxGeometry height="148" width="320" x="630" y="260" as="geometry" />
         </mxCell>
-        <mxCell id="d8Eak7cNOWqgoXhCGxEU-18" parent="d8Eak7cNOWqgoXhCGxEU-17" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" value="- id: UUID&#xa;- method: String&#xa;- path: String&#xa;- providerSystemComponent: SystemComponent&#xa;- consumerSystemComponent: SystemComponent&#xa;- createdAt: ZonedDateTime" vertex="1">
+        <mxCell id="d8Eak7cNOWqgoXhCGxEU-18" parent="d8Eak7cNOWqgoXhCGxEU-17" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" value="- id: Long&lt;br&gt;- method: String&lt;br&gt;- path: String&lt;br&gt;- providerSystemComponent: SystemComponent&lt;br&gt;- consumerSystemComponent: SystemComponent&lt;br&gt;- createdAt: ZonedDateTime" vertex="1">
           <mxGeometry height="100" width="320" y="40" as="geometry" />
         </mxCell>
         <mxCell id="d8Eak7cNOWqgoXhCGxEU-19" parent="d8Eak7cNOWqgoXhCGxEU-17" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" value="" vertex="1">

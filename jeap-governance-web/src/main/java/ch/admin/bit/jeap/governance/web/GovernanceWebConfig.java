@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableConfigurationProperties
 @EnableScheduling
 @EnableSchedulerLock(defaultLockAtMostFor = "10m")
-@ComponentScan(basePackages = "ch.admin.bit.jeap.governance")
+@ComponentScan(basePackages = "ch.admin.bit.jeap.governance.web")
 @PropertySource("classpath:governanceDefaultProperties.properties")
-public class GovernanceConfig {
+public class GovernanceWebConfig {
 }

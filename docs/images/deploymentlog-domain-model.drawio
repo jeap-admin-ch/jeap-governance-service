@@ -1,0 +1,46 @@
+<mxfile host="confluence.bit.admin.ch" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0" version="29.2.6">
+  <diagram id="KR_FKk2uConyi7XNn76q" name="Seite-1">
+    <mxGraphModel dx="2380" dy="1283" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="66GZfU5-wHs_jh9OYR2Q-1" parent="1" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&lt;&lt;Entity&gt;&gt;&#xa;SystemComponent" vertex="1">
+          <mxGeometry height="80" width="200" x="110" y="-185" as="geometry" />
+        </mxCell>
+        <mxCell id="66GZfU5-wHs_jh9OYR2Q-2" parent="66GZfU5-wHs_jh9OYR2Q-1" style="text;strokeColor=none;fillColor=none;align=center;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;fontStyle=2" value="From domain package&#xa;(simplified view)" vertex="1">
+          <mxGeometry height="40" width="200" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="66GZfU5-wHs_jh9OYR2Q-3" parent="1" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&amp;lt;&amp;gt;&lt;br&gt;DeploymentLogComponentVersion" vertex="1">
+          <mxGeometry height="118" width="240" x="-460" y="-220" as="geometry" />
+        </mxCell>
+        <mxCell id="66GZfU5-wHs_jh9OYR2Q-4" parent="66GZfU5-wHs_jh9OYR2Q-3" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" value="- id: Long&lt;br&gt;- version: String&lt;br&gt;- systemComponent: SystemComponent&lt;br&gt;- createdAt: ZonedDateTime" vertex="1">
+          <mxGeometry height="70" width="240" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="66GZfU5-wHs_jh9OYR2Q-5" parent="66GZfU5-wHs_jh9OYR2Q-3" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" value="" vertex="1">
+          <mxGeometry height="8" width="240" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="66GZfU5-wHs_jh9OYR2Q-15" edge="1" parent="1" source="66GZfU5-wHs_jh9OYR2Q-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=diamond;endFill=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="66GZfU5-wHs_jh9OYR2Q-1" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-180" y="-145" />
+              <mxPoint x="-180" y="-145" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="66GZfU5-wHs_jh9OYR2Q-16" connectable="0" parent="66GZfU5-wHs_jh9OYR2Q-15" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="*" vertex="1">
+          <mxGeometry relative="1" x="-0.8" y="-2" as="geometry">
+            <mxPoint x="10" y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="66GZfU5-wHs_jh9OYR2Q-17" connectable="0" parent="66GZfU5-wHs_jh9OYR2Q-15" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="1" vertex="1">
+          <mxGeometry relative="1" x="0.8" y="-2" as="geometry">
+            <mxPoint x="-10" y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="66GZfU5-wHs_jh9OYR2Q-32" parent="1" style="text;html=1;strokeColor=#82b366;fillColor=#d5e8d4;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" value="Package: ch.admin.bit.jeap.governance.deploymentlog.domain" vertex="1">
+          <mxGeometry height="30" width="360" x="-520" y="-40" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

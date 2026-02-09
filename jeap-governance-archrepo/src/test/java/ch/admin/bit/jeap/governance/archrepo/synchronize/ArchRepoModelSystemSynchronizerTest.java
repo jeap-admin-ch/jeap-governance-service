@@ -36,7 +36,7 @@ class ArchRepoModelSystemSynchronizerTest {
     private ArchRepoModelSystemSynchronizer archRepoModelSystemSynchronizer;
 
     @Test
-    void synchronizeSystemWithArchRepo_createNewSystem() {
+    void synchronizeSystemWithArchRepo_createNew() {
         String systemName = "System A";
         when(systemRepository.findByName(systemName)).thenReturn(Optional.empty());
 
@@ -47,7 +47,7 @@ class ArchRepoModelSystemSynchronizerTest {
         System newSystem = mock(System.class);
         when(archRepoModelSystemUpdater.createNewSystem(archRepoSystem)).thenReturn(newSystem);
 
-        archRepoModelSystemSynchronizer.synchronizeSystemWithArchRepo(archRepoSystem);
+        archRepoModelSystemSynchronizer.synchronizeWithArchRepo(archRepoSystem);
 
         verify(systemRepository).findByName(systemName);
         verify(systemRepository).add(newSystem);
@@ -57,7 +57,7 @@ class ArchRepoModelSystemSynchronizerTest {
     }
 
     @Test
-    void synchronizeSystemWithArchRepo_updateExistingSystem() {
+    void synchronizeSystemWithArchRepo_updateExisting() {
         System existingSystem = mock(System.class);
         String systemName = "System A";
         when(systemRepository.findByName(systemName)).thenReturn(Optional.of(existingSystem));
@@ -69,7 +69,7 @@ class ArchRepoModelSystemSynchronizerTest {
         when(archRepoModelSystemUpdater.updateSystem(eq(existingSystem), eq(archRepoSystem), any(LongConsumer.class))).thenReturn(updatedSystem);
 
 
-        archRepoModelSystemSynchronizer.synchronizeSystemWithArchRepo(archRepoSystem);
+        archRepoModelSystemSynchronizer.synchronizeWithArchRepo(archRepoSystem);
 
         verify(systemRepository).findByName(systemName);
         verify(systemRepository).update(updatedSystem);

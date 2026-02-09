@@ -24,11 +24,6 @@ public class ReactionGraphRepositoryImpl implements ReactionGraphRepository {
     }
 
     @Override
-    public ReactionGraph update(ReactionGraph reactionGraph) {
-        return jpaRepository.save(reactionGraph);
-    }
-
-    @Override
     public ReactionGraph add(ReactionGraph reactionGraph) {
         return jpaRepository.save(reactionGraph);
     }

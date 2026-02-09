@@ -36,7 +36,7 @@ class ApiDocVersionSynchronizerTest {
 
         synchronizer.synchronizeModelWithArchRepo(dtos);
 
-        verify(systemSynchronizer).synchronizeApiDocVersionWithArchRepo(SYSTEM_NAME_A, List.of(dto1, dto2));
+        verify(systemSynchronizer).synchronizeWithArchRepo(SYSTEM_NAME_A, List.of(dto1, dto2));
         verifyNoMoreInteractions(systemSynchronizer);
     }
 
@@ -50,8 +50,8 @@ class ApiDocVersionSynchronizerTest {
 
         synchronizer.synchronizeModelWithArchRepo(dtos);
 
-        verify(systemSynchronizer).synchronizeApiDocVersionWithArchRepo(SYSTEM_NAME_A, List.of(dtoA1, dtoA2));
-        verify(systemSynchronizer).synchronizeApiDocVersionWithArchRepo(SYSTEM_NAME_B, List.of(dtoB1));
+        verify(systemSynchronizer).synchronizeWithArchRepo(SYSTEM_NAME_A, List.of(dtoA1, dtoA2));
+        verify(systemSynchronizer).synchronizeWithArchRepo(SYSTEM_NAME_B, List.of(dtoB1));
         verifyNoMoreInteractions(systemSynchronizer);
     }
 
@@ -63,12 +63,12 @@ class ApiDocVersionSynchronizerTest {
 
         List<ApiDocVersionDto> dtos = List.of(dtoA1, dtoA2, dtoB1);
 
-        doThrow(new RuntimeException("Something happened")).when(systemSynchronizer).synchronizeApiDocVersionWithArchRepo(SYSTEM_NAME_A, List.of(dtoA1, dtoA2));
+        doThrow(new RuntimeException("Something happened")).when(systemSynchronizer).synchronizeWithArchRepo(SYSTEM_NAME_A, List.of(dtoA1, dtoA2));
 
         assertThatThrownBy(() -> synchronizer.synchronizeModelWithArchRepo(dtos)).isInstanceOf(ArchRepoSynchronizeException.class);
 
-        verify(systemSynchronizer).synchronizeApiDocVersionWithArchRepo(SYSTEM_NAME_A, List.of(dtoA1, dtoA2));
-        verify(systemSynchronizer).synchronizeApiDocVersionWithArchRepo(SYSTEM_NAME_B, List.of(dtoB1));
+        verify(systemSynchronizer).synchronizeWithArchRepo(SYSTEM_NAME_A, List.of(dtoA1, dtoA2));
+        verify(systemSynchronizer).synchronizeWithArchRepo(SYSTEM_NAME_B, List.of(dtoB1));
         verifyNoMoreInteractions(systemSynchronizer);
     }
 }

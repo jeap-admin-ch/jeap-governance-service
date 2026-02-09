@@ -16,13 +16,13 @@ public class DatabaseSchemaVersionSynchronizer {
 
     private final DatabaseSchemaVersionSystemSynchronizer databaseSchemaVersionSystemSynchronizer;
 
-    public void synchronizeModelWithArchRepo(List<DatabaseSchemaVersionDto> databaseSchemaVersionDtos) {
+    public void synchronizeWithArchRepo(List<DatabaseSchemaVersionDto> databaseSchemaVersionDtos) {
         boolean hasException = false;
         // Group relations by provider system and component to minimize transaction size
         Map<String, List<DatabaseSchemaVersionDto>> databaseSchemaVersionsBySystem = groupBySystem(databaseSchemaVersionDtos);
         for (Map.Entry<String, List<DatabaseSchemaVersionDto>> entry : databaseSchemaVersionsBySystem.entrySet()) {
             try {
-                databaseSchemaVersionSystemSynchronizer.synchronizeDatabaseSchemaVersionWithArchRepo(entry.getKey(), entry.getValue());
+                databaseSchemaVersionSystemSynchronizer.synchronizeWithArchRepo(entry.getKey(), entry.getValue());
             } catch (Exception e) {
                 // Log and continue with next system to avoid blocking the whole synchronization in case of errors
                 log.error("Error synchronizing DatabaseSchemaVersions for system {}: {}. Proceeding import", entry.getKey(), e.getMessage(), e);

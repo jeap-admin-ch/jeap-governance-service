@@ -14,11 +14,11 @@ public class ReactionGraphSynchronizer {
 
     private final ReactionGraphsOneByOneSynchronizer oneByOneSynchronizer;
 
-    public void synchronizeModelWithArchRepo(List<ReactionGraphDto> reactionGraphDtos) {
+    public void synchronizeWithArchRepo(List<ReactionGraphDto> reactionGraphDtos) {
         boolean hasException = false;
         for (ReactionGraphDto reactionGraphDto : reactionGraphDtos) {
             try {
-                oneByOneSynchronizer.synchronizeReactionGraphsLastModifiedAtWithArchRepo(reactionGraphDto);
+                oneByOneSynchronizer.synchronize(reactionGraphDto);
             } catch (Exception e) {
                 // Log and continue with next system to avoid blocking the whole synchronization in case of errors
                 log.error("Error synchronizing ReactionGraphDto for system component {}: {}. Proceeding import", reactionGraphDto.getComponent(), e.getMessage(), e);

@@ -17,13 +17,13 @@ public class RestApiRelationWithoutPactSynchronizer {
 
     private final RestApiRelationSystemComponentSynchronizer restApiRelationSystemComponentSynchronizer;
 
-    public void synchronizeModelWithArchRepo(List<RestApiRelationWithoutPactDto> restApiRelationDtos) {
+    public void synchronizeWithArchRepo(List<RestApiRelationWithoutPactDto> restApiRelationDtos) {
         boolean hasException = false;
         // Group relations by provider system and component to minimize transaction size
         Map<ComponentTechnicalIdentifier, List<RestApiRelationWithoutPactDto>> relationsByProvider = groupForProviders(restApiRelationDtos);
         for (Map.Entry<ComponentTechnicalIdentifier, List<RestApiRelationWithoutPactDto>> entry : relationsByProvider.entrySet()) {
             try {
-                restApiRelationSystemComponentSynchronizer.synchronizeRestApiRelationWithArchRepo(entry.getKey(), entry.getValue());
+                restApiRelationSystemComponentSynchronizer.synchronizeWithArchRepo(entry.getKey(), entry.getValue());
             } catch (Exception e) {
                 // Log and continue with next provider to avoid blocking the whole synchronization in case of errors
                 log.error("Error synchronizing REST API relations for provider {}: {}. Proceeding import", entry.getKey(), e.getMessage(), e);

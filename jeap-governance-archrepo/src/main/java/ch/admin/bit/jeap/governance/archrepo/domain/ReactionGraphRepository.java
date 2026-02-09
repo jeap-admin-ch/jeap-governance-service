@@ -8,8 +8,6 @@ public interface ReactionGraphRepository {
 
     Optional<ReactionGraph> findByComponentName(String componentName);
 
-    ReactionGraph update(ReactionGraph reactionGraph);
-
     ReactionGraph add(ReactionGraph reactionGraph);
 
     void delete(ReactionGraph reactionGraph);

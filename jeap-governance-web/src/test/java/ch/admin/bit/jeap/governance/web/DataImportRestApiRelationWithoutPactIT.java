@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class DataImportRestApiRelationWithoutPactIT extends ArchRepoMockIntegrationTestBase {
+class DataImportRestApiRelationWithoutPactIT extends GovernanceIntegrationTestBase {
 
     @Autowired
     private JpaRestApiRelationWithoutPactRepository repository;
@@ -35,7 +35,7 @@ class DataImportRestApiRelationWithoutPactIT extends ArchRepoMockIntegrationTest
                 new RestApiRelationWithoutPactDto(SYSTEM_C_NAME, COMPONENT_C1_NAME, SYSTEM_B_NAME, COMPONENT_B1_NAME, "GET", "/api/resource1"),
                 new RestApiRelationWithoutPactDto(SYSTEM_C_NAME, COMPONENT_C1_NAME, SYSTEM_C_NAME, COMPONENT_C2_NAME, "GET", "/api/resource1")
         );
-        stubRestApiRelationsWithoutPact(restApiRelationsWithoutPact);
+        stubArchRepoRestApiRelationsWithoutPact(restApiRelationsWithoutPact);
 
         dataImportScheduler.update();
 
@@ -54,7 +54,7 @@ class DataImportRestApiRelationWithoutPactIT extends ArchRepoMockIntegrationTest
                 new RestApiRelationWithoutPactDto(SYSTEM_C_NAME, COMPONENT_C1_NAME, SYSTEM_B_NAME, COMPONENT_B1_NAME, "GET", "/api/resource1"), // System C will be deleted later
                 new RestApiRelationWithoutPactDto(SYSTEM_C_NAME, COMPONENT_C1_NAME, SYSTEM_C_NAME, COMPONENT_C2_NAME, "GET", "/api/resource1") // System C will be deleted later
         );
-        stubRestApiRelationsWithoutPact(restApiRelationsWithoutPact);
+        stubArchRepoRestApiRelationsWithoutPact(restApiRelationsWithoutPact);
 
         dataImportScheduler.update();
 
@@ -82,7 +82,7 @@ class DataImportRestApiRelationWithoutPactIT extends ArchRepoMockIntegrationTest
                 new RestApiRelationWithoutPactDto(SYSTEM_C_NAME, COMPONENT_C1_NAME, SYSTEM_B_NAME, COMPONENT_B1_NAME, "GET", "/api/resource1"), // System C will be added later
                 new RestApiRelationWithoutPactDto(SYSTEM_C_NAME, COMPONENT_C1_NAME, SYSTEM_C_NAME, COMPONENT_C2_NAME, "GET", "/api/resource1")
         );
-        stubRestApiRelationsWithoutPact(restApiRelationsWithoutPact);
+        stubArchRepoRestApiRelationsWithoutPact(restApiRelationsWithoutPact);
 
         dataImportScheduler.update();
 

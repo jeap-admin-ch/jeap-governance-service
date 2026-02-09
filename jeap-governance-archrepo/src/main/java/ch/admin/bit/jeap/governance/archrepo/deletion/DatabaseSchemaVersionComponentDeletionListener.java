@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-@ConditionalOnProperty("jeap.governance.archrepo.import.databaseschemaversion.enabled")
+@ConditionalOnProperty(name = "jeap.governance.archrepo.import.databaseschemaversion.enabled", havingValue = "true", matchIfMissing = true)
 @Slf4j
 public class DatabaseSchemaVersionComponentDeletionListener implements ComponentDeletionListener {
 

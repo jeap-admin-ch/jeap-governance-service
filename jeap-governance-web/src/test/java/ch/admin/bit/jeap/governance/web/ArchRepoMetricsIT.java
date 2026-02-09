@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
         "management.endpoint.prometheus.enabled=true",
         "management.endpoints.web.exposure.include=*"})
-class ArchRepoMetricsIT extends ArchRepoMockIntegrationTestBase {
+class ArchRepoMetricsIT extends GovernanceIntegrationTestBase {
 
     @LocalServerPort
     private int localServerPort;

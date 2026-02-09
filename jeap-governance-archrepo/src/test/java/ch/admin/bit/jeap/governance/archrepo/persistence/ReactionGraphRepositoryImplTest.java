@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ReactionGraphRepositoryImplTest extends PostgresTestContainerBase {
 
     private static final ZonedDateTime LAST_MODIFIED_AT = ZonedDateTime.now().minusDays(1);
-    private static final ZonedDateTime LAST_MODIFIED_AT_NEWER = ZonedDateTime.now();
 
     @Autowired
     private TestEntityManager entityManager;
@@ -53,28 +52,6 @@ class ReactionGraphRepositoryImplTest extends PostgresTestContainerBase {
         assertThat(found.getLastModifiedAt())
                 .isCloseTo(LAST_MODIFIED_AT, within(1, ChronoUnit.MILLIS));
         assertEquals(systemComponent.getId(), found.getSystemComponent().getId());
-    }
-
-    @Test
-    void update() {
-        SystemComponent systemComponent = PersistenceTestUtility.createAndPersistSystemWithOneSystemComponent(entityManager);
-        ReactionGraph reactionGraph = ReactionGraph.builder()
-                .systemComponent(systemComponent)
-                .lastModifiedAt(LAST_MODIFIED_AT)
-                .build();
-        repository.add(reactionGraph);
-        flushAndClear();
-
-        ReactionGraph found = entityManager.find(ReactionGraph.class, reactionGraph.getId());
-        assertNotNull(found);
-        found.updateLastModifiedAt(LAST_MODIFIED_AT_NEWER);
-
-        repository.update(found);
-        flushAndClear();
-        ReactionGraph updated = entityManager.find(ReactionGraph.class, reactionGraph.getId());
-        assertNotNull(updated);
-        assertThat(found.getLastModifiedAt())
-                .isCloseTo(LAST_MODIFIED_AT_NEWER, within(1, ChronoUnit.MILLIS));
     }
 
     @Test

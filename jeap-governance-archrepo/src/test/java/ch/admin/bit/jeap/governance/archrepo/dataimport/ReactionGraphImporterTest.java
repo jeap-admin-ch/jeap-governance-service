@@ -35,7 +35,7 @@ class ReactionGraphImporterTest {
 
         reactionGraphImporter.importData();
 
-        verify(reactionGraphSynchronizer).synchronizeModelWithArchRepo(reactionGraphsLastModifiedDtos);
+        verify(reactionGraphSynchronizer).synchronizeWithArchRepo(reactionGraphsLastModifiedDtos);
         verifyNoMoreInteractions(reactionGraphSynchronizer);
 
         verify(archRepoConnector).getReactionGraphDtos();

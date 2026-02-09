@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class DataImportCoreModelIT extends ArchRepoMockIntegrationTestBase {
+class DataImportCoreModelIT extends GovernanceIntegrationTestBase {
 
     @Autowired
     private SystemRepository systemRepository;

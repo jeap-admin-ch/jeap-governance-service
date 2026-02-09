@@ -24,7 +24,7 @@ class ArchRepoModelSynchronizerTest {
     private ArchRepoModelSynchronizer archRepoModelSynchronizer;
 
     @Test
-    void synchronizeModelWithArchRepo() {
+    void synchronizeWithArchRepo() {
         ArchRepoSystemDto systemA = ArchRepoSystemDto.builder()
                 .name("System A")
                 .build();
@@ -35,10 +35,10 @@ class ArchRepoModelSynchronizerTest {
         ArchRepoModelDto archRepoModel = ArchRepoModelDto.builder()
                 .systems(Arrays.asList(systemA, systemB))
                 .build();
-        archRepoModelSynchronizer.synchronizeModelWithArchRepo(archRepoModel);
+        archRepoModelSynchronizer.synchronizeWithArchRepo(archRepoModel);
 
-        verify(archRepoModelSystemSynchronizer).synchronizeSystemWithArchRepo(systemA);
-        verify(archRepoModelSystemSynchronizer).synchronizeSystemWithArchRepo(systemB);
+        verify(archRepoModelSystemSynchronizer).synchronizeWithArchRepo(systemA);
+        verify(archRepoModelSystemSynchronizer).synchronizeWithArchRepo(systemB);
         verify(archRepoModelSystemSynchronizer).deleteNoMoreExistingSystems(Arrays.asList("System A", "System B").stream().collect(Collectors.toSet()));
         verifyNoMoreInteractions(archRepoModelSystemSynchronizer);
     }

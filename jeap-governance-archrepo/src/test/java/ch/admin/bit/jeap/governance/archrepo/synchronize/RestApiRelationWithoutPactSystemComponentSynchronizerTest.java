@@ -40,7 +40,7 @@ class RestApiRelationWithoutPactSystemComponentSynchronizerTest {
         when(systemComponentRepository.findByName(COMPONENT_NAME_A1)).thenReturn(Optional.of(SYSTEM_COMPONENT_A1));
         when(systemComponentRepository.findByName(COMPONENT_NAME_B1)).thenReturn(Optional.of(SYSTEM_COMPONENT_B1));
 
-        synchronizer.synchronizeRestApiRelationWithArchRepo(PROVIDER_KEY_COMPONENT_A1, List.of(relation));
+        synchronizer.synchronizeWithArchRepo(PROVIDER_KEY_COMPONENT_A1, List.of(relation));
 
         ArgumentCaptor<RestApiRelationWithoutPact> captor = ArgumentCaptor.forClass(RestApiRelationWithoutPact.class);
         verify(restApiRelationWithoutPactRepository).add(captor.capture());
@@ -66,7 +66,7 @@ class RestApiRelationWithoutPactSystemComponentSynchronizerTest {
         when(systemComponentRepository.findByName(COMPONENT_NAME_B1)).thenReturn(Optional.of(SYSTEM_COMPONENT_B1));
         when(systemComponentRepository.findByName(COMPONENT_NAME_A_NON_EXISTING)).thenReturn(Optional.empty());
 
-        synchronizer.synchronizeRestApiRelationWithArchRepo(PROVIDER_KEY_COMPONENT_A1, List.of(relation1, relationConsumerNonExisting, relation2));
+        synchronizer.synchronizeWithArchRepo(PROVIDER_KEY_COMPONENT_A1, List.of(relation1, relationConsumerNonExisting, relation2));
 
         verify(restApiRelationWithoutPactRepository, times(2)).add(any());
         verify(restApiRelationWithoutPactRepository).deleteAllByProviderSystemComponentId(SYSTEM_COMPONENT_A1.getId());
@@ -77,7 +77,7 @@ class RestApiRelationWithoutPactSystemComponentSynchronizerTest {
     void synchronizeRestApiRelationWithArchRepo_DoThrowExceptionWhenFindByNameReturnsAnotherComponent() {
         when(systemComponentRepository.findByName(COMPONENT_NAME_A1)).thenReturn(Optional.of(SYSTEM_COMPONENT_A2));
 
-        assertThatThrownBy(() -> synchronizer.synchronizeRestApiRelationWithArchRepo(PROVIDER_KEY_COMPONENT_A1, List.of()))
+        assertThatThrownBy(() -> synchronizer.synchronizeWithArchRepo(PROVIDER_KEY_COMPONENT_A1, List.of()))
                 .isInstanceOf(ArchRepoSynchronizeException.class);
     }
 
@@ -85,7 +85,7 @@ class RestApiRelationWithoutPactSystemComponentSynchronizerTest {
     void synchronizeRestApiRelationWithArchRepo_DoThrowExceptionWhenFindByNameReturnsAnotherSystem() {
         when(systemComponentRepository.findByName(COMPONENT_NAME_A1)).thenReturn(Optional.of(SYSTEM_COMPONENT_B2));
 
-        assertThatThrownBy(() -> synchronizer.synchronizeRestApiRelationWithArchRepo(PROVIDER_KEY_COMPONENT_A1, List.of()))
+        assertThatThrownBy(() -> synchronizer.synchronizeWithArchRepo(PROVIDER_KEY_COMPONENT_A1, List.of()))
                 .isInstanceOf(ArchRepoSynchronizeException.class);
     }
 
@@ -93,7 +93,7 @@ class RestApiRelationWithoutPactSystemComponentSynchronizerTest {
     void synchronizeRestApiRelationWithArchRepoProviderNotFound() {
         when(systemComponentRepository.findByName(COMPONENT_NAME_A1)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> synchronizer.synchronizeRestApiRelationWithArchRepo(PROVIDER_KEY_COMPONENT_A1, List.of()))
+        assertThatThrownBy(() -> synchronizer.synchronizeWithArchRepo(PROVIDER_KEY_COMPONENT_A1, List.of()))
                 .isInstanceOf(ArchRepoSynchronizeException.class);
 
         verifyNoMoreInteractions(restApiRelationWithoutPactRepository);

@@ -40,10 +40,6 @@ public class ReactionGraph {
         this.createdAt = zonedDateTime;
     }
 
-    public void updateLastModifiedAt(ZonedDateTime lastModifiedAt) {
-        this.lastModifiedAt = lastModifiedAt;
-    }
-
     @Builder
     private static ReactionGraph build(ZonedDateTime lastModifiedAt, SystemComponent systemComponent, ZonedDateTime createdAt) {
         return new ReactionGraph(lastModifiedAt, systemComponent, createdAt == null ? ZonedDateTime.now() : createdAt);

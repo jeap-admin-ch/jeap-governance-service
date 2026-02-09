@@ -26,7 +26,7 @@ public class ArchRepoModelSystemSynchronizer {
     private final ArchRepoModelSystemUpdater archRepoModelSystemUpdater;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void synchronizeSystemWithArchRepo(ArchRepoSystemDto archRepoSystem) {
+    public void synchronizeWithArchRepo(ArchRepoSystemDto archRepoSystem) {
         log.info("Synchronize system {}", archRepoSystem.getName());
 
         Optional<System> systemByName = systemRepository.findByName(archRepoSystem.getName());

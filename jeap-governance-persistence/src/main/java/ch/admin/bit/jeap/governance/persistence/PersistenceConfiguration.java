@@ -16,8 +16,8 @@ import javax.sql.DataSource;
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages = "ch.admin.bit.jeap.governance")
 @EnableJpaAuditing
-@ComponentScan
 @EntityScan(basePackages = "ch.admin.bit.jeap.governance")
+@ComponentScan(basePackages = "ch.admin.bit.jeap.governance.persistence")
 class PersistenceConfiguration {
     @Bean
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")

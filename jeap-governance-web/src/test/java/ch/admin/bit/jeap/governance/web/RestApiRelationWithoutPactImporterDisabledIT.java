@@ -19,7 +19,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @TestPropertySource(properties = {
         "jeap.governance.archrepo.url=http://localhost:8080",
-        "jeap.governance.archrepo.import.restapirelationwithoutpact.enabled=false"
+        "jeap.governance.archrepo.import.restapirelationwithoutpact.enabled=false",
+        "jeap.governance.deploymentlog.enabled=false",
+        "jeap.governance.environment=DEV"
+
 })
 class RestApiRelationWithoutPactImporterDisabledIT extends PostgresTestContainerBase {
 

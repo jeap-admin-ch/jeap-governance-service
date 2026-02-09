@@ -18,7 +18,7 @@ import static ch.admin.bit.jeap.governance.archrepo.dataimport.ImportOrder.REACT
 @Order(REACTION_GRAPHS_LAST_MODIFIED_AT_ORDER)
 @RequiredArgsConstructor
 @Slf4j
-@ConditionalOnProperty("jeap.governance.archrepo.import.reactiongraph.enabled")
+@ConditionalOnProperty(name="jeap.governance.archrepo.import.reactiongraph.enabled", havingValue = "true", matchIfMissing = true)
 public class ReactionGraphImporter implements DataSourceImporter {
 
     private final ArchRepoConnector archRepoConnector;
@@ -29,7 +29,7 @@ public class ReactionGraphImporter implements DataSourceImporter {
         log.info("Start synchronization with arch repo");
         List<ReactionGraphDto> reactionGraphDtos = archRepoConnector.getReactionGraphDtos();
         log.debug("Got model from arch repo: {}", reactionGraphDtos);
-        reactionGraphSynchronizer.synchronizeModelWithArchRepo(reactionGraphDtos);
+        reactionGraphSynchronizer.synchronizeWithArchRepo(reactionGraphDtos);
         log.info("Finished synchronization with arch repo");
     }
 }
