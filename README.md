@@ -24,16 +24,18 @@ This repository is Open Source Software licensed under the [Apache License 2.0](
 
 - [Module Overview](#module-overview)
 - [Domain Model](#domain-model)
-    - [Core Model](#core-model)
-    - [ArchRepo Model](#archrepo-model)
+  - [Core Model](#core-model)
+  - [ArchRepo Model](#archrepo-model)
+  - [DeploymentLog Model](#deploymentlog-model)
 - [Database Schema](#database-schema)
-    - [Flyway Migration Strategy](#flyway-migration-strategy)
-    - [Core Schema](#core-schema)
-    - [ArchRepo Schema](#archrepo-schema)
+  - [Flyway Migration Strategy](#flyway-migration-strategy)
+  - [Core Schema](#core-schema)
+  - [ArchRepo Schema](#archrepo-schema)
+  - [DeploymentLog Schema](#deploymentlog-schema)
 - [Configuration](#configuration)
 - [Plugin Mechanism](#plugin-mechanism)
-    - [Data Import](#data-import)
-    - [Data Deletion](#data-deletion)
+  - [Data Import](#data-import)
+  - [Data Deletion](#data-deletion)
 - [Metrics](#metrics)
 
 ### Module Overview
@@ -46,6 +48,7 @@ This repository is Open Source Software licensed under the [Apache License 2.0](
 | `jeap-governance-service-instance` | Module for easily creating an instance of the governance service                                                                                                                                                             | Instances can define this as their parent                                            |
 | `jeap-governance-web`              | Contains REST interfaces and the application itself                                                                                                                                                                          | -                                                                                    |
 | `jeap-governance-archrepo`         | Handles integration with the Architecture Repository. Loads the core model and persists it to the database. Can optionally load and persist: ApiDocVersion, DatabaseSchemaVersion, ReactionGraph, RestApiRelationWithoutPact | See [Configuration](#configuration)                                                  |
+| `jeap-governance-deploymentlog`    | Handles integration with the Deployment Log. Loads the deployment log component versions and persists it to the database.                                                                                                    | See [Configuration](#configuration)                                                  |
 
 ### Domain Model
 
@@ -61,6 +64,12 @@ The ArchRepo model consists of ApiDocVersion, DatabaseSchemaVersion, ReactionGra
 
 ![ArchRepo Model Diagram](docs/images/archrepo-domain-model.png)
 
+#### DeploymentLog Model
+
+The DeploymentLog model consists of DeploymentLogComponentVersion.
+
+![DeploymentLog Model Diagram](docs/images/deploymentlog-domain-model.png)
+
 ### Database
 
 #### Flyway Migration Strategy
@@ -69,11 +78,11 @@ We use major version namespaces to clearly separate database migrations for the 
 
 ##### Version Ranges
 
-| Range                | Purpose                                                                                 |
-|----------------------|-----------------------------------------------------------------------------------------|
-| `V1_*`               | Core schema - Shared database structure used by all services                            |
-| `V1000_*`            | Architecture/shared repository - Reserved for cross-cutting or architectural migrations |
-| `V2000_*` and higher | Service/plugin-specific migrations                                                      |
+| Range                   | Purpose                                                            |
+|-------------------------|--------------------------------------------------------------------|
+| `V1_*`                  | Core schema - Shared database structure used by all services       |
+| `V1000_*` to `V1999_*'  | Reserved for modules within the jeap-governance-service reposiotry |
+| `V2000_*` and higher    | Service/plugin-specific migrations                                 |
 
 ##### Flyway Configuration
 
@@ -93,27 +102,42 @@ spring:
 
 ![ArchRepo Schema Diagram](docs/images/archrepo-db-schema.png)
 
+#### DeploymentLog Schema
+
+![DeploymentLog Schema Diagram](docs/images/deploymentlog-db-schema.png)
+
 ### Configuration
 
 All configuration properties support Spring Boot's standard configuration mechanisms (application.yml, environment variables, etc.).
 
-| Property                                                             | Description                                                                   | Default                       | Required  |
-|----------------------------------------------------------------------|-------------------------------------------------------------------------------|-------------------------------|-----------|
-| `jeap.governance.archrepo.url`                                       | URL of the Architecture Repository                                            | -                             | No        |
-| `jeap.governance.dataimport.cron-expression`                         | Cron expression to schedule the data import job                               | `0 15 6,10,14,18 * * MON-FRI` | No        |
-| `jeap.governance.dataimport.lock-at-least`                           | Minimum duration for which the lock should be held during the data import job | `PT30M`                       | No        |
-| `jeap.governance.dataimport.lock-at-most`                            | Maximum lock duration for the data import job                                 | `PT2H`                        | No        |
-| `jeap.governance.archrepo.timeout`                                   | Connection timeout for Architecture Repository integration                    | `PT5M`                        | No        |
-| `jeap.governance.archrepo.import.apidocversion.enabled`              | Enable/disable import of API documentation versions from ArchRepo             | `true`                        | No        |
-| `jeap.governance.archrepo.import.databaseschemaversion.enabled`      | Enable/disable import of database schema versions from ArchRepo               | `true`                        | No        |
-| `jeap.governance.archrepo.import.reactiongraph.enabled`              | Enable/disable import of reaction graphs from ArchRepo                        | `true`                        | No        |
-| `jeap.governance.archrepo.import.restapirelationwithoutpact.enabled` | Enable/disable import of REST API relations without Pact from ArchRepo        | `true`                        | No        |
+| Property                                                              | Description                                                                   | Default                       | Required                      |
+|-----------------------------------------------------------------------|-------------------------------------------------------------------------------|-------------------------------|-------------------------------|
+| `jeap.governance.environment`                                         | Environment of the service(DEV, REF, ABN, PROD).                              | -                             | Yes                           |
+| `jeap.governance.archrepo.url`                                        | URL of the Architecture Repository                                            | -                             | Yes                           |
+| `jeap.governance.dataimport.cron-expression`                          | Cron expression to schedule the data import job                               | `0 15 6,10,14,18 * * MON-FRI` | No                            |
+| `jeap.governance.dataimport.lock-at-least`                            | Minimum duration for which the lock should be held during the data import job | `PT30M`                       | No                            |
+| `jeap.governance.dataimport.lock-at-most`                             | Maximum lock duration for the data import job                                 | `PT2H`                        | No                            |
+| `jeap.governance.archrepo.timeout`                                    | Connection timeout for Architecture Repository integration                    | `PT5M`                        | No                            |
+| `jeap.governance.archrepo.import.apidocversion.enabled`               | Enable/disable import of API documentation versions from ArchRepo             | `true`                        | No                            |
+| `jeap.governance.archrepo.import.databaseschemaversion.enabled`       | Enable/disable import of database schema versions from ArchRepo               | `true`                        | No                            |
+| `jeap.governance.archrepo.import.reactiongraph.enabled`               | Enable/disable import of reaction graphs from ArchRepo                        | `true`                        | No                            |
+| `jeap.governance.archrepo.import.restapirelationwithoutpact.enabled`  | Enable/disable import of REST API relations without Pact from ArchRepo        | `true`                        | No                            |
+| `jeap.governance.deploymentlog.enabled`                               | URL of the Architecture Repository                                            | `true`                        | No                            |
+| `jeap.governance.deploymentlog.url`                                   | URL of the DeploymentLog                                                      | -                             | Yes, if deploymentlog enabled |
+| `jeap.governance.deploymentlog.username`                              | Username to access the DeploymentLog                                          | -                             | Yes, if deploymentlog enabled |
+| `jeap.governance.deploymentlog.password`                              | Password to access the DeploymentLog                                          | -                             | Yes, if deploymentlog enabled |
+| `jeap.governance.deploymentlog.timeout`                               | DeploymentLog connection timeout duration.                                    | 'PT5M'                        | No                            |
 
 #### Example Configuration
 
 ```yaml
 jeap:
   governance:
+    environment: DEV
+    dataimport:
+      cron-expression: "0 15 6,10,14,18 * * MON-FRI"
+      lock-at-least: PT30M
+      lock-at-most: PT2H
     archrepo:
       url: https://archrepo.example.com
       timeout: PT5M
@@ -126,10 +150,12 @@ jeap:
           enabled: false
         restapirelationwithoutpact:
           enabled: true
-    dataimport:
-      cron-expression: "0 15 6,10,14,18 * * MON-FRI"
-      lock-at-least: PT30M
-      lock-at-most: PT2H
+    deploymentlog:
+        enabled: true
+        url: https://deploymentlog.example.com
+        username: deploymentlog_user
+        password: securepassword
+        timeout: PT15M
 ```
 
 ### Plugin Mechanism
@@ -185,7 +211,7 @@ public interface ComponentDeletionListener {
      *
      * @param systemComponentId the unique identifier of the component to be deleted
      */
-    void preComponentDeletion(UUID systemComponentId);
+    void preComponentDeletion(Long systemComponentId);
 
 }
 ```
@@ -201,11 +227,11 @@ public interface ComponentDeletionListener {
 ```java
 @Component
 public class CustomCleanupListener implements ComponentDeletionListener {
-    
-    @Override
-    public void preComponentDeletion(UUID systemComponentId) {
-        // Cleanup logic before component deletion
-    }
+
+  @Override
+  public void preComponentDeletion(Long systemComponentId) {
+    // Cleanup logic before component deletion
+  }
 }
 ```
 
