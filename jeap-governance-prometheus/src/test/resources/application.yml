@@ -1,0 +1,13 @@
+spring:
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    out-of-order: true
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+logging:
+  level:
+    ch.admin.bit.jeap.governance.prometheus: DEBUG
+

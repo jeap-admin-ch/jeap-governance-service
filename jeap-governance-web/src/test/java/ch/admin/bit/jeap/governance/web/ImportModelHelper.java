@@ -35,6 +35,14 @@ public class ImportModelHelper {
     static final int SYSTEM_COUNT_LESS = DEFAULT_SYSTEM_COUNT - 1;
     static final int COMPONENT_COUNT_PER_SYSTEM_LESS = DEFAULT_SYSTEM_COUNT - 1;
 
+    static final Set<String> DEFAULT_MODEL_COMPONENT_NAMES = Set.of(
+            COMPONENT_A1_NAME, COMPONENT_A2_NAME, COMPONENT_A3_NAME,
+            COMPONENT_B1_NAME, COMPONENT_B2_NAME, COMPONENT_B3_NAME,
+            COMPONENT_C1_NAME, COMPONENT_C2_NAME, COMPONENT_C3_NAME);
+
+    static final Set<String> LESS_MODEL_COMPONENT_NAMES = Set.of(
+            COMPONENT_A1_NAME, COMPONENT_A2_NAME,
+            COMPONENT_B1_NAME, COMPONENT_B2_NAME);
 
     static ArchRepoModelDto createDefaultArchRepoModelDto() {
         var archRepoSystemA = createSystemA(createComponentA1(), createComponentA2(), createComponentA3());

@@ -27,11 +27,13 @@ This repository is Open Source Software licensed under the [Apache License 2.0](
   - [Core Model](#core-model)
   - [ArchRepo Model](#archrepo-model)
   - [DeploymentLog Model](#deploymentlog-model)
+  - [Prometheus Model](#prometheus-time-series-model)
 - [Database Schema](#database-schema)
   - [Flyway Migration Strategy](#flyway-migration-strategy)
   - [Core Schema](#core-schema)
   - [ArchRepo Schema](#archrepo-schema)
   - [DeploymentLog Schema](#deploymentlog-schema)
+  - [Prometheus Schema](#prometheus-time-series-schema)
 - [Configuration](#configuration)
 - [Plugin Mechanism](#plugin-mechanism)
   - [Data Import](#data-import)
@@ -40,15 +42,16 @@ This repository is Open Source Software licensed under the [Apache License 2.0](
 
 ### Module Overview
 
-| Module                             | Description                                                                                                                                                                                                                  | Notes                                                                                |
-|------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
-| `jeap-governance-plugin-api`       | Contains all interfaces for implementing custom logic in concrete instances of the governance service                                                                                                                        | -                                                                                    |
+| Module                             | Description                                                                                                                                                                                                                  | Notes                                                            |
+|------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------|
+| `jeap-governance-plugin-api`       | Contains all interfaces for implementing custom logic in concrete instances of the governance service                                                                                                                        | -                                                                |
 | `jeap-governance-dataimport`       | Schedules the data import process                                                                                                                                                                                            | See [Data Import plugin mechanism](#data-import) and [Configuration](#configuration) |
-| `jeap-governance-domain`           | Contains the core model, specifically System and SystemComponent, including data access interfaces                                                                                                                           | -                                                                                    |
-| `jeap-governance-service-instance` | Module for easily creating an instance of the governance service                                                                                                                                                             | Instances can define this as their parent                                            |
-| `jeap-governance-web`              | Contains REST interfaces and the application itself                                                                                                                                                                          | -                                                                                    |
-| `jeap-governance-archrepo`         | Handles integration with the Architecture Repository. Loads the core model and persists it to the database. Can optionally load and persist: ApiDocVersion, DatabaseSchemaVersion, ReactionGraph, RestApiRelationWithoutPact | See [Configuration](#configuration)                                                  |
-| `jeap-governance-deploymentlog`    | Handles integration with the Deployment Log. Loads the deployment log component versions and persists it to the database.                                                                                                    | See [Configuration](#configuration)                                                  |
+| `jeap-governance-domain`           | Contains the core model, specifically System and SystemComponent, including data access interfaces                                                                                                                           | -                                                                |
+| `jeap-governance-service-instance` | Module for easily creating an instance of the governance service                                                                                                                                                             | Instances can define this as their parent                        |
+| `jeap-governance-web`              | Contains REST interfaces and the application itself                                                                                                                                                                          | -                                                                |
+| `jeap-governance-archrepo`         | Handles integration with the Architecture Repository. Loads the core model and persists it to the database. Can optionally load and persist: ApiDocVersion, DatabaseSchemaVersion, ReactionGraph, RestApiRelationWithoutPact | See [Configuration](#configuration)                              |
+| `jeap-governance-deploymentlog`    | Handles integration with the Deployment Log. Loads the deployment log component versions and persists it to the database.                                                                                                    | See [Configuration](#configuration)                              |
+| `jeap-governance-prometheus`       | Handles integration with a Prometheus server. Queries the latest samples of selected standard jEAP metrics for the system's service components and persists them to the database.                                            | See [Configuration](#configuration)                              |
 
 ### Domain Model
 
@@ -69,6 +72,15 @@ The ArchRepo model consists of ApiDocVersion, DatabaseSchemaVersion, ReactionGra
 The DeploymentLog model consists of DeploymentLogComponentVersion.
 
 ![DeploymentLog Model Diagram](docs/images/deploymentlog-domain-model.png)
+
+#### Prometheus Time Series Model
+
+The Prometheus domain model records time series samples per service component and query type. Since import queries are
+designed to capture the current state of a component aspect (not to retrieve extended time series) only a limited number
+of time series samples is expected. Consequently, the model intentionally remains denormalized to keep the domain and
+implementation straightforward.
+
+![Prometheus Model Diagram](docs/images/prometheus-domain-model.png)
 
 ### Database
 
@@ -106,27 +118,40 @@ spring:
 
 ![DeploymentLog Schema Diagram](docs/images/deploymentlog-db-schema.png)
 
+#### Prometheus Time Series Schema
+The Prometheus database schema is designed around the assumption that import queries capture the current state of a 
+component aspect rather than extended time series. As a result, only a limited number of samples is expected to be
+stored. Consequently, the schema intentionally remains denormalized (avoiding additional normalization of sample
+storage) to keep both the data model and the implementation straightforward.
+
+![Prometheus Time Series Schema Diagram](docs/images/prometheus-db-schema.png)
+
 ### Configuration
 
 All configuration properties support Spring Boot's standard configuration mechanisms (application.yml, environment variables, etc.).
 
-| Property                                                              | Description                                                                   | Default                       | Required                      |
-|-----------------------------------------------------------------------|-------------------------------------------------------------------------------|-------------------------------|-------------------------------|
-| `jeap.governance.environment`                                         | Environment of the service(DEV, REF, ABN, PROD).                              | -                             | Yes                           |
-| `jeap.governance.archrepo.url`                                        | URL of the Architecture Repository                                            | -                             | Yes                           |
-| `jeap.governance.dataimport.cron-expression`                          | Cron expression to schedule the data import job                               | `0 15 6,10,14,18 * * MON-FRI` | No                            |
-| `jeap.governance.dataimport.lock-at-least`                            | Minimum duration for which the lock should be held during the data import job | `PT30M`                       | No                            |
-| `jeap.governance.dataimport.lock-at-most`                             | Maximum lock duration for the data import job                                 | `PT2H`                        | No                            |
-| `jeap.governance.archrepo.timeout`                                    | Connection timeout for Architecture Repository integration                    | `PT5M`                        | No                            |
-| `jeap.governance.archrepo.import.apidocversion.enabled`               | Enable/disable import of API documentation versions from ArchRepo             | `true`                        | No                            |
-| `jeap.governance.archrepo.import.databaseschemaversion.enabled`       | Enable/disable import of database schema versions from ArchRepo               | `true`                        | No                            |
-| `jeap.governance.archrepo.import.reactiongraph.enabled`               | Enable/disable import of reaction graphs from ArchRepo                        | `true`                        | No                            |
-| `jeap.governance.archrepo.import.restapirelationwithoutpact.enabled`  | Enable/disable import of REST API relations without Pact from ArchRepo        | `true`                        | No                            |
-| `jeap.governance.deploymentlog.enabled`                               | URL of the Architecture Repository                                            | `true`                        | No                            |
-| `jeap.governance.deploymentlog.url`                                   | URL of the DeploymentLog                                                      | -                             | Yes, if deploymentlog enabled |
-| `jeap.governance.deploymentlog.username`                              | Username to access the DeploymentLog                                          | -                             | Yes, if deploymentlog enabled |
-| `jeap.governance.deploymentlog.password`                              | Password to access the DeploymentLog                                          | -                             | Yes, if deploymentlog enabled |
-| `jeap.governance.deploymentlog.timeout`                               | DeploymentLog connection timeout duration.                                    | 'PT5M'                        | No                            |
+| Property                                                             | Description                                                                   | Default                       | Required               |
+|----------------------------------------------------------------------|-------------------------------------------------------------------------------|-------------------------------|------------------------|
+| `jeap.governance.environment`                                        | Environment of the service(DEV, REF, ABN, PROD).                              | -                             | Yes                    |
+| `jeap.governance.archrepo.url`                                       | URL of the Architecture Repository                                            | -                             | Yes                    |
+| `jeap.governance.dataimport.cron-expression`                         | Cron expression to schedule the data import job                               | `0 15 6,10,14,18 * * MON-FRI` | No                     |
+| `jeap.governance.dataimport.lock-at-least`                           | Minimum duration for which the lock should be held during the data import job | `PT30M`                       | No                     |
+| `jeap.governance.dataimport.lock-at-most`                            | Maximum lock duration for the data import job                                 | `PT2H`                        | No                     |
+| `jeap.governance.archrepo.timeout`                                   | Connection timeout for Architecture Repository integration                    | `PT5M`                        | No                     |
+| `jeap.governance.archrepo.import.apidocversion.enabled`              | Enable/disable import of API documentation versions from ArchRepo             | `true`                        | No                     |
+| `jeap.governance.archrepo.import.databaseschemaversion.enabled`      | Enable/disable import of database schema versions from ArchRepo               | `true`                        | No                     |
+| `jeap.governance.archrepo.import.reactiongraph.enabled`              | Enable/disable import of reaction graphs from ArchRepo                        | `true`                        | No                     |
+| `jeap.governance.archrepo.import.restapirelationwithoutpact.enabled` | Enable/disable import of REST API relations without Pact from ArchRepo        | `true`                        | No                     |
+| `jeap.governance.deploymentlog.enabled`                              | Enable/disable import of data from the of DeploymentLog                       | `true`                        | No                     |
+| `jeap.governance.deploymentlog.url`                                  | URL of the DeploymentLog                                                      | -                             | Yes, if deploymentlog enabled |
+| `jeap.governance.deploymentlog.username`                             | Username to access the DeploymentLog                                          | -                             | Yes, if deploymentlog enabled |
+| `jeap.governance.deploymentlog.password`                             | Password to access the DeploymentLog                                          | -                             | Yes, if deploymentlog enabled |
+| `jeap.governance.deploymentlog.timeout`                              | DeploymentLog connection timeout duration.                                    | 'PT5M'                        | No                     |
+| `jeap.governance.prometheus.enablede`                                | Enable/disable the import of time series from Prometheus                      | 'true'                        | No                     |
+| `jeap.governance.prometheus.amp.host`                                | Amazon Managed Prometheus host URL                                            | -                             | Yes, if enabled        |
+| `jeap.governance.prometheus.amp.workspace`                           | Amazon Managed Prometheus workspace id                                        | -                             | Yes, if enabled        |
+| `jeap.governance.prometheus.amp.role-arn`                            | ARN of the role to assume for accessing the Amazon Managed Prometheus         | -                             | Yes, if enabled        |
+| `jeap.governance.prometheus.amp.role-session-name`                   | Name of the session to be used for accessing the Amazon Managed Prometheus    | -                             | Yes, if enabled        |
 
 #### Example Configuration
 
@@ -151,11 +176,18 @@ jeap:
         restapirelationwithoutpact:
           enabled: true
     deploymentlog:
-        enabled: true
-        url: https://deploymentlog.example.com
-        username: deploymentlog_user
-        password: securepassword
-        timeout: PT15M
+      enabled: true
+      url: https://deploymentlog.example.com
+      username: deploymentlog_user
+      password: securepassword
+      timeout: PT15M
+    prometheus:
+      enabled: true
+      amp:
+        host: "https://aps-workspaces.eu-central-1.amazonaws.com"
+        workspace: "ws-4f9f438a-efdf-4081-9745-fc4a0ad35f32b2"
+        role-arn: "arn:aws:iam::892367255812:role/amp-read-assume-role"
+        role-session-name: mySession
 ```
 
 ### Plugin Mechanism
@@ -239,12 +271,16 @@ public class CustomCleanupListener implements ComponentDeletionListener {
 
 The governance service provides the following Prometheus-compatible metrics for monitoring the data import process.
 
-| Metric                                                       | Description                                                                                                                                                                                                                                       | Labels                                                                                                                                                                                                                                        | Example                                                                                                                             |
-|--------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
-| `jeap_governance_service_data_import_duration_seconds_count` | **Counter** tracking the total number of data import executions per data source connector. Use this to track how many times each import has been executed and monitor success/failure rates.                                                      | • `data_source_connector`: Import connector type (`ArchRepoSystemImport`, `ApiDocVersionImport`, `DatabaseSchemaVersionImport`, `ReactionGraphImport`, `RestApiRelationWithoutPactImport`)<br>• `success`: Execution status (`true`, `false`) | `jeap_governance_service_data_import_duration_seconds_count{data_source_connector="ApiDocVersionImport",success="true"} 2`          |
-| `jeap_governance_service_data_import_duration_seconds_sum`   | **Summary** tracking the cumulative duration (in seconds) of all data import executions per data source connector. Use this to calculate average import durations (sum/count) and monitor performance trends over time.                           | • `data_source_connector`: Import connector type (`ArchRepoSystemImport`, `ApiDocVersionImport`, `DatabaseSchemaVersionImport`, `ReactionGraphImport`, `RestApiRelationWithoutPactImport`)<br>• `success`: Execution status (`true`, `false`) | `jeap_governance_service_data_import_duration_seconds_sum{data_source_connector="ApiDocVersionImport",success="true"} 0.748848553`  |
-| `jeap_governance_service_data_import_duration_seconds_max`   | **Gauge** tracking the maximum observed duration (in seconds) for data import executions within the current observation window. Use this to identify performance outliers and detect import operations that take significantly longer than usual. | • `data_source_connector`: Import connector type (`ArchRepoSystemImport`, `ApiDocVersionImport`, `DatabaseSchemaVersionImport`, `ReactionGraphImport`, `RestApiRelationWithoutPactImport`)<br>• `success`: Execution status (`true`, `false`) | `jeap_governance_service_data_import_duration_seconds_max{data_source_connector="ArchRepoSystemImport",success="true"} 2.118972172` |
-| `jeap_governance_service_data_import_last_run_from_minutes`  | **Gauge** indicating how many minutes have elapsed since the last successful data import execution (across all import connectors). Use this for alerting to detect when data imports have not run for an unexpectedly long time.                  | None                                                                                                                                                                                                                                          | `jeap_governance_service_data_import_last_run_from_minutes 4.0`                                                                     |
+| Metric                                                              | Description                                                                                                                                                                                                                                       | Labels                                                                                                                                                                                                                                        | Example                                                                                                                             |
+|---------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| `jeap_governance_service_data_import_duration_seconds_count`        | **Counter** tracking the total number of data import executions per data source connector. Use this to track how many times each import has been executed and monitor success/failure rates.                                                      | • `data_source_connector`: Import connector type (`ArchRepoSystemImport`, `ApiDocVersionImport`, `DatabaseSchemaVersionImport`, `ReactionGraphImport`, `RestApiRelationWithoutPactImport`)<br>• `success`: Execution status (`true`, `false`) | `jeap_governance_service_data_import_duration_seconds_count{data_source_connector="ApiDocVersionImport",success="true"} 2`          |
+| `jeap_governance_service_data_import_duration_seconds_sum`          | **Summary** tracking the cumulative duration (in seconds) of all data import executions per data source connector. Use this to calculate average import durations (sum/count) and monitor performance trends over time.                           | • `data_source_connector`: Import connector type (`ArchRepoSystemImport`, `ApiDocVersionImport`, `DatabaseSchemaVersionImport`, `ReactionGraphImport`, `RestApiRelationWithoutPactImport`)<br>• `success`: Execution status (`true`, `false`) | `jeap_governance_service_data_import_duration_seconds_sum{data_source_connector="ApiDocVersionImport",success="true"} 0.748848553`  |
+| `jeap_governance_service_data_import_duration_seconds_max`          | **Gauge** tracking the maximum observed duration (in seconds) for data import executions within the current observation window. Use this to identify performance outliers and detect import operations that take significantly longer than usual. | • `data_source_connector`: Import connector type (`ArchRepoSystemImport`, `ApiDocVersionImport`, `DatabaseSchemaVersionImport`, `ReactionGraphImport`, `RestApiRelationWithoutPactImport`)<br>• `success`: Execution status (`true`, `false`) | `jeap_governance_service_data_import_duration_seconds_max{data_source_connector="ArchRepoSystemImport",success="true"} 2.118972172` |
+| `jeap_governance_service_data_import_last_run_from_minutes`         | **Gauge** indicating how many minutes have elapsed since the last successful data import execution (across all import connectors). Use this for alerting to detect when data imports have not run for an unexpectedly long time.                  | None                                                                                                                                                                                                                                          | `jeap_governance_service_data_import_last_run_from_minutes 4.0`                                                                     |
+| `jeap_governance_service_prometheus_queries_duration_seconds_count` | **Counter** The number of queries made to Prometheus                                                                                                                                                                                              | see @Timed annotation                                                                                                                                                                                                                         | `jeap_governance_service_prometheus_query_count 97395.00`                                                                           | 
+| `jeap_governance_service_prometheus_queries_duration_seconds_sum`   | **Summary** The cumaltive duration in seconds of the queries made to Prometheus                                                                                                                                                                   | see @Timed annotation                                                                                                                                                                                                                         | `jeap_governance_service_prometheus_query_sum 32431.0`                                                                              |
+| `jeap_governance_service_prometheus_queries_duration_seconds_max`   | **Gauge** The maximum observed duration in seconds of a query made to Prometheus                                                                                                                                                                  | see @Timed annotation                                                                                                                                                                                                                         | `jeap_governance_service_prometheus_query_max 7.3`                                                                                  |
+
 
 ### Recommended Alerts
 

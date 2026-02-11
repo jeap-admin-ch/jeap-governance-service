@@ -5,6 +5,10 @@ jeap:
       cron-expression: "-"
       lock-at-least: PT0.001S
       lock-at-most: PT0.002S
+    deploymentlog:
+      enabled: false
+    prometheus:
+      enabled: false
   monitor:
     prometheus:
       secure: false

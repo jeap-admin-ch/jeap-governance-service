@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
@@ -27,10 +28,21 @@ public class SystemComponentRepositoryImpl implements SystemComponentRepository 
         SystemComponent systemComponent = byId.get();
         log.info("Deleting SystemComponent: {}", systemComponent);
         systemComponent.getSystem().deleteSystemComponent(systemComponent);
+        jpaComponentRepository.delete(systemComponent);
     }
 
     @Override
     public Optional<SystemComponent> findByName(String componentName) {
         return jpaComponentRepository.findByName(componentName);
     }
+
+    public Optional<String> findSystemComponentNameById(long systemComponentId) {
+        return jpaComponentRepository.findSystemComponentNameById(systemComponentId);
+    }
+
+    @Override
+    public Set<String> findAllSystemComponentNames() {
+        return jpaComponentRepository.findAllSystemComponentNames();
+    }
+
 }

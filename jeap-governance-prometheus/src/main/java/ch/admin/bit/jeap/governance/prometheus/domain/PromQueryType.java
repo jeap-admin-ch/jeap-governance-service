@@ -1,0 +1,11 @@
+package ch.admin.bit.jeap.governance.prometheus.domain;
+
+public enum PromQueryType {
+    JEAP_MESSAGING_CONTRACT,
+    JEAP_JAVA_VERSION,
+    JEAP_DEPENDENCY_VERSION,
+    JEAP_REST_ENDPOINT_WITHOUT_JWT,
+    JEAP_MESSAGING_TOTAL,
+    JEAP_MESSAGING_SIGNATURE_REQUIRED,
+    JDBC_CONNECTIONS_ACTIVE
+}

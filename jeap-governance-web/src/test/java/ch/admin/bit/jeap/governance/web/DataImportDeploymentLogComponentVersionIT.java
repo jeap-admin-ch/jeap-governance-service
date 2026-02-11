@@ -18,7 +18,7 @@ import static ch.admin.bit.jeap.governance.web.ImportModelHelper.COMPONENT_B1_NA
 import static ch.admin.bit.jeap.governance.web.ImportModelHelper.COMPONENT_C1_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+@SpringBootTest(properties = {"jeap.governance.deploymentlog.enabled=true"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class DataImportDeploymentLogComponentVersionIT extends GovernanceIntegrationTestBase {
 
