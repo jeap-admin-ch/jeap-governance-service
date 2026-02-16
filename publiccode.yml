@@ -17,11 +17,12 @@ organisation:
 description:
   en:
     localisedName: jeap-governance-service
-    shortDescription: A jEAP service and library which provides a quick overview of system and service compliance with defined policies.
+    shortDescription: Service template to provide a quick overview of system and service compliance with defined policies.
     longDescription: |
       The jEAP Governance Service is a compliance monitoring solution designed to help 
       development teams and administrators maintain adherence to organizational policies and best practices 
-      across microservices and systems within the jEAP ecosystem.
+      across microservices and systems within the jEAP ecosystem. A service instance can be created by depending on 
+      this template,then adding specific configuration and extending it with plugin implementations.
       
       ## Purpose
       
