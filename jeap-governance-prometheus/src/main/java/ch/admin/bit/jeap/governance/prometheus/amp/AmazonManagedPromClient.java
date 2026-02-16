@@ -35,11 +35,9 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * This class can query Prometheus metrics through an Amazon Managed Prometheus in AWS. The Data Source API of
- * Grafana is used to proxy requests to a specific datasource.
+ * This Prometheus client can execute predefined queries on an Amazon Managed Prometheus.
  * <p>
- * See Grafana Proxy API <a href="https://grafana.com/docs/grafana/latest/http_api/data_source/#data-source-proxy-calls">...</a>
- * See Prometheus Query API <a href="https://prometheus.io/docs/prometheus/latest/querying/api/#querying-metadata">...</a>
+ * For the Prometheus Query API <a href="https://prometheus.io/docs/prometheus/latest/querying/api/#querying-metadata">...</a>
  */
 
 @Slf4j
@@ -131,14 +129,14 @@ public class AmazonManagedPromClient implements PromClient {
         try {
             response = callAmp(queryParameters(queryString));
         } catch (Exception e) {
-            log.warn("Error in Grafana call", e);
+            log.warn("Error in Prometheus call", e);
             throw PromException.connectionFailed(e);
         }
         if (response == null) {
             throw PromException.noSample();
         }
         if (StringUtils.hasText(response.getError())) {
-            log.warn("Error in Grafana call {}", response.getError());
+            log.warn("Error in Prometheus call {}", response.getError());
             throw PromException.errorResponse(response.getError());
         }
         List<PrometheusQueryResponseResult> result = filterByMaxTaskRevision(response.getData().getResult());
