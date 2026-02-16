@@ -1,0 +1,25 @@
+<mxfile host="confluence.bit.admin.ch" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0" version="29.2.6">
+  <diagram id="KR_FKk2uConyi7XNn76q" name="Seite-1">
+    <mxGraphModel dx="2242" dy="1402" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="66GZfU5-wHs_jh9OYR2Q-3" parent="1" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&amp;lt;Entity&amp;gt;&lt;br&gt;SecscanState" vertex="1">
+          <mxGeometry height="140" width="240" x="-460" y="-220" as="geometry" />
+        </mxCell>
+        <mxCell id="66GZfU5-wHs_jh9OYR2Q-4" parent="66GZfU5-wHs_jh9OYR2Q-3" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" value="- id: Long&lt;br&gt;- systemComponentId: long&lt;div&gt;- scanMessage: String&lt;/div&gt;&lt;div&gt;- scanTimestamp: ZonedDateTime&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="240" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="66GZfU5-wHs_jh9OYR2Q-32" parent="1" style="text;html=1;strokeColor=#82b366;fillColor=#d5e8d4;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" value="Package: ch.admin.bit.jeap.governance.secscan.domain" vertex="1">
+          <mxGeometry height="30" width="360" x="-460" y="-50" as="geometry" />
+        </mxCell>
+        <mxCell id="-VZLViKqSWk3Wi-O9lPN-1" parent="1" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&amp;lt;Entity&amp;gt;&lt;br&gt;SecscanFlaggedEndpoint" vertex="1">
+          <mxGeometry height="140" width="240" x="-170" y="-220" as="geometry" />
+        </mxCell>
+        <mxCell id="-VZLViKqSWk3Wi-O9lPN-2" parent="-VZLViKqSWk3Wi-O9lPN-1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" value="- id: Long&lt;br&gt;- systemComponentId: long&lt;div&gt;- path: String&lt;/div&gt;&lt;div&gt;- method: String&lt;/div&gt;&lt;div&gt;- scanMessage: String&lt;/div&gt;&lt;div&gt;- scanTimestamp: ZonedDateTime&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="240" y="40" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

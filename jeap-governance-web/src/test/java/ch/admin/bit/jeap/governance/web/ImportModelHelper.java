@@ -13,21 +13,21 @@ import java.util.Set;
 @UtilityClass
 public class ImportModelHelper {
 
-    static final String SYSTEM_A_NAME = "System A";
-    static final String SYSTEM_B_NAME = "System B";
-    static final String SYSTEM_C_NAME = "System C";
+    static final String SYSTEM_A_NAME = "sysa";
+    static final String SYSTEM_B_NAME = "sysb";
+    static final String SYSTEM_C_NAME = "sysc";
 
-    static final String COMPONENT_A1_NAME = "Component A1";
-    static final String COMPONENT_A2_NAME = "Component A2";
-    static final String COMPONENT_A3_NAME = "Component A3";
+    static final String COMPONENT_A1_NAME = "sysa-comp1-svc";
+    static final String COMPONENT_A2_NAME = "sysa-comp2-scs";
+    static final String COMPONENT_A3_NAME = "sysa-comp3-svc";
 
-    static final String COMPONENT_B1_NAME = "Component B1";
-    static final String COMPONENT_B2_NAME = "Component B2";
-    static final String COMPONENT_B3_NAME = "Component B3";
+    static final String COMPONENT_B1_NAME = "sysb-comp1-svc";
+    static final String COMPONENT_B2_NAME = "sysb-comp2-svc";
+    static final String COMPONENT_B3_NAME = "sysb-comp3-svc";
 
-    static final String COMPONENT_C1_NAME = "Component C1";
-    static final String COMPONENT_C2_NAME = "Component C2";
-    static final String COMPONENT_C3_NAME = "Component C3";
+    static final String COMPONENT_C1_NAME = "sysc-comp1-svc";
+    static final String COMPONENT_C2_NAME = "sysc-comp2-scs";
+    static final String COMPONENT_C3_NAME = "sysc-comp3-svc";
 
     static final int DEFAULT_SYSTEM_COUNT = 3;
     static final int DEFAULT_COMPONENT_COUNT_PER_SYSTEM = 3;
@@ -66,7 +66,7 @@ public class ImportModelHelper {
     private static ArchRepoSystemDto createSystemA(ArchRepoSystemComponentDto... components) {
         return ArchRepoSystemDto.builder()
                 .name(SYSTEM_A_NAME)
-                .aliases(Set.of("SysA", "System Alpha"))
+                .aliases(Set.of("sys-a", "alpha"))
                 .systemComponents(Arrays.asList(components))
                 .build();
     }
@@ -74,7 +74,7 @@ public class ImportModelHelper {
     private static ArchRepoSystemDto createSystemB(ArchRepoSystemComponentDto... components) {
         return ArchRepoSystemDto.builder()
                 .name(SYSTEM_B_NAME)
-                .aliases(Set.of("SysB", "System Bravo"))
+                .aliases(Set.of("sys-b", "bravo"))
                 .systemComponents(Arrays.asList(components))
                 .build();
     }
@@ -83,7 +83,7 @@ public class ImportModelHelper {
     private static ArchRepoSystemDto createDefaultSystemC() {
         return ArchRepoSystemDto.builder()
                 .name(SYSTEM_C_NAME)
-                .aliases(Set.of("SysC", "System Charlie"))
+                .aliases(Set.of("sys-c", "charlie"))
                 .systemComponents(Arrays.asList(
                         ArchRepoSystemComponentDto.builder()
                                 .name(COMPONENT_C1_NAME)

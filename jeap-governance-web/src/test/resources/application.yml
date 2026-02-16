@@ -12,6 +12,8 @@ jeap:
       enabled: false
     prometheus:
       enabled: false
+    secscan:
+      enabled: false
   monitor:
     prometheus:
       secure: false
