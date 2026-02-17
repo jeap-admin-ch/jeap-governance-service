@@ -1,5 +1,6 @@
 package ch.admin.bit.jeap.governance.domain;
 
+import ch.admin.bit.jeap.governance.domain.rule.State;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

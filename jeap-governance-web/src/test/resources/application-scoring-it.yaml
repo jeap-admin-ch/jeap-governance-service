@@ -1,0 +1,14 @@
+jeap:
+  governance:
+    rules:
+      active:
+        - id: always-ok-rule
+        - id: always-fail-rule
+        - id: exempted-rule
+        - id: flipping-rule
+      component-exemptions:
+        - id: exemption-for-service-b
+          component-name: service-b
+          rule-id:
+            - exempted-rule
+          reason: "Permanently exempted for testing"

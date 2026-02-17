@@ -6,12 +6,4 @@ public enum ComponentType {
     MOBILE_APP,
     SELF_CONTAINED_SYSTEM,
     UNKNOWN;
-
-    public static ComponentType valueOfIfExistsElseUnknown(String name) {
-        try {
-            return valueOf(name);
-        } catch (IllegalArgumentException ex) {
-            return UNKNOWN;
-        }
-    }
 }

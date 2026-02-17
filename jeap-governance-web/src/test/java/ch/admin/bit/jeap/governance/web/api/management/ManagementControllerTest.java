@@ -1,6 +1,7 @@
 package ch.admin.bit.jeap.governance.web.api.management;
 
 import ch.admin.bit.jeap.governance.dataimport.DataImportScheduler;
+import ch.admin.bit.jeap.governance.rules.ScoringScheduler;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,6 +18,9 @@ class ManagementControllerTest {
     @Mock
     private DataImportScheduler dataImportScheduler;
 
+    @Mock
+    private ScoringScheduler scoringScheduler;
+
     @InjectMocks
     private ManagementController managementController;
 
@@ -27,6 +31,15 @@ class ManagementControllerTest {
         managementController.triggerUpdate(jobDto);
 
         verify(dataImportScheduler).update();
+    }
+
+    @Test
+    void triggerUpdate_ShouldInvokeScoringScheduler_WhenJobTypeIsScoring() {
+        JobDto jobDto = new JobDto(JobType.SCORING);
+
+        managementController.triggerUpdate(jobDto);
+
+        verify(scoringScheduler).updateScores();
     }
 
     @Test

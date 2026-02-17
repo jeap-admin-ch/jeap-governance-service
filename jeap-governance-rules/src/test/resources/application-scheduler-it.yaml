@@ -1,0 +1,12 @@
+spring:
+  main:
+    banner-mode: off
+  application:
+    name: scheduler-it
+
+jeap:
+  governance:
+    scoring:
+      cron-expression: "*/1 * * * * *"
+      lock-at-least: PT0S
+      lock-at-most: PT10S

@@ -1,15 +1,11 @@
 package ch.admin.bit.jeap.governance.domain;
 
+import ch.admin.bit.jeap.governance.domain.rule.State;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // for jpa
 @Entity(name = "System")

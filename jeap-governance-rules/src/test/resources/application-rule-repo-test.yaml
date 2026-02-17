@@ -1,0 +1,35 @@
+spring:
+  main:
+    banner-mode: off
+  application:
+    name: rule-repo-test
+
+jeap:
+  governance:
+    rules:
+      active:
+        - id: enforce-oauth2
+        - id: check-tls
+          parameters:
+            minVersion: "1.2"
+            timeout: 30
+      component-exemptions:
+        - id: permanent-exemption
+          component-name: exempted-service
+          rule-id:
+            - enforce-oauth2
+          reason: "Internal tool, no external access"
+          parameters:
+            scope: internal
+        - id: temporary-exemption
+          component-name: temporary-exempted-service
+          rule-id:
+            - enforce-oauth2
+          reason: "Migrating to OAuth2"
+          until: "2099-12-31"
+        - id: expired-exemption
+          component-name: expired-exemption-service
+          rule-id:
+            - enforce-oauth2
+          reason: "Was temporarily exempted"
+          until: "2020-01-01"

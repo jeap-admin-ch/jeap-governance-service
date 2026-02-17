@@ -1,13 +1,13 @@
 package ch.admin.bit.jeap.governance.web.api.management;
 
 import ch.admin.bit.jeap.governance.dataimport.DataImportScheduler;
+import ch.admin.bit.jeap.governance.rules.ScoringScheduler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import static ch.admin.bit.jeap.governance.web.api.management.JobType.DATA_IMPORT;
-
 @RestController
 @RequestMapping("/api/management")
 @RequiredArgsConstructor
@@ -27,8 +25,8 @@ import static ch.admin.bit.jeap.governance.web.api.management.JobType.DATA_IMPOR
 @Tag(name = "Management", description = "Manage the governance service")
 public class ManagementController {
 
-    @Autowired
-    private DataImportScheduler dataImportScheduler;
+    private final DataImportScheduler dataImportScheduler;
+    private final ScoringScheduler scoringScheduler;
 
     @PostMapping
     @Operation(
@@ -45,9 +43,11 @@ public class ManagementController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Job type must be provided");
         }
 
-        if (DATA_IMPORT.equals(jobDto.getType())) {
-            dataImportScheduler.update();
+        switch (jobDto.type()) {
+            case DATA_IMPORT -> dataImportScheduler.update();
+            case SCORING -> scoringScheduler.updateScores();
+            default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Unsupported job type: " + jobDto.type());
         }
     }
-
 }

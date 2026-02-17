@@ -1,9 +1,9 @@
 package ch.admin.bit.jeap.governance.archrepo.persistence;
 
 import ch.admin.bit.jeap.governance.domain.ComponentType;
-import ch.admin.bit.jeap.governance.domain.State;
 import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
+import ch.admin.bit.jeap.governance.domain.rule.State;
 import lombok.experimental.UtilityClass;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 

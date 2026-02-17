@@ -1,0 +1,22 @@
+{
+  "properties": [
+    {
+      "name": "jeap.governance.scoring.cron-expression",
+      "description": "Cron expression to schedule the scoring job",
+      "defaultValue": "0 30 6,10,14,18 * * MON-FRI",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jeap.governance.scoring.lock-at-least",
+      "description": "Minimum duration for which the lock should be held during the scoring job",
+      "defaultValue": "PT1M",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jeap.governance.scoring.lock-at-most",
+      "description": "Maximum duration for which the lock can be held during the scoring job",
+      "defaultValue": "PT15M",
+      "type": "java.lang.String"
+    }
+  ]
+}

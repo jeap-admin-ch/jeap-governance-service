@@ -1,10 +1,13 @@
 jeap:
   governance:
     dataimport:
+      enabled: true
       # This is done to let the tests run without scheduling issues
       cron-expression: "-"
       lock-at-least: PT0.001S
       lock-at-most: PT0.002S
+    scoring:
+      cron-expression: "-"
     deploymentlog:
       enabled: false
     prometheus:
@@ -26,3 +29,5 @@ spring:
       hibernate:
         format_sql: true
         highlight_sql: true
+  main:
+    banner-mode: off

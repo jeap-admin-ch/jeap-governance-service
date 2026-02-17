@@ -1,9 +1,9 @@
 package ch.admin.bit.jeap.governance.archrepo;
 
 import ch.admin.bit.jeap.governance.domain.ComponentType;
-import ch.admin.bit.jeap.governance.domain.State;
 import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
+import ch.admin.bit.jeap.governance.domain.rule.State;
 import ch.admin.bit.jeap.governance.plugin.api.model.ComponentTechnicalIdentifier;
 import lombok.experimental.UtilityClass;
 

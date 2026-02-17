@@ -1,0 +1,33 @@
+spring:
+  main:
+    banner-mode: off
+  application:
+    name: test
+
+jeap:
+  governance:
+    rules:
+      active:
+        - id: enforce-oauth2
+        - id: check-tls
+          parameters:
+            minVersion: "1.2"
+            timeout: 30
+        - id: dazit-special-rule
+          parameters:
+            threshold: 10
+      component-exemptions:
+        - id: legacy-auth-exemption
+          component-name: old-service
+          rule-id:
+            - enforce-oauth2
+            - check-tls
+          reason: "Legacy service, uses basic auth"
+          until: "2026-12-24"
+          parameters:
+            scope: read
+        - id: permanent-exemption
+          component-name: internal-tool
+          rule-id:
+            - enforce-oauth2
+          reason: "Internal tool, no external access"

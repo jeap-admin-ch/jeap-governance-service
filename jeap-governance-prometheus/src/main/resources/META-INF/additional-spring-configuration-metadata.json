@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "jeap.governance.prometheus.enabled",
+      "description": "Enable or disable the Prometheus integration",
+      "defaultValue": true,
+      "type": "java.lang.Boolean"
+    }
+  ]
+}
