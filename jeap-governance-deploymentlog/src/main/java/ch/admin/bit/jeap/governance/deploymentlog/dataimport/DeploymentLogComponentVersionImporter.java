@@ -4,7 +4,7 @@ import ch.admin.bit.jeap.governance.deploymentlog.connector.DeploymentLogConnect
 import ch.admin.bit.jeap.governance.deploymentlog.connector.model.DeploymentLogComponentVersionDto;
 import ch.admin.bit.jeap.governance.deploymentlog.synchronize.DeploymentLogComponentVersionSynchronizer;
 import ch.admin.bit.jeap.governance.domain.GovernanceProperties;
-import ch.admin.bit.jeap.governance.plugin.api.datasource.DataSourceImporter;
+import ch.admin.bit.jeap.governance.domain.datasource.DataSourceImporter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;

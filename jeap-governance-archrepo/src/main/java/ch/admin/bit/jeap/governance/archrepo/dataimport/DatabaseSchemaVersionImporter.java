@@ -3,7 +3,7 @@ package ch.admin.bit.jeap.governance.archrepo.dataimport;
 import ch.admin.bit.jeap.governance.archrepo.connector.ArchRepoConnector;
 import ch.admin.bit.jeap.governance.archrepo.connector.model.DatabaseSchemaVersionDto;
 import ch.admin.bit.jeap.governance.archrepo.synchronize.DatabaseSchemaVersionSynchronizer;
-import ch.admin.bit.jeap.governance.plugin.api.datasource.DataSourceImporter;
+import ch.admin.bit.jeap.governance.domain.datasource.DataSourceImporter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

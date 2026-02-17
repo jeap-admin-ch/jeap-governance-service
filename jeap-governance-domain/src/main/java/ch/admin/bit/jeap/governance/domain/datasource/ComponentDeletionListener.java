@@ -1,4 +1,4 @@
-package ch.admin.bit.jeap.governance.plugin.api.datasource;
+package ch.admin.bit.jeap.governance.domain.datasource;
 
 /**
  * Interface for data source connectors used in the governance service.

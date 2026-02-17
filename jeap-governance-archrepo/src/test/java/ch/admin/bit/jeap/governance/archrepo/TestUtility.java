@@ -1,10 +1,10 @@
 package ch.admin.bit.jeap.governance.archrepo;
 
+import ch.admin.bit.jeap.governance.archrepo.synchronize.ComponentTechnicalIdentifier;
 import ch.admin.bit.jeap.governance.domain.ComponentType;
 import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
 import ch.admin.bit.jeap.governance.domain.rule.State;
-import ch.admin.bit.jeap.governance.plugin.api.model.ComponentTechnicalIdentifier;
 import lombok.experimental.UtilityClass;
 
 import java.time.ZonedDateTime;

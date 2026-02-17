@@ -1,7 +1,6 @@
 package ch.admin.bit.jeap.governance.archrepo.synchronize;
 
 import ch.admin.bit.jeap.governance.archrepo.connector.model.RestApiRelationWithoutPactDto;
-import ch.admin.bit.jeap.governance.plugin.api.model.ComponentTechnicalIdentifier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

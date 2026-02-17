@@ -2,7 +2,7 @@ package ch.admin.bit.jeap.governance.archrepo.deletion;
 
 import ch.admin.bit.jeap.governance.archrepo.domain.ApiDocVersion;
 import ch.admin.bit.jeap.governance.archrepo.domain.ApiDocVersionRepository;
-import ch.admin.bit.jeap.governance.plugin.api.datasource.ComponentDeletionListener;
+import ch.admin.bit.jeap.governance.domain.datasource.ComponentDeletionListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

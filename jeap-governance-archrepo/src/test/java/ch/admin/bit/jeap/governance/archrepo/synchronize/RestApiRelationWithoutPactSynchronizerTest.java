@@ -1,7 +1,6 @@
 package ch.admin.bit.jeap.governance.archrepo.synchronize;
 
 import ch.admin.bit.jeap.governance.archrepo.connector.model.RestApiRelationWithoutPactDto;
-import ch.admin.bit.jeap.governance.plugin.api.model.ComponentTechnicalIdentifier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,17 +10,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.ArrayList;
 import java.util.List;
 
-import static ch.admin.bit.jeap.governance.archrepo.TestUtility.COMPONENT_NAME_A1;
-import static ch.admin.bit.jeap.governance.archrepo.TestUtility.COMPONENT_NAME_A2;
-import static ch.admin.bit.jeap.governance.archrepo.TestUtility.COMPONENT_NAME_B1;
-import static ch.admin.bit.jeap.governance.archrepo.TestUtility.COMPONENT_NAME_B2;
-import static ch.admin.bit.jeap.governance.archrepo.TestUtility.SYSTEM_NAME_A;
-import static ch.admin.bit.jeap.governance.archrepo.TestUtility.SYSTEM_NAME_B;
+import static ch.admin.bit.jeap.governance.archrepo.TestUtility.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RestApiRelationWithoutPactSynchronizerTest {

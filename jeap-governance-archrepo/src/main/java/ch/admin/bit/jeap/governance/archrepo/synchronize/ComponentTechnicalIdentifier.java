@@ -1,4 +1,4 @@
-package ch.admin.bit.jeap.governance.plugin.api.model;
+package ch.admin.bit.jeap.governance.archrepo.synchronize;
 
 public record ComponentTechnicalIdentifier(
         String systemName,

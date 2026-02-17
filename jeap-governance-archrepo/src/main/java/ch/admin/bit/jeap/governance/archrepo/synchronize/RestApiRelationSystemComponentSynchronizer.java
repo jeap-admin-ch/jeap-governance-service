@@ -5,7 +5,6 @@ import ch.admin.bit.jeap.governance.archrepo.domain.RestApiRelationWithoutPact;
 import ch.admin.bit.jeap.governance.archrepo.domain.RestApiRelationWithoutPactRepository;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
 import ch.admin.bit.jeap.governance.domain.SystemComponentRepository;
-import ch.admin.bit.jeap.governance.plugin.api.model.ComponentTechnicalIdentifier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

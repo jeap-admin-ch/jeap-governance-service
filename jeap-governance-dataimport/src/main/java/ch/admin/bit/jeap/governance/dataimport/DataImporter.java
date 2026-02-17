@@ -1,6 +1,6 @@
 package ch.admin.bit.jeap.governance.dataimport;
 
-import ch.admin.bit.jeap.governance.plugin.api.datasource.DataSourceImporter;
+import ch.admin.bit.jeap.governance.domain.datasource.DataSourceImporter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import jakarta.annotation.PostConstruct;

@@ -1,15 +1,10 @@
 package ch.admin.bit.jeap.governance.deploymentlog.deletion;
 
-import ch.admin.bit.jeap.governance.deploymentlog.DeploymentLogProperties;
 import ch.admin.bit.jeap.governance.deploymentlog.domain.DeploymentLogComponentVersion;
 import ch.admin.bit.jeap.governance.deploymentlog.domain.DeploymentLogComponentVersionRepository;
-import ch.admin.bit.jeap.governance.plugin.api.datasource.ComponentDeletionListener;
+import ch.admin.bit.jeap.governance.domain.datasource.ComponentDeletionListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

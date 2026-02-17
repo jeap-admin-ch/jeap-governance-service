@@ -1,6 +1,6 @@
 package ch.admin.bit.jeap.governance.dataimport;
 
-import ch.admin.bit.jeap.governance.plugin.api.datasource.DataSourceImporter;
+import ch.admin.bit.jeap.governance.domain.datasource.DataSourceImporter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.MockClock;
 import io.micrometer.core.instrument.Timer;
@@ -11,10 +11,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class DataImporterTest {
 

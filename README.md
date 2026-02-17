@@ -51,7 +51,6 @@ This repository is Open Source Software licensed under the [Apache License 2.0](
 | `jeap-governance-domain`           | Contains the core model, specifically System and SystemComponent, including data access interfaces                                                                                                                           | -                                                                |
 | `jeap-governance-pactbroker`       | Imports data from a PACT broker instance                                                                                                                                                                                     | -                                                                |
 | `jeap-governance-persistence`      | Provides flyway migration scripts and JPA repositories                                                                                                                                                                       | -                                                                |
-| `jeap-governance-plugin-api`       | Contains all interfaces for implementing custom logic in concrete instances of the governance service                                                                                                                        | -                                                                |
 | `jeap-governance-prometheus`       | Handles integration with a Prometheus server. Queries the latest samples of selected standard jEAP metrics for the system's service components and persists them to the database.                                            | See [Configuration](#configuration)                              |
 | `jeap-governance-rules`            | Provides the infrastructure to evaluate governance rules and score services/systems on a regular basis                                                                                                                       | Instances can define this as their parent                        |
 | `jeap-governance-service-instance` | Module for easily creating an instance of the governance service                                                                                                                                                             | Instances can define this as their parent                        |
@@ -212,10 +211,10 @@ Instances of the governance service can collect their own data. To do so, the go
 ```java
 public interface DataSourceImporter {
 
-    /**
-     * Imports data from the external data source into the governance system.
-     */
-    void importData();
+  /**
+   * Imports data from the external data source into the governance system.
+   */
+  void importData();
 
 }
 ```
@@ -230,11 +229,11 @@ public interface DataSourceImporter {
 ```java
 @Component
 public class CustomDataImporter implements DataSourceImporter {
-    
-    @Override
-    public void importData() {
-        // Your custom import logic here
-    }
+
+  @Override
+  public void importData() {
+    // Your custom import logic here
+  }
 }
 ```
 
@@ -248,13 +247,13 @@ If you hold data in instances of the governance service that reference SystemCom
  */
 public interface ComponentDeletionListener {
 
-    /**
-     * This method is called before a component identified by {@code systemComponentId} is deleted.
-     * Implementations should perform any necessary cleanup or data removal related to the component.
-     *
-     * @param systemComponentId the unique identifier of the component to be deleted
-     */
-    void preComponentDeletion(Long systemComponentId);
+  /**
+   * This method is called before a component identified by {@code systemComponentId} is deleted.
+   * Implementations should perform any necessary cleanup or data removal related to the component.
+   *
+   * @param systemComponentId the unique identifier of the component to be deleted
+   */
+  void preComponentDeletion(Long systemComponentId);
 
 }
 ```
@@ -270,11 +269,11 @@ public interface ComponentDeletionListener {
 ```java
 @Component
 public class CustomCleanupListener implements ComponentDeletionListener {
-    
-    @Override
-    public void preComponentDeletion(Long systemComponentId) {
-        // Cleanup logic before component deletion
-    }
+
+  @Override
+  public void preComponentDeletion(Long systemComponentId) {
+    // Cleanup logic before component deletion
+  }
 }
 ```
 
