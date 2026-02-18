@@ -3,7 +3,7 @@ package ch.admin.bit.jeap.governance.archrepo.dataimport;
 import ch.admin.bit.jeap.governance.archrepo.connector.ArchRepoConnector;
 import ch.admin.bit.jeap.governance.archrepo.connector.model.ArchRepoModelDto;
 import ch.admin.bit.jeap.governance.archrepo.synchronize.ArchRepoModelSynchronizer;
-import ch.admin.bit.jeap.governance.domain.datasource.DataSourceImporter;
+import ch.admin.bit.jeap.governance.domain.plugin.datasource.DataSourceImporter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;

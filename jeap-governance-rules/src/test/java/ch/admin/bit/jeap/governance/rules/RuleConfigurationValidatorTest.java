@@ -1,7 +1,11 @@
 package ch.admin.bit.jeap.governance.rules;
 
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
-import ch.admin.bit.jeap.governance.domain.rule.*;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.Rule;
+import ch.admin.bit.jeap.governance.domain.rule.RuleEvaluationResult;
+import ch.admin.bit.jeap.governance.domain.rule.RuleId;
+import ch.admin.bit.jeap.governance.domain.rule.RuleMetadata;
+import ch.admin.bit.jeap.governance.domain.rule.RuleParameters;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.system.CapturedOutput;

@@ -2,6 +2,7 @@ package ch.admin.bit.jeap.governance.domain.rule;
 
 import ch.admin.bit.jeap.governance.domain.ComponentType;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.Rule;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;

@@ -1,7 +1,7 @@
 package ch.admin.bit.jeap.governance.prometheus.datadeletion;
 
 import ch.admin.bit.jeap.governance.domain.SystemComponentRepository;
-import ch.admin.bit.jeap.governance.domain.datasource.ComponentDeletionListener;
+import ch.admin.bit.jeap.governance.domain.plugin.datasource.ComponentDeletionListener;
 import ch.admin.bit.jeap.governance.prometheus.domain.PromTimeSeriesRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

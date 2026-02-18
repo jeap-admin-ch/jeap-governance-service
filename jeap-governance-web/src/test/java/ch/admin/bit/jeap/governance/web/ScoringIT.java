@@ -4,6 +4,7 @@ import ch.admin.bit.jeap.governance.domain.ComponentType;
 import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
 import ch.admin.bit.jeap.governance.domain.SystemRepository;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.Rule;
 import ch.admin.bit.jeap.governance.domain.rule.*;
 import ch.admin.bit.jeap.governance.domain.score.ComponentScoreRepository;
 import ch.admin.bit.jeap.governance.domain.score.ScoringService;

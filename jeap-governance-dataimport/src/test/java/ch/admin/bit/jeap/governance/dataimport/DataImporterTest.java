@@ -1,6 +1,6 @@
 package ch.admin.bit.jeap.governance.dataimport;
 
-import ch.admin.bit.jeap.governance.domain.datasource.DataSourceImporter;
+import ch.admin.bit.jeap.governance.domain.plugin.datasource.DataSourceImporter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.MockClock;
 import io.micrometer.core.instrument.Timer;

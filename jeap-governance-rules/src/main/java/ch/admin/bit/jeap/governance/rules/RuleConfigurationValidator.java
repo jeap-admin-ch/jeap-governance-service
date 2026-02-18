@@ -1,6 +1,6 @@
 package ch.admin.bit.jeap.governance.rules;
 
-import ch.admin.bit.jeap.governance.domain.rule.Rule;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.Rule;
 import ch.admin.bit.jeap.governance.domain.rule.RuleId;
 import ch.admin.bit.jeap.governance.rules.RuleConfigurationProperties.ActiveRule;
 import lombok.extern.slf4j.Slf4j;

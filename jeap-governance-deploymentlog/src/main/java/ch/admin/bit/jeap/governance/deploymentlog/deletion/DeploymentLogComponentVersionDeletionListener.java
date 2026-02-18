@@ -2,7 +2,7 @@ package ch.admin.bit.jeap.governance.deploymentlog.deletion;
 
 import ch.admin.bit.jeap.governance.deploymentlog.domain.DeploymentLogComponentVersion;
 import ch.admin.bit.jeap.governance.deploymentlog.domain.DeploymentLogComponentVersionRepository;
-import ch.admin.bit.jeap.governance.domain.datasource.ComponentDeletionListener;
+import ch.admin.bit.jeap.governance.domain.plugin.datasource.ComponentDeletionListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;

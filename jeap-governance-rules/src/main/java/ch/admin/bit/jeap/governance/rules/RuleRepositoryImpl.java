@@ -1,6 +1,7 @@
 package ch.admin.bit.jeap.governance.rules;
 
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.Rule;
 import ch.admin.bit.jeap.governance.domain.rule.*;
 import ch.admin.bit.jeap.governance.rules.RuleConfigurationProperties.ActiveRule;
 import ch.admin.bit.jeap.governance.rules.RuleConfigurationProperties.ComponentExemption;

@@ -2,6 +2,7 @@ package ch.admin.bit.jeap.governance.rules;
 
 import ch.admin.bit.jeap.governance.domain.ComponentType;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.Rule;
 import ch.admin.bit.jeap.governance.domain.rule.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

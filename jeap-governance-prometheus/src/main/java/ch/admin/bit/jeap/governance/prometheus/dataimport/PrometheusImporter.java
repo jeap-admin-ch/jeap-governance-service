@@ -3,7 +3,7 @@ package ch.admin.bit.jeap.governance.prometheus.dataimport;
 import ch.admin.bit.jeap.governance.domain.GovernanceProperties;
 import ch.admin.bit.jeap.governance.domain.GovernanceServiceEnvironment;
 import ch.admin.bit.jeap.governance.domain.SystemComponentRepository;
-import ch.admin.bit.jeap.governance.domain.datasource.DataSourceImporter;
+import ch.admin.bit.jeap.governance.domain.plugin.datasource.DataSourceImporter;
 import ch.admin.bit.jeap.governance.prometheus.domain.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
