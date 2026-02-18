@@ -29,4 +29,14 @@ public class RuleConformanceRateRepositoryImpl implements RuleConformanceRateRep
     public List<RuleConformanceRate> findByRuleId(String ruleId) {
         return jpaRuleConformanceRateRepository.findByRuleId(ruleId);
     }
+
+    @Override
+    public void deleteAllByDay(LocalDate day) {
+        jpaRuleConformanceRateRepository.deleteByDay(day);
+    }
+
+    @Override
+    public void saveAll(List<RuleConformanceRate> rates) {
+        jpaRuleConformanceRateRepository.saveAll(rates);
+    }
 }

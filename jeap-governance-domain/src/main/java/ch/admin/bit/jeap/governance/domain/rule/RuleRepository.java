@@ -7,4 +7,6 @@ import java.util.List;
 public interface RuleRepository {
 
     List<RuleEvaluation> getRulesToEvaluateForComponent(SystemComponent systemComponent);
+
+    List<RuleId> getActiveRuleIds();
 }

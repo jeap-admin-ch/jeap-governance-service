@@ -2,13 +2,16 @@ package ch.admin.bit.jeap.governance.domain.score;
 
 import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
+import ch.admin.bit.jeap.governance.domain.rule.RuleEvaluationResult;
 import ch.admin.bit.jeap.governance.domain.rule.RuleEvaluationService;
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,6 +19,7 @@ import java.util.List;
  */
 @RequiredArgsConstructor
 @Component
+@Slf4j
 public class ScoringService {
 
     private final ComponentScoreCalculator componentScoreCalculator;
@@ -26,20 +30,24 @@ public class ScoringService {
 
     @Timed("jeap.governance.service.scoring")
     @Transactional
-    public void updateSystemScore(System system) {
-        var day = LocalDate.now();
+    public List<RuleEvaluationResult> updateSystemScore(System system, LocalDate day) {
+        log.info("Updating system score for system {}", system);
+        List<RuleEvaluationResult> allResults = new ArrayList<>();
 
         List<ComponentScore> componentScores = system.getSystemComponents().stream()
-                .map(systemComponent -> updateComponentScore(systemComponent, day))
+                .map(systemComponent -> evaluateComponentScore(systemComponent, day, allResults))
                 .toList();
         componentScoreRepository.saveOrReplaceAllForSystemAndDay(system, componentScores, day);
 
         var systemScore = systemScoreCalculator.calculateSystemScore(system, day, componentScores);
         systemScoreRepository.save(systemScore);
+
+        return allResults;
     }
 
-    private ComponentScore updateComponentScore(SystemComponent systemComponent, LocalDate day) {
+    private ComponentScore evaluateComponentScore(SystemComponent systemComponent, LocalDate day, List<RuleEvaluationResult> allResults) {
         var results = ruleEvaluationService.updateRuleStatesForComponent(systemComponent);
+        allResults.addAll(results);
         return componentScoreCalculator.calculateComponentScore(systemComponent, day, results);
     }
 }

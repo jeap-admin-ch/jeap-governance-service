@@ -11,4 +11,8 @@ public interface RuleConformanceRateRepository {
     Optional<RuleConformanceRate> findByRuleIdAndDay(String ruleId, LocalDate day);
 
     List<RuleConformanceRate> findByRuleId(String ruleId);
+
+    void deleteAllByDay(LocalDate day);
+
+    void saveAll(List<RuleConformanceRate> rates);
 }

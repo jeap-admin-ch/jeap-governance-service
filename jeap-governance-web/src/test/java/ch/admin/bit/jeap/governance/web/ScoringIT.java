@@ -108,7 +108,13 @@ class ScoringIT extends GovernanceIntegrationTestBase {
     private ScoringService scoringService;
 
     @Autowired
+    private RuleConformanceRateService ruleConformanceRateService;
+
+    @Autowired
     private RuleStateRepository ruleStateRepository;
+
+    @Autowired
+    private RuleConformanceRateRepository ruleConformanceRateRepository;
 
     @Autowired
     private ComponentScoreRepository componentScoreRepository;
@@ -131,8 +137,10 @@ class ScoringIT extends GovernanceIntegrationTestBase {
                 ))
                 .build());
 
+        var today = LocalDate.now();
+
         // When: scoring is triggered
-        scoringService.updateSystemScore(system);
+        var results = scoringService.updateSystemScore(system, today);
 
         // Then: rule states are persisted for both components
         var serviceA = findComponent(system, "service-a");
@@ -152,7 +160,6 @@ class ScoringIT extends GovernanceIntegrationTestBase {
         assertRuleState(serviceB, "exempted-rule", State.DISABLED, null);
 
         // Then: component scores are persisted
-        var today = LocalDate.now();
         var scoreA = componentScoreRepository.findBySystemComponentAndDay(serviceA, today);
         assertThat(scoreA).isPresent();
         // service-a: 4 active rules, weight 10 each. OK=20 (always-ok + exempted-rule), total=40 -> 50%
@@ -168,6 +175,18 @@ class ScoringIT extends GovernanceIntegrationTestBase {
         assertThat(systemScore).isPresent();
         // (50 + 33) / 2 = 41
         assertThat(systemScore.get().getScore()).isEqualTo(41);
+
+        // Then: conformance rates are calculated and persisted
+        ruleConformanceRateService.updateConformanceRates(results, today);
+
+        // always-ok-rule: OK for both components -> 100%
+        assertConformanceRate("always-ok-rule", today, 100);
+        // always-fail-rule: FAIL for both components -> 0%
+        assertConformanceRate("always-fail-rule", today, 0);
+        // flipping-rule: FAIL for both components -> 0%
+        assertConformanceRate("flipping-rule", today, 0);
+        // exempted-rule: OK for service-a, DISABLED for service-b (excluded) -> 1 OK / 1 total = 100%
+        assertConformanceRate("exempted-rule", today, 100);
     }
 
     @Test
@@ -184,18 +203,24 @@ class ScoringIT extends GovernanceIntegrationTestBase {
                 ))
                 .build());
         var component = findComponent(system, "update-service");
+        var today = LocalDate.now();
 
         // When: first scoring run
-        scoringService.updateSystemScore(system);
+        var firstResults = scoringService.updateSystemScore(system, today);
 
         // Then: flipping-rule is FAIL
         assertRuleState(component, "flipping-rule", State.FAIL, "not yet compliant");
         var ruleStateAfterFirstRun = ruleStateRepository.findBySystemComponentAndRuleId(component, RuleId.of("flipping-rule"));
         var idAfterFirstRun = ruleStateAfterFirstRun.orElseThrow().getId();
 
+        // Then: conformance rates after first run
+        ruleConformanceRateService.updateConformanceRates(firstResults, today);
+        // flipping-rule: FAIL for 1 component -> 0%
+        assertConformanceRate("flipping-rule", today, 0);
+
         // When: rule outcome changes and scoring runs again
         FLIPPING_RULE_STATE.set(State.OK);
-        scoringService.updateSystemScore(system);
+        var secondResults = scoringService.updateSystemScore(system, today);
 
         // Then: existing rule state is updated (same ID, new state)
         var ruleStateAfterSecondRun = ruleStateRepository.findBySystemComponentAndRuleId(component, RuleId.of("flipping-rule"));
@@ -205,11 +230,21 @@ class ScoringIT extends GovernanceIntegrationTestBase {
         assertThat(ruleStateAfterSecondRun.get().getStateComment()).isNull();
 
         // Then: scores reflect the updated rule state
-        var today = LocalDate.now();
         var score = componentScoreRepository.findBySystemComponentAndDay(component, today);
         assertThat(score).isPresent();
         // 4 active rules, OK=30 (always-ok + exempted-rule + flipping-rule), total=40 -> 75%
         assertThat(score.get().getScore()).isEqualTo(75);
+
+        // Then: conformance rates are updated (old rates deleted, new rates saved)
+        ruleConformanceRateService.updateConformanceRates(secondResults, today);
+        // flipping-rule: now OK for 1 component -> 100%
+        assertConformanceRate("flipping-rule", today, 100);
+    }
+
+    private void assertConformanceRate(String ruleId, LocalDate day, int expectedRate) {
+        var rate = ruleConformanceRateRepository.findByRuleIdAndDay(ruleId, day);
+        assertThat(rate).as("Conformance rate for %s", ruleId).isPresent();
+        assertThat(rate.get().getConformanceRate()).as("Conformance rate value for %s", ruleId).isEqualTo(expectedRate);
     }
 
     private void assertRuleState(SystemComponent component, String ruleId, State expectedState, String expectedComment) {

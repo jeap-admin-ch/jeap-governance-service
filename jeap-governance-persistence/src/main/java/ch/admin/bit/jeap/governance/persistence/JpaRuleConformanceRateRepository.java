@@ -21,4 +21,8 @@ interface JpaRuleConformanceRateRepository extends CrudRepository<RuleConformanc
     @Modifying
     @Query("DELETE FROM RuleConformanceRate rcr WHERE rcr.day < :cutoffDate")
     void deleteByDayBefore(@Param("cutoffDate") LocalDate cutoffDate);
+
+    @Modifying
+    @Query("DELETE FROM RuleConformanceRate rcr WHERE rcr.day = :day")
+    void deleteByDay(@Param("day") LocalDate day);
 }

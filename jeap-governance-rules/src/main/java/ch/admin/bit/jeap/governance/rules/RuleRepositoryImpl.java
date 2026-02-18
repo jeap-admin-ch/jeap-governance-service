@@ -43,6 +43,14 @@ class RuleRepositoryImpl implements RuleRepository {
                 .toList();
     }
 
+    @Override
+    public List<RuleId> getActiveRuleIds() {
+        return properties.getActive().stream()
+                .map(ActiveRule::getId)
+                .filter(rulesByIdMap::containsKey)
+                .toList();
+    }
+
     private RuleEvaluation toRuleEvaluation(ActiveRule activeRule, SystemComponent component) {
         var rule = rulesByIdMap.get(activeRule.getId());
         var optionalExemption = findExemption(rule.metadata().ruleId(), component);

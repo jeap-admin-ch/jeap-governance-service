@@ -2,6 +2,7 @@ package ch.admin.bit.jeap.governance.rules;
 
 import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemRepository;
+import ch.admin.bit.jeap.governance.domain.rule.RuleConformanceRateService;
 import ch.admin.bit.jeap.governance.domain.rule.State;
 import ch.admin.bit.jeap.governance.domain.score.ScoringService;
 import net.javacrumbs.shedlock.core.LockProvider;
@@ -47,6 +48,9 @@ class ScoringSchedulerIT {
     @MockitoBean
     private SystemRepository systemRepository;
 
+    @MockitoBean
+    private RuleConformanceRateService ruleConformanceRateService;
+
     @Test
     void schedulerFiresAndCallsScoringService() {
         System system = System.builder()
@@ -58,7 +62,7 @@ class ScoringSchedulerIT {
         when(systemRepository.findAll()).thenReturn(List.of(system));
 
         await().atMost(5, SECONDS).untilAsserted(() ->
-                verify(scoringService, atLeastOnce()).updateSystemScore(any())
+                verify(scoringService, atLeastOnce()).updateSystemScore(any(), any())
         );
     }
 
