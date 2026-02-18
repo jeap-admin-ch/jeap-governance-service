@@ -11,6 +11,9 @@ import java.time.ZonedDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // for jpa
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+/**
+ * Persisted daily aggregate compliance score for a system.
+ */
 public class SystemScore {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "system_score_seq")

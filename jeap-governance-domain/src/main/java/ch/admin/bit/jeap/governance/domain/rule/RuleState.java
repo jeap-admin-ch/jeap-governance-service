@@ -11,6 +11,9 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // for jpa
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+/**
+ * Persisted evaluation state of a rule for a specific system component.
+ */
 public class RuleState {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "rule_state_rate_seq")

@@ -21,7 +21,6 @@ Apache License Version 2.0
  * ch.admin.bit.jeap:jeap-governance-domain - [ch.admin.bit.jeap:jeap-governance-domain](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-domain)
  * ch.admin.bit.jeap:jeap-governance-pactbroker - [ch.admin.bit.jeap:jeap-governance-pactbroker](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-pactbroker)
  * ch.admin.bit.jeap:jeap-governance-persistence - [ch.admin.bit.jeap:jeap-governance-persistence](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-persistence)
- * ch.admin.bit.jeap:jeap-governance-plugin-api - [ch.admin.bit.jeap:jeap-governance-plugin-api](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-plugin-api)
  * ch.admin.bit.jeap:jeap-governance-prometheus - [ch.admin.bit.jeap:jeap-governance-prometheus](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-prometheus)
  * ch.admin.bit.jeap:jeap-governance-rules - [ch.admin.bit.jeap:jeap-governance-rules](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-rules)
  * ch.admin.bit.jeap:jeap-governance-web - [ch.admin.bit.jeap:jeap-governance-web](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-web)

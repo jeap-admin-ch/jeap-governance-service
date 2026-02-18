@@ -9,6 +9,9 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
+/**
+ * Evaluates all applicable rules for a component and persists the resulting rule states.
+ */
 public class RuleEvaluationService {
 
     private final RuleEvaluator ruleEvaluator;

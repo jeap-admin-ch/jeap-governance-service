@@ -13,6 +13,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Component
+/** Orchestrates rule evaluation and score calculation for all components of a system. */
 public class ScoringService {
 
     private final ComponentScoreCalculator componentScoreCalculator;

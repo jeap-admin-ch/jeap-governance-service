@@ -9,6 +9,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Component
+/// Calculates a component's compliance score as a weighted
+/// percentage of passing rules. Uses the formular
+/// `score = 100 * (sum(ruleWeight)[ruleState == OK] / sum(ruleWeight)[ruleState != DISABLED])`
+///  to score components.
 class ComponentScoreCalculator {
 
     ComponentScore calculateComponentScore(SystemComponent systemComponent, LocalDate day, List<RuleEvaluationResult> allResults) {
@@ -26,7 +30,6 @@ class ComponentScoreCalculator {
                 .build();
     }
 
-    /// `score = 100 * (sum(ruleWeight)[ruleState == OK] / sum(ruleWeight)[ruleState != DISABLED])``
     private int calculateScore(List<RuleEvaluationResult> results) {
         double totalWeight = totalWeight(results);
         if (totalWeight == 0) {

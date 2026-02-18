@@ -204,6 +204,8 @@ jeap:
 
 The governance service provides several extension points, which are explained in this chapter.
 
+Plugin beans must be registered in the Spring context using autoconfiguration. Create a configuration class annotated with `@AutoConfiguration` that declares your plugin beans, and register it in `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`.
+
 #### Data Import
 
 Instances of the governance service can collect their own data. To do so, the governance service offers an interface:
@@ -211,10 +213,10 @@ Instances of the governance service can collect their own data. To do so, the go
 ```java
 public interface DataSourceImporter {
 
-  /**
-   * Imports data from the external data source into the governance system.
-   */
-  void importData();
+    /**
+     * Imports data from the external data source into the governance system.
+     */
+    void importData();
 
 }
 ```
@@ -229,11 +231,11 @@ public interface DataSourceImporter {
 ```java
 @Component
 public class CustomDataImporter implements DataSourceImporter {
-
-  @Override
-  public void importData() {
-    // Your custom import logic here
-  }
+    
+    @Override
+    public void importData() {
+        // Your custom import logic here
+    }
 }
 ```
 
@@ -247,13 +249,13 @@ If you hold data in instances of the governance service that reference SystemCom
  */
 public interface ComponentDeletionListener {
 
-  /**
-   * This method is called before a component identified by {@code systemComponentId} is deleted.
-   * Implementations should perform any necessary cleanup or data removal related to the component.
-   *
-   * @param systemComponentId the unique identifier of the component to be deleted
-   */
-  void preComponentDeletion(Long systemComponentId);
+    /**
+     * This method is called before a component identified by {@code systemComponentId} is deleted.
+     * Implementations should perform any necessary cleanup or data removal related to the component.
+     *
+     * @param systemComponentId the unique identifier of the component to be deleted
+     */
+    void preComponentDeletion(Long systemComponentId);
 
 }
 ```

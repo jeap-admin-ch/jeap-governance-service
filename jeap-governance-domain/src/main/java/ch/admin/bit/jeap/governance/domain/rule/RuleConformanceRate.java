@@ -10,6 +10,9 @@ import java.time.ZonedDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // for jpa
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+/**
+ * Persisted daily conformance rate percentage for a specific rule across all components.
+ */
 public class RuleConformanceRate {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "rule_conformance_rate_seq")

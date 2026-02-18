@@ -8,6 +8,9 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+/**
+ * Evaluates rules for a component, respecting exemption states.
+ */
 class RuleEvaluator {
 
     private final RuleRepository ruleRepository;

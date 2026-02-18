@@ -3,6 +3,9 @@ package ch.admin.bit.jeap.governance.domain.rule;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Key-value parameters passed to a rule evaluation, combining rule-specific and exemption-specific parameters. Exemption parameters take precedence.
+ */
 public record RuleParameters(Map<String, String> parameters) {
 
     public static RuleParameters of(Map<String, String> ruleParameters, Map<String, String> exemptionParameters) {

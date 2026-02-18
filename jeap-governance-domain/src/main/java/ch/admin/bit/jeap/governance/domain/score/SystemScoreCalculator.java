@@ -7,6 +7,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Component
+/**
+ * Calculates a system's compliance score as the average of its component scores.
+ */
 class SystemScoreCalculator {
 
     public SystemScore calculateSystemScore(System system, LocalDate day, List<ComponentScore> componentScores) {

@@ -3,6 +3,9 @@ package ch.admin.bit.jeap.governance.domain.rule;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
 import org.springframework.util.StringUtils;
 
+/**
+ * The outcome of evaluating a rule against a component, carrying the resulting state and an optional comment for failed rules.
+ */
 public record RuleEvaluationResult(RuleEvaluation ruleEvaluation, State state, String stateComment) {
 
     static RuleEvaluationResult ok(RuleEvaluation ruleEvaluation) {
