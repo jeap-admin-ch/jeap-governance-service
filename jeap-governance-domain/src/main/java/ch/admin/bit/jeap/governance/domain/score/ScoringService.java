@@ -11,9 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Orchestrates rule evaluation and score calculation for all components of a system.
+ */
 @RequiredArgsConstructor
 @Component
-/** Orchestrates rule evaluation and score calculation for all components of a system. */
 public class ScoringService {
 
     private final ComponentScoreCalculator componentScoreCalculator;

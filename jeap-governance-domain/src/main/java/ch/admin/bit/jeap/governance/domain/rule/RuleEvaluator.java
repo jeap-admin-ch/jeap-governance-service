@@ -6,11 +6,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
-@RequiredArgsConstructor
 /**
  * Evaluates rules for a component, respecting exemption states.
  */
+@Component
+@RequiredArgsConstructor
 class RuleEvaluator {
 
     private final RuleRepository ruleRepository;

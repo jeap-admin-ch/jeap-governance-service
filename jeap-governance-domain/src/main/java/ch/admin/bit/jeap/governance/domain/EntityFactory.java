@@ -30,8 +30,8 @@ public class EntityFactory {
     /**
      * Create a new system component but do not add it to the model or DB yet
      *
-     * @param name the name of the system component
-     * @param type the component type
+     * @param name     the name of the system component
+     * @param type     the component type
      */
     public SystemComponent createNewSystemComponent(String name, ComponentType type) {
         return SystemComponent.builder()

@@ -8,4 +8,5 @@ import lombok.Value;
 public class ArchRepoSystemComponentDto {
     String name;
     ArchRepoSystemComponentType type;
+    ArchRepoComponentImporter importer;
 }

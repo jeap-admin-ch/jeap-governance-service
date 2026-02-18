@@ -28,17 +28,20 @@ This repository is Open Source Software licensed under the [Apache License 2.0](
   - [ArchRepo Model](#archrepo-model)
   - [DeploymentLog Model](#deploymentlog-model)
   - [Prometheus Model](#prometheus-time-series-model)
-- [Database Schema](#database-schema)
+- [Database](#database)
   - [Flyway Migration Strategy](#flyway-migration-strategy)
   - [Core Schema](#core-schema)
   - [ArchRepo Schema](#archrepo-schema)
   - [DeploymentLog Schema](#deploymentlog-schema)
   - [Prometheus Schema](#prometheus-time-series-schema)
 - [Configuration](#configuration)
+  - [Example Configuration](#example-configuration)
 - [Plugin Mechanism](#plugin-mechanism)
   - [Data Import](#data-import)
   - [Data Deletion](#data-deletion)
+- [Rules](#rules)
 - [Metrics](#metrics)
+- [Recommended Alerts](#recommended-alerts)
 
 ### Module Overview
 
@@ -63,6 +66,33 @@ This repository is Open Source Software licensed under the [Apache License 2.0](
 The core model consists of Systems and their associated System Components.
 
 ![Core Model Diagram](docs/images/governance-domain-model.png)
+
+#### Scoring and Rule Models
+
+The scoring model consists of ComponentScore and SystemScore, which are used to capture the results of governance rule
+evaluations. The rule model consists of the RuleState of a single system component, and the RuleConformanceRate, which
+captures the overall conformance of a rule across all evaluated components.
+
+The ComponentScoreCalculator and SystemScoreCalculator are responsible for calculating the scores based on the
+active governance rules and their evaluation results.
+
+A rule for a component can be in any of the following four rule states after evaluation:
+
+- OK: The rule is active and the component complies with the rule.
+- FAIL: The rule is active but the component does not comply with the rule.
+- PAUSED: The rule is temporarily paused due to a temporary exemption.
+- DISABLED: The rule is disabled due to an indefinite exemption.
+
+A component's score is defined as the percentage of active rules that are in the OK state, weighted by the importance
+of each rule. A rule is disabled if it has an indefinite exemption. The formula is as follows:
+
+```
+score = 100 * (sum(ruleWeight)[ruleState == OK] / sum(ruleWeight)[ruleState != DISABLED])
+```
+
+The system score is calculated as the average of the component scores of all components belonging to the system.
+
+![Scoring Model Diagram](docs/images/scoring-model.png)
 
 #### ArchRepo Model
 
@@ -122,6 +152,7 @@ spring:
 ![DeploymentLog Schema Diagram](docs/images/deploymentlog-db-schema.png)
 
 #### Prometheus Time Series Schema
+
 The Prometheus database schema is designed around the assumption that import queries capture the current state of a
 component aspect rather than extended time series. As a result, only a limited number of samples is expected to be
 stored. Consequently, the schema intentionally remains denormalized (avoiding additional normalization of sample

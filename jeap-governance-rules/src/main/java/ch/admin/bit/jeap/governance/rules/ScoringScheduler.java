@@ -1,5 +1,6 @@
 package ch.admin.bit.jeap.governance.rules;
 
+import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemRepository;
 import ch.admin.bit.jeap.governance.domain.score.ScoringService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class ScoringScheduler {
         systemRepository.findAll().forEach(this::updateSystemScore);
     }
 
-    private void updateSystemScore(ch.admin.bit.jeap.governance.domain.System system) {
+    private void updateSystemScore(System system) {
         try {
             scoringService.updateSystemScore(system);
         } catch (Exception e) {

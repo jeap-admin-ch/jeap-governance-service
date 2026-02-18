@@ -1,7 +1,6 @@
 package ch.admin.bit.jeap.governance.rules;
 
 import ch.admin.bit.jeap.governance.domain.rule.RuleId;
-import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -55,8 +54,7 @@ public class RuleConfigurationProperties {
      */
     private List<ComponentExemption> componentExemptions = new ArrayList<>();
 
-    @PostConstruct
-    void init() {
+    void logConfiguration() {
         String activeRules = active.stream()
                 .map(ActiveRule::toString)
                 .collect(joining(","));

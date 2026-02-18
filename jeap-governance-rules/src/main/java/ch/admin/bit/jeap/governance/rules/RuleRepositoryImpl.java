@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.joining;
 
 @Component
 @Slf4j
@@ -28,8 +29,10 @@ class RuleRepositoryImpl implements RuleRepository {
         this.rulesByIdMap = rules.stream()
                 .collect(Collectors.toMap(rule -> rule.metadata().ruleId(), identity()));
         this.properties = properties;
-        log.info("RuleRepository initialized with {} rule bean(s) and {} active rule(s) configured",
-                rulesByIdMap.size(), properties.getActive().size());
+        String activeRules = properties.getActive().stream()
+                .map(a -> a.getId().toString()).sorted().collect(joining(","));
+        log.info("RuleRepository initialized with {} rule(s) and {} active rule(s) configured. Active rules: {}",
+                rulesByIdMap.size(), properties.getActive().size(), activeRules);
     }
 
     @Override

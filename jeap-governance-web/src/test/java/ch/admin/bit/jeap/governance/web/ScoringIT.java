@@ -191,7 +191,7 @@ class ScoringIT extends GovernanceIntegrationTestBase {
         // Then: flipping-rule is FAIL
         assertRuleState(component, "flipping-rule", State.FAIL, "not yet compliant");
         var ruleStateAfterFirstRun = ruleStateRepository.findBySystemComponentAndRuleId(component, RuleId.of("flipping-rule"));
-        var idAfterFirstRun = ruleStateAfterFirstRun.get().getId();
+        var idAfterFirstRun = ruleStateAfterFirstRun.orElseThrow().getId();
 
         // When: rule outcome changes and scoring runs again
         FLIPPING_RULE_STATE.set(State.OK);

@@ -63,9 +63,10 @@ public class ArchRepoModelSystemUpdater {
         serviceByName.update(ComponentType.valueOf(systemComponent.getType().name()));
     }
 
-
     private SystemComponent createNewSystemComponent(ArchRepoSystemComponentDto systemComponent) {
         log.info("Create service {} as it is in the arch repo", systemComponent.getName());
-        return entityFactory.createNewSystemComponent(systemComponent.getName(), ComponentType.valueOf(systemComponent.getType().name()));
+        return entityFactory.createNewSystemComponent(
+                systemComponent.getName(),
+                ComponentType.valueOf(systemComponent.getType().name()));
     }
 }

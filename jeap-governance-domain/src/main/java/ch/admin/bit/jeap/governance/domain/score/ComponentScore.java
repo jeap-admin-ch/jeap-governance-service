@@ -7,13 +7,13 @@ import lombok.*;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 
+/**
+ * Persisted daily compliance score for a system component
+ */
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // for jpa
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-/**
- * Persisted daily compliance score for a system component
- */
 public class ComponentScore {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "component_score_seq")

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="confluence.bit.admin.ch" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0" version="29.2.6">
+  <diagram id="6quZliqbsYP06nI_W_fp" name="ArchRepo Domain Model">
+    <mxGraphModel dx="1818" dy="1190" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="d8Eak7cNOWqgoXhCGxEU-1" parent="1" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&lt;&lt;Entity&gt;&gt;&#xa;SystemComponent" vertex="1">
+          <mxGeometry height="80" width="200" x="440" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="d8Eak7cNOWqgoXhCGxEU-2" parent="d8Eak7cNOWqgoXhCGxEU-1" style="text;strokeColor=none;fillColor=none;align=center;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;fontStyle=2" value="From domain package&#xa;(simplified view)" vertex="1">
+          <mxGeometry height="40" width="200" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="d8Eak7cNOWqgoXhCGxEU-3" parent="1" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&amp;lt;&amp;gt;&lt;br&gt;ComponentScore" vertex="1">
+          <mxGeometry height="128" width="240" x="-130" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="d8Eak7cNOWqgoXhCGxEU-4" parent="d8Eak7cNOWqgoXhCGxEU-3" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" value="- id: Long&lt;br&gt;- systemComponent: SystemComponent&lt;div&gt;- score: int (percent)&lt;br&gt;- day: LocalDate&lt;div&gt;- createdAt: ZonedDateTime&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="240" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="d8Eak7cNOWqgoXhCGxEU-5" parent="d8Eak7cNOWqgoXhCGxEU-3" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" value="" vertex="1">
+          <mxGeometry height="8" width="240" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="d8Eak7cNOWqgoXhCGxEU-38" parent="1" style="text;html=1;strokeColor=#82b366;fillColor=#d5e8d4;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" value="Packages: ch.admin.bit.jeap.governance.archrepo.domain.score" vertex="1">
+          <mxGeometry height="30" width="400" x="-130" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="NuY2IfBHQqag9rUEK7BR-1" parent="1" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&amp;lt;&amp;gt;&lt;br&gt;System" vertex="1">
+          <mxGeometry height="80" width="200" x="440" y="-50" as="geometry" />
+        </mxCell>
+        <mxCell id="NuY2IfBHQqag9rUEK7BR-2" parent="NuY2IfBHQqag9rUEK7BR-1" style="text;strokeColor=none;fillColor=none;align=center;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;fontStyle=2" value="From domain package&#xa;(simplified view)" vertex="1">
+          <mxGeometry height="40" width="200" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="NuY2IfBHQqag9rUEK7BR-3" edge="1" parent="1" source="d8Eak7cNOWqgoXhCGxEU-1" style="endArrow=diamondThin;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;endFill=0;" target="NuY2IfBHQqag9rUEK7BR-2" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="480" y="260" as="sourcePoint" />
+            <mxPoint x="530" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NuY2IfBHQqag9rUEK7BR-4" edge="1" parent="1" source="d8Eak7cNOWqgoXhCGxEU-1" style="endArrow=diamondThin;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;endFill=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="d8Eak7cNOWqgoXhCGxEU-4" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="620" y="110" as="sourcePoint" />
+            <mxPoint x="620" y="50" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NuY2IfBHQqag9rUEK7BR-5" parent="1" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&amp;lt;&amp;gt;&lt;br&gt;SystemScore" vertex="1">
+          <mxGeometry height="128" width="240" x="-130" y="-70" as="geometry" />
+        </mxCell>
+        <mxCell id="NuY2IfBHQqag9rUEK7BR-6" parent="NuY2IfBHQqag9rUEK7BR-5" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" value="- id: Long&lt;br&gt;- system: System&lt;div&gt;- score: int (percent)&lt;br&gt;- day: LocalDate&lt;div&gt;- createdAt: ZonedDateTime&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="240" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="NuY2IfBHQqag9rUEK7BR-7" parent="NuY2IfBHQqag9rUEK7BR-5" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" value="" vertex="1">
+          <mxGeometry height="8" width="240" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="NuY2IfBHQqag9rUEK7BR-8" edge="1" parent="1" source="NuY2IfBHQqag9rUEK7BR-2" style="endArrow=diamondThin;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;endFill=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="NuY2IfBHQqag9rUEK7BR-6" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="480" y="160" as="sourcePoint" />
+            <mxPoint x="200" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NuY2IfBHQqag9rUEK7BR-9" parent="1" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&amp;lt;&amp;gt;&lt;br&gt;RuleState" vertex="1">
+          <mxGeometry height="168" width="290" x="760" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="NuY2IfBHQqag9rUEK7BR-10" parent="NuY2IfBHQqag9rUEK7BR-9" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" value="- id: Long&lt;div&gt;- systemComponent: SystemComponent&lt;br&gt;- ruleId: String&lt;div&gt;- state: State (OK, FAIL, PAUSED, DISABLED)&lt;br&gt;- day: LocalDate&lt;div&gt;- createdAt: ZonedDateTime&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;- modifiedAt: ZonedDateTime (last state change)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="290" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="NuY2IfBHQqag9rUEK7BR-11" parent="NuY2IfBHQqag9rUEK7BR-9" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" value="" vertex="1">
+          <mxGeometry height="8" width="290" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="NuY2IfBHQqag9rUEK7BR-12" parent="1" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&amp;lt;&amp;gt;&lt;br&gt;RuleConformanceRate" vertex="1">
+          <mxGeometry height="128" width="290" x="760" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="NuY2IfBHQqag9rUEK7BR-13" parent="NuY2IfBHQqag9rUEK7BR-12" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" value="- id: Long&lt;div&gt;- ruleId: String&lt;br&gt;&lt;div&gt;- conformanceRate: int (percent)&lt;br&gt;- day: LocalDate&lt;div&gt;- createdAt: ZonedDateTime&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="290" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="NuY2IfBHQqag9rUEK7BR-14" parent="NuY2IfBHQqag9rUEK7BR-12" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" value="" vertex="1">
+          <mxGeometry height="8" width="290" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="NuY2IfBHQqag9rUEK7BR-15" parent="1" style="text;html=1;strokeColor=#82b366;fillColor=#d5e8d4;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" value="Package: ch.admin.bit.jeap.governance.archrepo.domain.rule" vertex="1">
+          <mxGeometry height="30" width="400" x="650" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="NuY2IfBHQqag9rUEK7BR-16" edge="1" parent="1" source="d8Eak7cNOWqgoXhCGxEU-2" style="endArrow=diamondThin;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;endFill=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="NuY2IfBHQqag9rUEK7BR-10" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="720" y="240" as="sourcePoint" />
+            <mxPoint x="390" y="240" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -7,13 +7,13 @@ import lombok.*;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 
+/**
+ * Persisted daily aggregate compliance score for a system.
+ */
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // for jpa
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-/**
- * Persisted daily aggregate compliance score for a system.
- */
 public class SystemScore {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "system_score_seq")
@@ -32,7 +32,7 @@ public class SystemScore {
     @Getter
     @Setter(AccessLevel.PACKAGE)
     @ToString.Exclude
-    private ch.admin.bit.jeap.governance.domain.System system;
+    private System system;
 
     @Getter
     @Column(nullable = false)
@@ -41,7 +41,7 @@ public class SystemScore {
     @Getter
     private ZonedDateTime createdAt;
 
-    private SystemScore(ch.admin.bit.jeap.governance.domain.System system, int score, LocalDate day, ZonedDateTime createdAt) {
+    private SystemScore(System system, int score, LocalDate day, ZonedDateTime createdAt) {
         this.system = system;
         this.score = score;
         this.day = day;

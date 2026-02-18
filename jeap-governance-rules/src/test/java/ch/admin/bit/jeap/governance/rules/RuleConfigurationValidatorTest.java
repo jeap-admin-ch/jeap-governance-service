@@ -14,12 +14,13 @@ import org.springframework.boot.test.system.OutputCaptureExtension;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(OutputCaptureExtension.class)
 class RuleConfigurationValidatorTest {
 
     @Test
-    void unknownActiveRuleId_logsError(CapturedOutput output) {
+    void unknownActiveRuleId_failOnError_throwsException(CapturedOutput output) {
         var properties = new RuleConfigurationProperties();
         var activeRule = new RuleConfigurationProperties.ActiveRule();
         activeRule.setId("non-existent-rule");
@@ -27,14 +28,30 @@ class RuleConfigurationValidatorTest {
 
         var validator = new RuleConfigurationValidator(List.of(testRule("enforce-oauth2")), properties);
 
-        validator.validateConfiguration();
+        assertThatThrownBy(() -> validator.validateConfiguration(true))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("unknown rule ID(s)");
+        assertThat(output).contains("Active rule(s) reference unknown rule ID(s)")
+                .contains("non-existent-rule");
+    }
+
+    @Test
+    void unknownActiveRuleId_noFailOnError_logsErrorOnly(CapturedOutput output) {
+        var properties = new RuleConfigurationProperties();
+        var activeRule = new RuleConfigurationProperties.ActiveRule();
+        activeRule.setId("non-existent-rule");
+        properties.setActive(List.of(activeRule));
+
+        var validator = new RuleConfigurationValidator(List.of(testRule("enforce-oauth2")), properties);
+
+        validator.validateConfiguration(false);
 
         assertThat(output).contains("Active rule(s) reference unknown rule ID(s)")
                 .contains("non-existent-rule");
     }
 
     @Test
-    void unknownExemptionRuleId_logsError(CapturedOutput output) {
+    void unknownExemptionRuleId_failOnError_throwsException(CapturedOutput output) {
         var properties = new RuleConfigurationProperties();
         var activeRule = new RuleConfigurationProperties.ActiveRule();
         activeRule.setId("enforce-oauth2");
@@ -46,7 +63,27 @@ class RuleConfigurationValidatorTest {
 
         var validator = new RuleConfigurationValidator(List.of(testRule("enforce-oauth2")), properties);
 
-        validator.validateConfiguration();
+        assertThatThrownBy(() -> validator.validateConfiguration(true))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("unknown rule ID(s)");
+        assertThat(output).contains("Component exemption(s) reference unknown rule ID(s)")
+                .contains("non-existent-rule");
+    }
+
+    @Test
+    void unknownExemptionRuleId_noFailOnError_logsErrorOnly(CapturedOutput output) {
+        var properties = new RuleConfigurationProperties();
+        var activeRule = new RuleConfigurationProperties.ActiveRule();
+        activeRule.setId("enforce-oauth2");
+        properties.setActive(List.of(activeRule));
+        var exemption = new RuleConfigurationProperties.ComponentExemption();
+        exemption.setComponentName("some-service");
+        exemption.setRuleId(List.of("non-existent-rule"));
+        properties.setComponentExemptions(List.of(exemption));
+
+        var validator = new RuleConfigurationValidator(List.of(testRule("enforce-oauth2")), properties);
+
+        validator.validateConfiguration(false);
 
         assertThat(output).contains("Component exemption(s) reference unknown rule ID(s)")
                 .contains("non-existent-rule");
@@ -65,7 +102,7 @@ class RuleConfigurationValidatorTest {
 
         var validator = new RuleConfigurationValidator(List.of(testRule("enforce-oauth2")), properties);
 
-        validator.validateConfiguration();
+        validator.validateConfiguration(true);
 
         assertThat(output).doesNotContain("unknown rule ID(s)");
     }

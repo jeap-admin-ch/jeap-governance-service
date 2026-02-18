@@ -3,9 +3,9 @@ package ch.admin.bit.jeap.governance.rules;
 import ch.admin.bit.jeap.governance.domain.plugin.rule.Rule;
 import ch.admin.bit.jeap.governance.domain.rule.RuleId;
 import ch.admin.bit.jeap.governance.rules.RuleConfigurationProperties.ActiveRule;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.context.scope.refresh.RefreshScopeRefreshedEvent;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -31,17 +31,19 @@ class RuleConfigurationValidator {
         this.properties = properties;
     }
 
-    @EventListener(ContextRefreshedEvent.class)
-    void onContextRefreshed() {
-        validateConfiguration();
+    @PostConstruct
+    void validateOnStartup() {
+        validateConfiguration(true);
+        properties.logConfiguration();
     }
 
     @EventListener(RefreshScopeRefreshedEvent.class)
     void onConfigurationRefresh() {
-        validateConfiguration();
+        validateConfiguration(false);
+        properties.logConfiguration();
     }
 
-    void validateConfiguration() {
+    void validateConfiguration(boolean failOnError) {
         List<RuleId> unknownActiveRuleIds = properties.getActive().stream()
                 .map(ActiveRule::getId)
                 .filter(id -> !knownRuleIds.contains(id))
@@ -57,6 +59,10 @@ class RuleConfigurationValidator {
                 .toList();
         if (!unknownExemptionRuleIds.isEmpty()) {
             log.error("Component exemption(s) reference unknown rule ID(s): {}", unknownExemptionRuleIds);
+        }
+
+        if (failOnError && (!unknownActiveRuleIds.isEmpty() || !unknownExemptionRuleIds.isEmpty())) {
+            throw new IllegalStateException("Rule configuration references unknown rule ID(s)");
         }
     }
 }

@@ -7,11 +7,11 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
-@Component
-@RequiredArgsConstructor
 /**
  * Evaluates all applicable rules for a component and persists the resulting rule states.
  */
+@Component
+@RequiredArgsConstructor
 public class RuleEvaluationService {
 
     private final RuleEvaluator ruleEvaluator;
