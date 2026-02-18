@@ -1,12 +1,8 @@
 package ch.admin.bit.jeap.governance.web;
 
-import ch.admin.bit.jeap.governance.archrepo.connector.model.ApiDocVersionDto;
-import ch.admin.bit.jeap.governance.archrepo.connector.model.ArchRepoModelDto;
-import ch.admin.bit.jeap.governance.archrepo.connector.model.DatabaseSchemaVersionDto;
-import ch.admin.bit.jeap.governance.archrepo.connector.model.ReactionGraphDto;
-import ch.admin.bit.jeap.governance.archrepo.connector.model.RestApiRelationWithoutPactDto;
-import ch.admin.bit.jeap.governance.domain.GovernanceServiceEnvironment;
+import ch.admin.bit.jeap.governance.archrepo.connector.model.*;
 import ch.admin.bit.jeap.governance.deploymentlog.connector.model.DeploymentLogComponentVersionDto;
+import ch.admin.bit.jeap.governance.domain.GovernanceServiceEnvironment;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -25,9 +21,7 @@ import java.util.Set;
 
 import static ch.admin.bit.jeap.governance.web.ImportModelHelper.createArchRepoModelDtoOneSystemLessOneSystemComponentEachLess;
 import static ch.admin.bit.jeap.governance.web.ImportModelHelper.createDefaultArchRepoModelDto;
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 public abstract class GovernanceIntegrationTestBase {
 

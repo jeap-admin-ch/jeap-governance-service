@@ -5,6 +5,9 @@ import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
 import ch.admin.bit.jeap.governance.domain.SystemRepository;
 import ch.admin.bit.jeap.governance.domain.plugin.rule.Rule;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleMetadata;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleParameters;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleResult;
 import ch.admin.bit.jeap.governance.domain.rule.*;
 import ch.admin.bit.jeap.governance.domain.score.ComponentScoreRepository;
 import ch.admin.bit.jeap.governance.domain.score.ScoringService;
@@ -39,15 +42,14 @@ class ScoringIT extends GovernanceIntegrationTestBase {
             return new Rule() {
                 @Override
                 public RuleMetadata metadata() {
-                    return new RuleMetadata(RuleId.of("flipping-rule"), "Flipping Rule", null, 10);
+                    return new RuleMetadata(RuleId.of("flipping-rule"), "Flipping Rule");
                 }
 
                 @Override
-                public RuleEvaluationResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters) {
+                public RuleResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters) {
                     var state = FLIPPING_RULE_STATE.get();
                     var comment = state == State.FAIL ? "not yet compliant" : null;
-                    return new RuleEvaluationResult(
-                            new RuleEvaluation(this, ruleParameters, RuleActivationState.ACTIVE), state, comment);
+                    return new RuleResult(state, comment);
                 }
             };
         }
@@ -57,13 +59,12 @@ class ScoringIT extends GovernanceIntegrationTestBase {
             return new Rule() {
                 @Override
                 public RuleMetadata metadata() {
-                    return new RuleMetadata(RuleId.of("always-ok-rule"), "Always OK", null, 10);
+                    return new RuleMetadata(RuleId.of("always-ok-rule"), "Always OK");
                 }
 
                 @Override
-                public RuleEvaluationResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters) {
-                    return new RuleEvaluationResult(
-                            new RuleEvaluation(this, ruleParameters, RuleActivationState.ACTIVE), State.OK, null);
+                public RuleResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters) {
+                    return RuleResult.ok();
                 }
             };
         }
@@ -73,13 +74,12 @@ class ScoringIT extends GovernanceIntegrationTestBase {
             return new Rule() {
                 @Override
                 public RuleMetadata metadata() {
-                    return new RuleMetadata(RuleId.of("always-fail-rule"), "Always Fail", null, 10);
+                    return new RuleMetadata(RuleId.of("always-fail-rule"), "Always Fail");
                 }
 
                 @Override
-                public RuleEvaluationResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters) {
-                    return new RuleEvaluationResult(
-                            new RuleEvaluation(this, ruleParameters, RuleActivationState.ACTIVE), State.FAIL, "non-compliant");
+                public RuleResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters) {
+                    return RuleResult.failed("non-compliant");
                 }
             };
         }
@@ -89,13 +89,12 @@ class ScoringIT extends GovernanceIntegrationTestBase {
             return new Rule() {
                 @Override
                 public RuleMetadata metadata() {
-                    return new RuleMetadata(RuleId.of("exempted-rule"), "Exempted Rule", null, 10);
+                    return new RuleMetadata(RuleId.of("exempted-rule"), "Exempted Rule");
                 }
 
                 @Override
-                public RuleEvaluationResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters) {
-                    return new RuleEvaluationResult(
-                            new RuleEvaluation(this, ruleParameters, RuleActivationState.ACTIVE), State.OK, null);
+                public RuleResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters) {
+                    return RuleResult.ok();
                 }
             };
         }
@@ -129,18 +128,17 @@ class ScoringIT extends GovernanceIntegrationTestBase {
         // Given: a system with two components
         var system = systemRepository.add(System.builder()
                 .name("test-system")
-                .state(State.OK)
                 .aliases(Set.of())
                 .systemComponents(List.of(
-                        SystemComponent.builder().name("service-a").state(State.OK).type(ComponentType.BACKEND_SERVICE).build(),
-                        SystemComponent.builder().name("service-b").state(State.OK).type(ComponentType.BACKEND_SERVICE).build()
+                        SystemComponent.builder().name("service-a").type(ComponentType.BACKEND_SERVICE).build(),
+                        SystemComponent.builder().name("service-b").type(ComponentType.BACKEND_SERVICE).build()
                 ))
                 .build());
 
         var today = LocalDate.now();
 
         // When: scoring is triggered
-        var results = scoringService.updateSystemScore(system, today);
+        var results = scoringService.updateSystemScore(system.getId(), today);
 
         // Then: rule states are persisted for both components
         var serviceA = findComponent(system, "service-a");
@@ -162,19 +160,19 @@ class ScoringIT extends GovernanceIntegrationTestBase {
         // Then: component scores are persisted
         var scoreA = componentScoreRepository.findBySystemComponentAndDay(serviceA, today);
         assertThat(scoreA).isPresent();
-        // service-a: 4 active rules, weight 10 each. OK=20 (always-ok + exempted-rule), total=40 -> 50%
-        assertThat(scoreA.get().getScore()).isEqualTo(50);
+        // service-a: 4 active rules. OK=30+10 (always-ok + exempted-rule), total=30+20+10+40=100 -> 40%
+        assertThat(scoreA.get().getScore()).isEqualTo(40);
 
         var scoreB = componentScoreRepository.findBySystemComponentAndDay(serviceB, today);
         assertThat(scoreB).isPresent();
-        // service-b: 3 active rules (DISABLED excluded), OK=10 (always-ok), total=30 -> 33%
+        // service-b: 3 active rules (DISABLED excluded). OK=30 (always-ok), total=30+20+40=90 -> 33%
         assertThat(scoreB.get().getScore()).isEqualTo(33);
 
         // Then: system score is the average of component scores
         var systemScore = systemScoreRepository.findBySystemAndDay(system, today);
         assertThat(systemScore).isPresent();
-        // (50 + 33) / 2 = 41
-        assertThat(systemScore.get().getScore()).isEqualTo(41);
+        // (40 + 33) / 2 = 36
+        assertThat(systemScore.get().getScore()).isEqualTo(36);
 
         // Then: conformance rates are calculated and persisted
         ruleConformanceRateService.updateConformanceRates(results, today);
@@ -196,17 +194,16 @@ class ScoringIT extends GovernanceIntegrationTestBase {
         // Given: a system with one component
         var system = systemRepository.add(System.builder()
                 .name("update-test-system")
-                .state(State.OK)
                 .aliases(Set.of())
                 .systemComponents(List.of(
-                        SystemComponent.builder().name("update-service").state(State.OK).type(ComponentType.BACKEND_SERVICE).build()
+                        SystemComponent.builder().name("update-service").type(ComponentType.BACKEND_SERVICE).build()
                 ))
                 .build());
         var component = findComponent(system, "update-service");
         var today = LocalDate.now();
 
         // When: first scoring run
-        var firstResults = scoringService.updateSystemScore(system, today);
+        var firstResults = scoringService.updateSystemScore(system.getId(), today);
 
         // Then: flipping-rule is FAIL
         assertRuleState(component, "flipping-rule", State.FAIL, "not yet compliant");
@@ -220,7 +217,7 @@ class ScoringIT extends GovernanceIntegrationTestBase {
 
         // When: rule outcome changes and scoring runs again
         FLIPPING_RULE_STATE.set(State.OK);
-        var secondResults = scoringService.updateSystemScore(system, today);
+        var secondResults = scoringService.updateSystemScore(system.getId(), today);
 
         // Then: existing rule state is updated (same ID, new state)
         var ruleStateAfterSecondRun = ruleStateRepository.findBySystemComponentAndRuleId(component, RuleId.of("flipping-rule"));
@@ -232,8 +229,8 @@ class ScoringIT extends GovernanceIntegrationTestBase {
         // Then: scores reflect the updated rule state
         var score = componentScoreRepository.findBySystemComponentAndDay(component, today);
         assertThat(score).isPresent();
-        // 4 active rules, OK=30 (always-ok + exempted-rule + flipping-rule), total=40 -> 75%
-        assertThat(score.get().getScore()).isEqualTo(75);
+        // 4 active rules, OK=30+10+40 (always-ok + exempted-rule + flipping-rule), total=100 -> 80%
+        assertThat(score.get().getScore()).isEqualTo(80);
 
         // Then: conformance rates are updated (old rates deleted, new rates saved)
         ruleConformanceRateService.updateConformanceRates(secondResults, today);

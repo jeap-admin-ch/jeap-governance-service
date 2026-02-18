@@ -13,7 +13,7 @@ jeap:
           parameters:
             minVersion: "1.2"
             timeout: 30
-        - id: dazit-special-rule
+        - id: some-special-rule
           parameters:
             threshold: 10
       component-exemptions:

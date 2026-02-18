@@ -1,13 +1,15 @@
 package ch.admin.bit.jeap.governance.archrepo.persistence;
 
 import ch.admin.bit.jeap.governance.archrepo.domain.ReactionGraph;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-public interface JpaReactionGraphRepository extends CrudRepository<ReactionGraph, Long> {
+@Repository
+public interface JpaReactionGraphRepository extends JpaRepository<ReactionGraph, Long> {
 
     Optional<ReactionGraph> findBySystemComponentName(String componentName);
 
-    Optional<ReactionGraph> findBySystemComponentId(Long componentId);
+    Optional<ReactionGraph> findBySystemComponentId(long componentId);
 }

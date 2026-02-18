@@ -14,7 +14,7 @@ public class DeploymentLogComponentVersionRepositoryImpl implements DeploymentLo
     private final JpaDeploymentLogComponentVersionRepository jpaRepository;
 
     @Override
-    public Optional<DeploymentLogComponentVersion> findByComponentId(Long componentId) {
+    public Optional<DeploymentLogComponentVersion> findByComponentId(long componentId) {
         return jpaRepository.findBySystemComponentId(componentId);
     }
 

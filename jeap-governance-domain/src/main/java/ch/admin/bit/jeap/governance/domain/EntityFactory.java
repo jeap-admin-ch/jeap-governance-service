@@ -1,6 +1,5 @@
 package ch.admin.bit.jeap.governance.domain;
 
-import ch.admin.bit.jeap.governance.domain.rule.State;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -22,22 +21,18 @@ public class EntityFactory {
                 .name(name)
                 .aliases(aliases)
                 .systemComponents(List.of())
-                //As no rules evaluated so far state is OK
-                .state(State.OK)
                 .build();
     }
 
     /**
      * Create a new system component but do not add it to the model or DB yet
      *
-     * @param name     the name of the system component
-     * @param type     the component type
+     * @param name the name of the system component
+     * @param type the component type
      */
     public SystemComponent createNewSystemComponent(String name, ComponentType type) {
         return SystemComponent.builder()
                 .name(name)
-                //As no rules evaluated so far state is OK
-                .state(State.OK)
                 .type(type)
                 .build();
     }

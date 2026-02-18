@@ -4,11 +4,11 @@ import java.util.Optional;
 
 public interface DatabaseSchemaVersionRepository {
 
-    Optional<DatabaseSchemaVersion> findByComponentId(Long id);
+    Optional<DatabaseSchemaVersion> findByComponentId(long id);
 
     DatabaseSchemaVersion add(DatabaseSchemaVersion apiDocVersion);
 
     void delete(DatabaseSchemaVersion apiDocVersion);
 
-    void deleteAllBySystemId(Long systemId);
+    void deleteAllBySystemId(long systemId);
 }

@@ -64,5 +64,15 @@ class RuleConfigurationValidator {
         if (failOnError && (!unknownActiveRuleIds.isEmpty() || !unknownExemptionRuleIds.isEmpty())) {
             throw new IllegalStateException("Rule configuration references unknown rule ID(s)");
         }
+
+        List<RuleId> rulesWithInvalidWeight = properties.getActive().stream()
+                .filter(activeRule -> activeRule.getWeight() == null || activeRule.getWeight() < 1)
+                .map(ActiveRule::getId).toList();
+        if (!rulesWithInvalidWeight.isEmpty()) {
+            log.error("Active rule(s) have invalid weight (must be >= 1): {}", rulesWithInvalidWeight);
+            if (failOnError) {
+                throw new IllegalStateException("Active rule(s) have invalid weight (must be >= 1)");
+            }
+        }
     }
 }

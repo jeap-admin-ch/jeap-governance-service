@@ -1,5 +1,8 @@
 package ch.admin.bit.jeap.governance.prometheus.datadeletion;
 
+import ch.admin.bit.jeap.governance.domain.ComponentType;
+import ch.admin.bit.jeap.governance.domain.System;
+import ch.admin.bit.jeap.governance.domain.SystemComponent;
 import ch.admin.bit.jeap.governance.domain.SystemComponentRepository;
 import ch.admin.bit.jeap.governance.prometheus.PrometheusAutoconfiguration;
 import ch.admin.bit.jeap.governance.prometheus.amp.AmazonManagedPromClient;
@@ -18,14 +21,14 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 @DataJpaTest
 @Import(PrometheusAutoconfiguration.class)
@@ -36,7 +39,8 @@ class PrometheusComponentDeletionListenerTest {
     @SuppressWarnings("unused")
     @Container
     @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
+            DockerImageName.parse("postgres:16-alpine").asCompatibleSubstituteFor("postgres:16-alpine"));
 
     @MockitoBean
     private SystemComponentRepository systemComponentRepository;
@@ -57,36 +61,23 @@ class PrometheusComponentDeletionListenerTest {
 
     @Test
     void preComponentDeletion_deletesRelatedPrometheusData() {
-        String componentName = "my-service";
-        long componentId = 42L;
-        persistTimeSeries(componentName);
-        persistTimeSeries(componentName);
-        persistTimeSeries("other-service");
+        SystemComponent myComponent = persistSystemComponent("my-service");
+        SystemComponent otherComponent = persistSystemComponent("other-service");
+        persistTimeSeries(myComponent);
+        persistTimeSeries(myComponent);
+        persistTimeSeries(otherComponent);
         assertThat(findAllTimeSeries()).hasSize(3);
-        when(systemComponentRepository.findSystemComponentNameById(componentId))
-                .thenReturn(Optional.of(componentName));
 
-        deletionListener.preComponentDeletion(componentId);
+        deletionListener.preComponentDeletion(myComponent.getId());
 
         List<PromTimeSeries> remaining = findAllTimeSeries();
         assertThat(remaining).hasSize(1);
-        assertThat(remaining.getFirst().getSystemComponentName()).isEqualTo("other-service");
-    }
-
-    @Test
-    void preComponentDeletion_withNullId_doesNothing() {
-        persistTimeSeries("my-service");
-
-        deletionListener.preComponentDeletion(null);
-
-        assertThat(findAllTimeSeries()).hasSize(1);
+        assertThat(remaining.getFirst().getSystemComponentId()).isEqualTo(otherComponent.getId());
     }
 
     @Test
     void preComponentDeletion_withUnknownId_doesNothing() {
-        persistTimeSeries("my-service");
-        when(systemComponentRepository.findSystemComponentNameById(999L))
-                .thenReturn(Optional.empty());
+        persistTimeSeries(persistSystemComponent("my-service"));
 
         deletionListener.preComponentDeletion(999L);
 
@@ -95,21 +86,35 @@ class PrometheusComponentDeletionListenerTest {
 
     @Test
     void preComponentDeletion_withNoMatchingData_deletesNothing() {
-        persistTimeSeries("other-service");
-        when(systemComponentRepository.findSystemComponentNameById(42L))
-                .thenReturn(Optional.of("non-existing-service"));
+        SystemComponent otherComponent = persistSystemComponent("other-service");
+        SystemComponent emptyComponent = persistSystemComponent("empty-service");
+        persistTimeSeries(otherComponent);
 
-        deletionListener.preComponentDeletion(42L);
+        deletionListener.preComponentDeletion(emptyComponent.getId());
 
         assertThat(findAllTimeSeries()).hasSize(1);
     }
 
-    private void persistTimeSeries(String systemComponentName) {
+    private SystemComponent persistSystemComponent(String name) {
+        SystemComponent component = SystemComponent.builder()
+                .name(name)
+                .type(ComponentType.BACKEND_SERVICE)
+                .build();
+        System system = ch.admin.bit.jeap.governance.domain.System.builder()
+                .name("system-" + name)
+                .aliases(Set.of())
+                .systemComponents(List.of(component))
+                .build();
+        entityManager.persistAndFlush(system);
+        return system.getSystemComponents().getFirst();
+    }
+
+    private void persistTimeSeries(SystemComponent systemComponent) {
         PromTimeSeries timeSeries = PromTimeSeries.builder()
                 .prometheusQueryType(PromQueryType.JEAP_JAVA_VERSION)
                 .queryTimestamp(ZonedDateTime.now())
-                .systemComponentName(systemComponentName)
-                .sample(new PromTimeSeriesSample(Map.of("service", systemComponentName), List.of("1770812157.00", "25.00")))
+                .systemComponentId(systemComponent.getId())
+                .sample(new PromTimeSeriesSample(Map.of("service", systemComponent.getName()), List.of("1770812157.00", "25.00")))
                 .build();
         entityManager.persistAndFlush(timeSeries);
         entityManager.clear();

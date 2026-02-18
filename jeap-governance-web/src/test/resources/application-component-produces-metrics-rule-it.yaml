@@ -1,0 +1,6 @@
+jeap:
+  governance:
+    rules:
+      active:
+        - id: component-produces-metrics
+          weight: 10

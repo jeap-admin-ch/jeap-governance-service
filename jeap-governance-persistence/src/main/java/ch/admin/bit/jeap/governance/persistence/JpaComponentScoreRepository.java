@@ -3,9 +3,9 @@ package ch.admin.bit.jeap.governance.persistence;
 import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
 import ch.admin.bit.jeap.governance.domain.score.ComponentScore;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-interface JpaComponentScoreRepository extends CrudRepository<ComponentScore, Long> {
+interface JpaComponentScoreRepository extends JpaRepository<ComponentScore, Long> {
 
     Optional<ComponentScore> findBySystemComponentAndDay(SystemComponent systemComponent, LocalDate day);
 

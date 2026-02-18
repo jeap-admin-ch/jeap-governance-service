@@ -12,7 +12,7 @@ public class SystemComponentService {
     private final ComponentDeletionListenerDelegate deletionListenerDelegate;
     private final SystemComponentRepository systemComponentRepository;
 
-    public void deleteById(Long systemComponentId) {
+    public void deleteById(long systemComponentId) {
         deletionListenerDelegate.notifyPreComponentDeletion(systemComponentId);
         systemComponentRepository.deleteById(systemComponentId);
     }

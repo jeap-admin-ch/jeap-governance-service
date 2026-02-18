@@ -14,7 +14,7 @@ public class ReactionGraphRepositoryImpl implements ReactionGraphRepository {
     private final JpaReactionGraphRepository jpaRepository;
 
     @Override
-    public Optional<ReactionGraph> findByComponentId(Long componentId) {
+    public Optional<ReactionGraph> findByComponentId(long componentId) {
         return jpaRepository.findBySystemComponentId(componentId);
     }
 

@@ -4,7 +4,7 @@ import java.util.Optional;
 
 public interface DeploymentLogComponentVersionRepository {
 
-    Optional<DeploymentLogComponentVersion> findByComponentId(Long id);
+    Optional<DeploymentLogComponentVersion> findByComponentId(long id);
 
     Optional<DeploymentLogComponentVersion> findByComponentName(String componentName);
 

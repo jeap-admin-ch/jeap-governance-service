@@ -45,19 +45,20 @@ This repository is Open Source Software licensed under the [Apache License 2.0](
 
 ### Module Overview
 
-| Module                             | Description                                                                                                                                                                                                                  | Notes                                                            |
-|------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------|
-| `jeap-governance-archrepo`         | Handles integration with the Architecture Repository. Loads the core model and persists it to the database. Can optionally load and persist: ApiDocVersion, DatabaseSchemaVersion, ReactionGraph, RestApiRelationWithoutPact | See [Configuration](#configuration)                              |
+| Module                             | Description                                                                                                                                                                                                                  | Notes                                                                                |
+|------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
+| `jeap-governance-archrepo`         | Handles integration with the Architecture Repository. Loads the core model and persists it to the database. Can optionally load and persist: ApiDocVersion, DatabaseSchemaVersion, ReactionGraph, RestApiRelationWithoutPact | See [Configuration](#configuration)                                                  |
 | `jeap-governance-dataimport`       | Schedules the data import process                                                                                                                                                                                            | See [Data Import plugin mechanism](#data-import) and [Configuration](#configuration) |
-| `jeap-governance-deploymentlog`    | Handles integration with the Deployment Log. Loads the deployment log component versions and persists it to the database.                                                                                                    | See [Configuration](#configuration)                              |
+| `jeap-governance-deploymentlog`    | Handles integration with the Deployment Log. Loads the deployment log component versions and persists it to the database.                                                                                                    | See [Configuration](#configuration)                                                  |
 | `jeap-governance-docgen`           | Generates governancen rule evaluation outcomes to Confluence                                                                                                                                                                 | See [Data Import plugin mechanism](#data-import) and [Configuration](#configuration) |
-| `jeap-governance-domain`           | Contains the core model, specifically System and SystemComponent, including data access interfaces                                                                                                                           | -                                                                |
-| `jeap-governance-pactbroker`       | Imports data from a PACT broker instance                                                                                                                                                                                     | -                                                                |
-| `jeap-governance-persistence`      | Provides flyway migration scripts and JPA repositories                                                                                                                                                                       | -                                                                |
-| `jeap-governance-prometheus`       | Handles integration with a Prometheus server. Queries the latest samples of selected standard jEAP metrics for the system's service components and persists them to the database.                                            | See [Configuration](#configuration)                              |
-| `jeap-governance-rules`            | Provides the infrastructure to evaluate governance rules and score services/systems on a regular basis                                                                                                                       | Instances can define this as their parent                        |
-| `jeap-governance-service-instance` | Module for easily creating an instance of the governance service                                                                                                                                                             | Instances can define this as their parent                        |
-| `jeap-governance-web`              | Contains REST interfaces and the application itself                                                                                                                                                                          | -                                                                |
+| `jeap-governance-domain`           | Contains the core model, specifically System and SystemComponent, including data access interfaces                                                                                                                           | -                                                                                    |
+| `jeap-governance-pactbroker`       | Imports data from a PACT broker instance                                                                                                                                                                                     | -                                                                                    |
+| `jeap-governance-persistence`      | Provides flyway migration scripts and JPA repositories                                                                                                                                                                       | -                                                                                    |
+| `jeap-governance-prometheus`       | Handles integration with a Prometheus server. Queries the latest samples of selected standard jEAP metrics for the system's service components and persists them to the database.                                            | See [Configuration](#configuration)                                                  |
+| `jeap-governance-rules`            | Provides the infrastructure to evaluate governance rules and score services/systems on a regular basis                                                                                                                       | Instances can define this as their parent                                            |
+| `jeap-governance-rules-core`       | Built-in governance rules shipped with the service                                                                                                                                                                           | Included transitively via `jeap-governance-rules`                                    |
+| `jeap-governance-service-instance` | Module for easily creating an instance of the governance service                                                                                                                                                             | Instances can define this as their parent                                            |
+| `jeap-governance-web`              | Contains REST interfaces and the application itself                                                                                                                                                                          | -                                                                                    |
 
 ### Domain Model
 
@@ -164,31 +165,41 @@ storage) to keep both the data model and the implementation straightforward.
 
 All configuration properties support Spring Boot's standard configuration mechanisms (application.yml, environment variables, etc.).
 
-| Property                                                             | Description                                                                       | Default                       | Required               |
-|----------------------------------------------------------------------|-----------------------------------------------------------------------------------|-------------------------------|------------------------|
-| `jeap.governance.environment`                                        | Environment of the service(DEV, REF, ABN, PROD).                                  | -                             | Yes                    |
-| `jeap.governance.archrepo.url`                                       | URL of the Architecture Repository                                                | -                             | Yes                    |
-| `jeap.governance.dataimport.cron-expression`                         | Cron expression to schedule the data import job                                   | `0 15 6,10,14,18 * * MON-FRI` | No                     |
-| `jeap.governance.dataimport.lock-at-least`                           | Minimum duration for which the lock should be held during the data import job     | `PT30M`                       | No                     |
-| `jeap.governance.dataimport.lock-at-most`                            | Maximum lock duration for the data import job                                     | `PT2H`                        | No                     |
-| `jeap.governance.archrepo.timeout`                                   | Connection timeout for Architecture Repository integration                        | `PT5M`                        | No                     |
-| `jeap.governance.archrepo.import.apidocversion.enabled`              | Enable/disable import of API documentation versions from ArchRepo                 | `true`                        | No                     |
-| `jeap.governance.archrepo.import.databaseschemaversion.enabled`      | Enable/disable import of database schema versions from ArchRepo                   | `true`                        | No                     |
-| `jeap.governance.archrepo.import.reactiongraph.enabled`              | Enable/disable import of reaction graphs from ArchRepo                            | `true`                        | No                     |
-| `jeap.governance.archrepo.import.restapirelationwithoutpact.enabled` | Enable/disable import of REST API relations without Pact from ArchRepo            | `true`                        | No                     |
-| `jeap.governance.deploymentlog.enabled`                              | Enable/disable import of data from the of DeploymentLog                           | `true`                        | No                     |
+| Property                                                             | Description                                                                       | Default                       | Required                      |
+|----------------------------------------------------------------------|-----------------------------------------------------------------------------------|-------------------------------|-------------------------------|
+| `jeap.governance.environment`                                        | Environment of the service(DEV, REF, ABN, PROD).                                  | -                             | Yes                           |
+| `jeap.governance.archrepo.url`                                       | URL of the Architecture Repository                                                | -                             | Yes                           |
+| `jeap.governance.dataimport.cron-expression`                         | Cron expression to schedule the data import job                                   | `0 15 6,10,14,18 * * MON-FRI` | No                            |
+| `jeap.governance.dataimport.lock-at-least`                           | Minimum duration for which the lock should be held during the data import job     | `PT30M`                       | No                            |
+| `jeap.governance.dataimport.lock-at-most`                            | Maximum lock duration for the data import job                                     | `PT2H`                        | No                            |
+| `jeap.governance.archrepo.timeout`                                   | Connection timeout for Architecture Repository integration                        | `PT5M`                        | No                            |
+| `jeap.governance.archrepo.import.apidocversion.enabled`              | Enable/disable import of API documentation versions from ArchRepo                 | `true`                        | No                            |
+| `jeap.governance.archrepo.import.databaseschemaversion.enabled`      | Enable/disable import of database schema versions from ArchRepo                   | `true`                        | No                            |
+| `jeap.governance.archrepo.import.reactiongraph.enabled`              | Enable/disable import of reaction graphs from ArchRepo                            | `true`                        | No                            |
+| `jeap.governance.archrepo.import.restapirelationwithoutpact.enabled` | Enable/disable import of REST API relations without Pact from ArchRepo            | `true`                        | No                            |
+| `jeap.governance.deploymentlog.enabled`                              | Enable/disable import of data from the of DeploymentLog                           | `true`                        | No                            |
 | `jeap.governance.deploymentlog.url`                                  | URL of the DeploymentLog                                                          | -                             | Yes, if deploymentlog enabled |
 | `jeap.governance.deploymentlog.username`                             | Username to access the DeploymentLog                                              | -                             | Yes, if deploymentlog enabled |
 | `jeap.governance.deploymentlog.password`                             | Password to access the DeploymentLog                                              | -                             | Yes, if deploymentlog enabled |
-| `jeap.governance.deploymentlog.timeout`                              | DeploymentLog connection timeout duration.                                        | 'PT5M'                        | No                     |
-| `jeap.governance.prometheus.enablede`                                | Enable/disable the import of time series from Prometheus                          | 'true'                        | No                     |
-| `jeap.governance.prometheus.amp.host`                                | Amazon Managed Prometheus host URL                                                | -                             | Yes, if enabled        |
-| `jeap.governance.prometheus.amp.workspace`                           | Amazon Managed Prometheus workspace id                                            | -                             | Yes, if enabled        |
-| `jeap.governance.prometheus.amp.role-arn`                            | ARN of the role to assume for accessing the Amazon Managed Prometheus             | -                             | Yes, if enabled        |
-| `jeap.governance.prometheus.amp.role-session-name`                   | Name of the session to be used for accessing the Amazon Managed Prometheus        | -                             | Yes, if enabled        |
-| `jeap.governance.scoring.cron-expression`                            | Cron expression to schedule the rule evaluation and scoring of components/systems | `0 0,45 6-20 * * MON-FRI`     | No                     |
-| `jeap.governance.scoring.lock-at-least`                              | Minimum duration for which the lock should be held during the data import job     | `PT1M`                        | No                     |
-| `jeap.governance.scoring.lock-at-most`                               | Maximum lock duration for the data import job                                     | `PT15M`                       | No                     |
+| `jeap.governance.deploymentlog.timeout`                              | DeploymentLog connection timeout duration.                                        | 'PT5M'                        | No                            |
+| `jeap.governance.prometheus.enablede`                                | Enable/disable the import of time series from Prometheus                          | 'true'                        | No                            |
+| `jeap.governance.prometheus.amp.host`                                | Amazon Managed Prometheus host URL                                                | -                             | Yes, if enabled               |
+| `jeap.governance.prometheus.amp.workspace`                           | Amazon Managed Prometheus workspace id                                            | -                             | Yes, if enabled               |
+| `jeap.governance.prometheus.amp.role-arn`                            | ARN of the role to assume for accessing the Amazon Managed Prometheus             | -                             | Yes, if enabled               |
+| `jeap.governance.prometheus.amp.role-session-name`                   | Name of the session to be used for accessing the Amazon Managed Prometheus        | -                             | Yes, if enabled               |
+| `jeap.governance.rules.active[].id`                                  | Rule identifier, must match a known rule implementation                           | -                             | Yes                           |
+| `jeap.governance.rules.active[].weight`                              | Rule weight for scoring (positive integer, >= 1)                                  | -                             | Yes                           |
+| `jeap.governance.rules.active[].documentation-link`                  | Optional link to the documentation for this rule, used in governance reports      | -                             | No                            |
+| `jeap.governance.rules.active[].parameters`                          | Optional key-value parameters passed to the rule                                  | `{}`                          | No                            |
+| `jeap.governance.rules.component-exemptions[].id`                    | Unique exemption identifier                                                       | -                             | Yes                           |
+| `jeap.governance.rules.component-exemptions[].component-name`        | Name of the component this exemption applies to                                   | -                             | Yes                           |
+| `jeap.governance.rules.component-exemptions[].rule-id`               | List of rule IDs this exemption covers                                            | -                             | Yes                           |
+| `jeap.governance.rules.component-exemptions[].reason`                | Explanation for the exemption                                                     | -                             | Yes                           |
+| `jeap.governance.rules.component-exemptions[].until`                 | Expiry date (ISO-8601 `yyyy-MM-dd`). If absent, the exemption is permanent        | -                             | No                            |
+| `jeap.governance.rules.component-exemptions[].parameters`            | Optional key-value parameters to further scope the exemption                      | `{}`                          | No                            |
+| `jeap.governance.scoring.cron-expression`                            | Cron expression to schedule the rule evaluation and scoring of components/systems | `0 0,45 6-20 * * MON-FRI`     | No                            |
+| `jeap.governance.scoring.lock-at-least`                              | Minimum duration for which the lock should be held during the data import job     | `PT1M`                        | No                            |
+| `jeap.governance.scoring.lock-at-most`                               | Maximum lock duration for the data import job                                     | `PT15M`                       | No                            |
 
 #### Example Configuration
 
@@ -229,6 +240,24 @@ jeap:
         workspace: "ws-4f9f438a-efdf-4081-9745-fc4a0ad35f32b2"
         role-arn: "arn:aws:iam::892367255812:role/amp-read-assume-role"
         role-session-name: mySession
+    rules:
+      active:
+        - id: component-name
+          weight: 10
+        - id: enforce-oauth2
+          weight: 10
+          documentation-link: https://wiki.example.com/enforce-oauth2
+        - id: custom-rule
+          weight: 5
+          parameters:
+            threshold: 10
+      component-exemptions:
+        - id: my-exemption
+          component-name: my-system-legacy-service
+          rule-id:
+            - enforce-oauth2
+          reason: "Legacy service, migration planned"
+          until: "2026-12-31"
 ```
 
 ### Plugin Mechanism
@@ -286,7 +315,7 @@ public interface ComponentDeletionListener {
      *
      * @param systemComponentId the unique identifier of the component to be deleted
      */
-    void preComponentDeletion(Long systemComponentId);
+    void preComponentDeletion(long systemComponentId);
 
 }
 ```
@@ -304,7 +333,7 @@ public interface ComponentDeletionListener {
 public class CustomCleanupListener implements ComponentDeletionListener {
 
   @Override
-  public void preComponentDeletion(Long systemComponentId) {
+  public void preComponentDeletion(long systemComponentId) {
     // Cleanup logic before component deletion
   }
 }
@@ -320,6 +349,32 @@ basis. Besides using predefined rules, you may also provide custom rules specifi
 2. Inject any necessary repositories into your implementation to access the data you need for the rule evaluation
 3. Provide the rule as a Spring bean
 4. It will be automatically be evaluated during the regular rule evaluation process
+
+#### Built-in Rules
+
+The `jeap-governance-rules-core` module ships the following built-in rules:
+
+| Rule ID                       | Description                                                                               |
+|-------------------------------|-------------------------------------------------------------------------------------------|
+| `component-naming-convention` | Validates that component names follow the convention `{system-name}-{context}-{type-id}`. |
+| `component-produces-metrics`  | Checks that a component has Prometheus metrics data available.                            |
+
+**Component Naming Convention Rule** (`component-naming-convention`)
+
+Splits the component name by `-` and validates three parts:
+
+1. **System name** (first part) — must match `[a-z]+[a-z0-9_]*` and equal the owning system's name or one of its
+   aliases (case-insensitive).
+2. **Context** (middle parts joined by `-`) — must match `[a-z]+[a-z0-9-]*`.
+3. **Type-id** (last part) — must be one of: `service`, `ui`, `scs`, `mobileapp`, `gateway`, `db`.
+
+Names with fewer than 3 parts fail immediately.
+
+**Component Produces Metrics Rule** (`component-produces-metrics`)
+
+Verifies that at least one Prometheus time series exists for the component. This ensures that the
+`jeap-spring-boot-monitoring-starter` dependency is added and the monitoring configuration is working correctly.
+Requires the Prometheus module to be enabled (`jeap.governance.prometheus.enabled=true`).
 
 ### Metrics
 

@@ -1,5 +1,6 @@
 package ch.admin.bit.jeap.governance.domain.rule;
 
+import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleParameters;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;

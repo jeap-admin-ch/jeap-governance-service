@@ -1,12 +1,9 @@
 package ch.admin.bit.jeap.governance.domain.rule;
 
-import ch.admin.bit.jeap.governance.domain.SystemComponent;
-import ch.admin.bit.jeap.governance.domain.plugin.rule.Rule;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -145,18 +142,6 @@ class RuleConformanceRateCalculatorTest {
     }
 
     private static RuleEvaluationResult result(String ruleId, State state) {
-        Rule rule = new Rule() {
-            @Override
-            public RuleMetadata metadata() {
-                return new RuleMetadata(RuleId.of(ruleId), "Rule", null, 10);
-            }
-
-            @Override
-            public RuleEvaluationResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters) {
-                throw new UnsupportedOperationException();
-            }
-        };
-        var evaluation = new RuleEvaluation(rule, new RuleParameters(Map.of()), RuleActivationState.ACTIVE);
-        return new RuleEvaluationResult(evaluation, state, null);
+        return new RuleEvaluationResult(RuleId.of(ruleId), state, null);
     }
 }

@@ -1,8 +1,7 @@
 package ch.admin.bit.jeap.governance.prometheus.dataimport;
 
-import ch.admin.bit.jeap.governance.domain.GovernanceProperties;
-import ch.admin.bit.jeap.governance.domain.GovernanceServiceEnvironment;
-import ch.admin.bit.jeap.governance.domain.SystemComponentRepository;
+import ch.admin.bit.jeap.governance.domain.*;
+import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.prometheus.PrometheusAutoconfiguration;
 import ch.admin.bit.jeap.governance.prometheus.amp.AmazonManagedPromClient;
 import ch.admin.bit.jeap.governance.prometheus.datadeletion.PrometheusComponentDeletionListener;
@@ -10,6 +9,7 @@ import ch.admin.bit.jeap.governance.prometheus.domain.PromQueryType;
 import ch.admin.bit.jeap.governance.prometheus.domain.PromTimeSeries;
 import ch.admin.bit.jeap.governance.prometheus.domain.PromTimeSeriesSample;
 import ch.admin.bit.jeap.governance.prometheus.domain.Transactions;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +21,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
-import jakarta.persistence.EntityManager;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -33,7 +33,8 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @DataJpaTest
 @Import(PrometheusAutoconfiguration.class)
@@ -44,7 +45,8 @@ class PrometheusImporterTest {
     @SuppressWarnings("unused")
     @Container
     @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
+            DockerImageName.parse("postgres:16-alpine").asCompatibleSubstituteFor("postgres:16-alpine"));
 
     @MockitoBean
     private SystemComponentRepository systemComponentRepository;
@@ -72,15 +74,20 @@ class PrometheusImporterTest {
     void setUp() {
         when(governanceProperties.getEnvironment()).thenReturn(GovernanceServiceEnvironment.DEV);
         // Clean up data committed in separate transactions by the importer
-        transactions.inNewTransaction(() ->
-                entityManager.createQuery("DELETE FROM PromTimeSeries").executeUpdate()
-        );
+        transactions.inNewTransaction(() -> {
+            entityManager.createQuery("DELETE FROM PromTimeSeries").executeUpdate();
+            entityManager.createNativeQuery("DELETE FROM system_component").executeUpdate();
+            entityManager.createNativeQuery("DELETE FROM system_aliases").executeUpdate();
+            entityManager.createNativeQuery("DELETE FROM system").executeUpdate();
+        });
     }
 
     @Test
     void importData_importsDataForAllSystemComponents() {
-        when(systemComponentRepository.findAllSystemComponentNames())
-                .thenReturn(Set.of("service-a", "service-b"));
+        SystemComponent componentA = createSystemComponentInNewTransaction("service-a");
+        SystemComponent componentB = createSystemComponentInNewTransaction("service-b");
+        when(systemComponentRepository.findAllSystemComponentReferences())
+                .thenReturn(List.of(toReference(componentA), toReference(componentB)));
         PromTimeSeriesSample sampleA = new PromTimeSeriesSample(Map.of("service", "service-a"), List.of("1770812157.00", "1.00"));
         PromTimeSeriesSample sampleB = new PromTimeSeriesSample(Map.of("service", "service-b"), List.of("1770812157.00", "2.00"));
         when(amazonManagedPromClient.query(any(PromQueryType.class), eq(GovernanceServiceEnvironment.DEV), eq("service-a")))
@@ -108,11 +115,13 @@ class PrometheusImporterTest {
     @Test
     void importData_replacesExistingDataForSystemComponent() {
         String componentName = "my-service";
+        SystemComponent component = createSystemComponentInNewTransaction(componentName);
         ZonedDateTime oldTimestamp = ZonedDateTime.now().minusDays(1);
-        persistTimeSeriesInNewTransaction(componentName, PromQueryType.JEAP_JAVA_VERSION, oldTimestamp, "99.00");
-        persistTimeSeriesInNewTransaction(componentName, PromQueryType.JEAP_JAVA_VERSION, oldTimestamp, "88.00");
+        persistTimeSeriesInNewTransaction(component, PromQueryType.JEAP_JAVA_VERSION, oldTimestamp, "99.00");
+        persistTimeSeriesInNewTransaction(component, PromQueryType.JEAP_JAVA_VERSION, oldTimestamp, "88.00");
         assertThat(findAllTimeSeriesInNewTransaction()).hasSize(2);
-        when(systemComponentRepository.findAllSystemComponentNames()).thenReturn(Set.of(componentName));
+        when(systemComponentRepository.findAllSystemComponentReferences())
+                .thenReturn(List.of(toReference(component)));
         PromTimeSeriesSample newSample = new PromTimeSeriesSample(Map.of("service", componentName), List.of("1770812157.00", "25.00"));
         when(amazonManagedPromClient.query(any(PromQueryType.class), eq(GovernanceServiceEnvironment.DEV), eq(componentName)))
                 .thenReturn(List.of(newSample));
@@ -125,7 +134,7 @@ class PrometheusImporterTest {
         assertThat(allTimeSeries).hasSize(numQueryTypes);
         // All entries have the new sample value, none have the old values
         assertThat(allTimeSeries).allSatisfy(ts -> {
-            assertThat(ts.getSystemComponentName()).isEqualTo(componentName);
+            assertThat(ts.getSystemComponentId()).isEqualTo(component.getId());
             assertThat(ts.getSample().value()).isEqualTo(List.of("1770812157.00", "25.00"));
             assertThat(ts.getQueryTimestamp()).isAfter(oldTimestamp);
         });
@@ -135,9 +144,12 @@ class PrometheusImporterTest {
 
     @Test
     void importData_doesNotAffectDataOfOtherSystemComponents() {
+        SystemComponent otherComponent = createSystemComponentInNewTransaction("other-service");
+        SystemComponent myComponent = createSystemComponentInNewTransaction("my-service");
         ZonedDateTime otherServiceTimestamp = ZonedDateTime.now().minusDays(1).truncatedTo(ChronoUnit.MICROS);
-        persistTimeSeriesInNewTransaction("other-service", PromQueryType.JEAP_JAVA_VERSION, otherServiceTimestamp, "42.00");
-        when(systemComponentRepository.findAllSystemComponentNames()).thenReturn(Set.of("my-service"));
+        persistTimeSeriesInNewTransaction(otherComponent, PromQueryType.JEAP_JAVA_VERSION, otherServiceTimestamp, "42.00");
+        when(systemComponentRepository.findAllSystemComponentReferences())
+                .thenReturn(List.of(toReference(myComponent)));
         PromTimeSeriesSample newSample = new PromTimeSeriesSample(Map.of("service", "my-service"), List.of("1770812157.00", "25.00"));
         when(amazonManagedPromClient.query(any(PromQueryType.class), eq(GovernanceServiceEnvironment.DEV), eq("my-service")))
                 .thenReturn(List.of(newSample));
@@ -157,7 +169,9 @@ class PrometheusImporterTest {
     @Test
     void importData_handlesPartialQueryFailures() {
         String componentName = "my-service";
-        when(systemComponentRepository.findAllSystemComponentNames()).thenReturn(Set.of(componentName));
+        SystemComponent component = createSystemComponentInNewTransaction(componentName);
+        when(systemComponentRepository.findAllSystemComponentReferences())
+                .thenReturn(List.of(toReference(component)));
 
         // All query types fail by default
         when(amazonManagedPromClient.query(any(PromQueryType.class), eq(GovernanceServiceEnvironment.DEV), eq(componentName)))
@@ -178,10 +192,12 @@ class PrometheusImporterTest {
     @Test
     void importData_allQueryTypesFailForComponent_leavesExistingDataUnchanged() {
         String componentName = "my-service";
+        SystemComponent component = createSystemComponentInNewTransaction(componentName);
         ZonedDateTime existingTimestamp = ZonedDateTime.now().minusDays(1).truncatedTo(ChronoUnit.MICROS);
-        persistTimeSeriesInNewTransaction(componentName, PromQueryType.JEAP_JAVA_VERSION, existingTimestamp, "77.00");
+        persistTimeSeriesInNewTransaction(component, PromQueryType.JEAP_JAVA_VERSION, existingTimestamp, "77.00");
         assertThat(findAllTimeSeriesInNewTransaction()).hasSize(1);
-        when(systemComponentRepository.findAllSystemComponentNames()).thenReturn(Set.of(componentName));
+        when(systemComponentRepository.findAllSystemComponentReferences())
+                .thenReturn(List.of(toReference(component)));
         when(amazonManagedPromClient.query(any(PromQueryType.class), any(), eq(componentName)))
                 .thenThrow(new RuntimeException("query failed"));
 
@@ -196,8 +212,10 @@ class PrometheusImporterTest {
 
     @Test
     void importData_failureForOneComponentDoesNotAffectOthers() {
-        when(systemComponentRepository.findAllSystemComponentNames())
-                .thenReturn(Set.of("failing-service", "working-service"));
+        SystemComponent failingComponent = createSystemComponentInNewTransaction("failing-service");
+        SystemComponent workingComponent = createSystemComponentInNewTransaction("working-service");
+        when(systemComponentRepository.findAllSystemComponentReferences())
+                .thenReturn(List.of(toReference(failingComponent), toReference(workingComponent)));
         when(amazonManagedPromClient.query(any(PromQueryType.class), any(), eq("failing-service")))
                 .thenThrow(new RuntimeException("query failed"));
         PromTimeSeriesSample sample = new PromTimeSeriesSample(Map.of("service", "working-service"), List.of("1770812157.00", "1.00"));
@@ -210,14 +228,14 @@ class PrometheusImporterTest {
         int numQueryTypes = PromQueryType.values().length;
         assertThat(allTimeSeries).hasSize(numQueryTypes);
         assertThat(allTimeSeries).allSatisfy(ts -> {
-            assertThat(ts.getSystemComponentName()).isEqualTo("working-service");
+            assertThat(ts.getSystemComponentId()).isEqualTo(workingComponent.getId());
             assertThat(ts.getSample().value()).isEqualTo(List.of("1770812157.00", "1.00"));
         });
     }
 
     @Test
     void importData_noSystemComponents_doesNothing() {
-        when(systemComponentRepository.findAllSystemComponentNames()).thenReturn(Set.of());
+        when(systemComponentRepository.findAllSystemComponentReferences()).thenReturn(List.of());
 
         prometheusImporter.importData();
 
@@ -228,9 +246,11 @@ class PrometheusImporterTest {
     @Test
     void importData_emptyQueryResults_deletesExistingData() {
         String componentName = "my-service";
-        persistTimeSeriesInNewTransaction(componentName, PromQueryType.JEAP_JAVA_VERSION, ZonedDateTime.now(), "25.00");
+        SystemComponent component = createSystemComponentInNewTransaction(componentName);
+        persistTimeSeriesInNewTransaction(component, PromQueryType.JEAP_JAVA_VERSION, ZonedDateTime.now(), "25.00");
         assertThat(findAllTimeSeriesInNewTransaction()).hasSize(1);
-        when(systemComponentRepository.findAllSystemComponentNames()).thenReturn(Set.of(componentName));
+        when(systemComponentRepository.findAllSystemComponentReferences())
+                .thenReturn(List.of(toReference(component)));
         when(amazonManagedPromClient.query(any(PromQueryType.class), any(), eq(componentName)))
                 .thenReturn(List.of());
 
@@ -239,23 +259,71 @@ class PrometheusImporterTest {
         assertThat(findAllTimeSeriesInNewTransaction()).isEmpty();
     }
 
-    private void persistTimeSeriesInNewTransaction(String systemComponentName, PromQueryType queryType,
+    private SystemComponent createSystemComponentInNewTransaction(String name) {
+        List<SystemComponent> result = new java.util.ArrayList<>();
+        transactions.inNewTransaction(() -> {
+            SystemComponent component = SystemComponent.builder()
+                    .name(name)
+                    .type(ComponentType.BACKEND_SERVICE)
+                    .build();
+            System system = ch.admin.bit.jeap.governance.domain.System.builder()
+                    .name("system-" + name)
+                    .aliases(Set.of())
+                    .systemComponents(List.of(component))
+                    .build();
+            entityManager.persist(system);
+            entityManager.flush();
+            result.add(system.getSystemComponents().getFirst());
+        });
+        return result.getFirst();
+    }
+
+    private static SystemComponentReference toReference(SystemComponent component) {
+        long id = component.getId();
+        String name = component.getName();
+        return new SystemComponentReference() {
+            @Override
+            public long getId() {
+                return id;
+            }
+
+            @Override
+            public String getName() {
+                return name;
+            }
+        };
+    }
+
+    private void persistTimeSeriesInNewTransaction(SystemComponent systemComponent, PromQueryType queryType,
                                                     ZonedDateTime queryTimestamp, String sampleValue) {
         transactions.inNewTransaction(() -> {
+            SystemComponent managedComponent = entityManager.find(SystemComponent.class, systemComponent.getId());
             PromTimeSeries timeSeries = PromTimeSeries.builder()
                     .prometheusQueryType(queryType)
                     .queryTimestamp(queryTimestamp)
-                    .systemComponentName(systemComponentName)
-                    .sample(new PromTimeSeriesSample(Map.of("service", systemComponentName), List.of("1770812157.00", sampleValue)))
+                    .systemComponentId(managedComponent.getId())
+                    .sample(new PromTimeSeriesSample(Map.of("service", systemComponent.getName()), List.of("1770812157.00", sampleValue)))
                     .build();
             entityManager.persist(timeSeries);
         });
     }
 
-    private static List<PromTimeSeries> filterByComponent(List<PromTimeSeries> timeSeries, String componentName) {
+    private List<PromTimeSeries> filterByComponent(List<PromTimeSeries> timeSeries, String componentName) {
+        long componentId = findComponentIdByName(componentName);
         return timeSeries.stream()
-                .filter(ts -> ts.getSystemComponentName().equals(componentName))
+                .filter(ts -> ts.getSystemComponentId() == componentId)
                 .toList();
+    }
+
+    private long findComponentIdByName(String componentName) {
+        List<Long> ids = new java.util.ArrayList<>();
+        transactions.inNewTransaction(() ->
+                ids.add(entityManager.createQuery(
+                                "SELECT sc.id FROM SystemComponent sc WHERE sc.name = :name", Long.class)
+                        .setParameter("name", componentName)
+                        .getSingleResult())
+        );
+        return ids.getFirst();
     }
 
     private static Set<PromQueryType> allQueryTypes() {

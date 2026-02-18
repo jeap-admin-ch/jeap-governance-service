@@ -3,7 +3,6 @@ package ch.admin.bit.jeap.governance.domain.score;
 import ch.admin.bit.jeap.governance.domain.ComponentType;
 import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
-import ch.admin.bit.jeap.governance.domain.rule.State;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -96,7 +95,6 @@ class SystemScoreCalculatorTest {
         List<SystemComponent> components = java.util.Arrays.stream(componentNames)
                 .map(n -> SystemComponent.builder()
                         .name(n)
-                        .state(State.OK)
                         .type(ComponentType.BACKEND_SERVICE)
                         .build())
                 .toList();
@@ -104,7 +102,6 @@ class SystemScoreCalculatorTest {
                 .name(name)
                 .aliases(Set.of())
                 .systemComponents(components)
-                .state(State.OK)
                 .build();
     }
 

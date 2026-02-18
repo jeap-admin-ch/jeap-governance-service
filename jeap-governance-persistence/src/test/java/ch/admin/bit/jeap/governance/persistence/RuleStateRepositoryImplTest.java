@@ -119,13 +119,11 @@ class RuleStateRepositoryImplTest extends PostgresTestContainerBase {
     private SystemComponent createAndPersistSystemWithComponent(String systemName, String componentName) {
         SystemComponent component = SystemComponent.builder()
                 .name(componentName)
-                .state(State.OK)
                 .type(ComponentType.BACKEND_SERVICE)
                 .build();
         System system = System.builder()
                 .name(systemName)
                 .systemComponents(List.of(component))
-                .state(State.OK)
                 .aliases(Set.of())
                 .build();
         entityManager.persist(system);

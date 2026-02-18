@@ -3,7 +3,6 @@ package ch.admin.bit.jeap.governance.persistence;
 import ch.admin.bit.jeap.governance.domain.ComponentType;
 import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
-import ch.admin.bit.jeap.governance.domain.rule.State;
 import ch.admin.bit.jeap.governance.domain.score.ComponentScore;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -175,14 +174,12 @@ class ComponentScoreRepositoryImplTest extends PostgresTestContainerBase {
         List<SystemComponent> components = java.util.Arrays.stream(componentNames)
                 .map(name -> SystemComponent.builder()
                         .name(name)
-                        .state(State.OK)
                         .type(ComponentType.BACKEND_SERVICE)
                         .build())
                 .toList();
         System system = System.builder()
                 .name(systemName)
                 .systemComponents(components)
-                .state(State.OK)
                 .aliases(Set.of())
                 .build();
         entityManager.persist(system);

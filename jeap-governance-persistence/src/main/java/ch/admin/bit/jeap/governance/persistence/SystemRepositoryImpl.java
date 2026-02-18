@@ -21,8 +21,18 @@ public class SystemRepositoryImpl implements SystemRepository {
     }
 
     @Override
+    public List<Long> findAllIds() {
+        return jpaSystemRepository.findAllIds();
+    }
+
+    @Override
     public Optional<System> findByName(String systemName) {
         return jpaSystemRepository.findByName(systemName);
+    }
+
+    @Override
+    public Optional<System> findById(Long id) {
+        return jpaSystemRepository.findById(id);
     }
 
     @Override

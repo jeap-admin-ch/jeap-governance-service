@@ -1,8 +1,8 @@
 package ch.admin.bit.jeap.governance.prometheus.persistence;
 
+import ch.admin.bit.jeap.governance.prometheus.domain.PromQueryType;
 import ch.admin.bit.jeap.governance.prometheus.domain.PromTimeSeries;
 import ch.admin.bit.jeap.governance.prometheus.domain.PromTimeSeriesQueryRepository;
-import ch.admin.bit.jeap.governance.prometheus.domain.PromQueryType;
 import ch.admin.bit.jeap.governance.prometheus.domain.PromTimeSeriesRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -15,18 +15,23 @@ class PromTimeSeriesRepositoryImpl implements PromTimeSeriesRepository, PromTime
 
     private final JpaPromTimeSeriesRepository jpaRepository;
 
-    public Iterable<PromTimeSeries> saveAll(List<PromTimeSeries> timeSeriesList) {
-        return jpaRepository.saveAll(timeSeriesList);
+    public void saveAll(List<PromTimeSeries> timeSeriesList) {
+        jpaRepository.saveAll(timeSeriesList);
     }
 
     @Override
-    public int deleteBy(String systemComponent) {
-        return jpaRepository.deleteBy(systemComponent);
+    public int deleteBySystemComponentId(long systemComponentId) {
+        return jpaRepository.deleteBySystemComponentId(systemComponentId);
     }
 
     @Override
-    public List<PromTimeSeries> findBy(PromQueryType promQueryType, String systemComponent) {
-        return jpaRepository.findByPrometheusQueryTypeAndSystemComponentName(promQueryType, systemComponent);
+    public List<PromTimeSeries> findBy(PromQueryType promQueryType, long systemComponentId) {
+        return jpaRepository.findByPrometheusQueryTypeAndSystemComponentId(promQueryType, systemComponentId);
+    }
+
+    @Override
+    public boolean anyTimeSeriesExistsBy(long systemComponentId) {
+        return jpaRepository.existsBySystemComponentId(systemComponentId);
     }
 
 }

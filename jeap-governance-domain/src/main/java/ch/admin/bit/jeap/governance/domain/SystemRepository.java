@@ -9,7 +9,11 @@ import java.util.Optional;
 public interface SystemRepository {
     List<System> findAll();
 
+    List<Long> findAllIds();
+
     Optional<System> findByName(String name);
+
+    Optional<System> findById(Long id);
 
     System add(System system);
 

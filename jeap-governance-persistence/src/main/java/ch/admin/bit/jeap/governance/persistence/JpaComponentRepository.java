@@ -1,23 +1,20 @@
 package ch.admin.bit.jeap.governance.persistence;
 
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
+import ch.admin.bit.jeap.governance.domain.SystemComponentReference;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Repository
-interface JpaComponentRepository extends CrudRepository<SystemComponent, Long> {
+interface JpaComponentRepository extends JpaRepository<SystemComponent, Long> {
 
     Optional<SystemComponent> findByName(String componentName);
 
-    @Query("select distinct sc.name from SystemComponent sc")
-    Set<String> findAllSystemComponentNames();
-
-    @Query("select sc.name from SystemComponent sc where sc.id = :systemComponentId")
-    Optional<String> findSystemComponentNameById(@Param("systemComponentId") long systemComponentId);
+    @Query("SELECT sc.id AS id, sc.name AS name FROM SystemComponent sc")
+    List<SystemComponentReference> findAllSystemComponentReferences();
 
 }

@@ -2,6 +2,7 @@ package ch.admin.bit.jeap.governance.domain.score;
 
 import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
+import ch.admin.bit.jeap.governance.domain.SystemRepository;
 import ch.admin.bit.jeap.governance.domain.rule.RuleEvaluationResult;
 import ch.admin.bit.jeap.governance.domain.rule.RuleEvaluationService;
 import io.micrometer.core.annotation.Timed;
@@ -27,11 +28,13 @@ public class ScoringService {
     private final SystemScoreCalculator systemScoreCalculator;
     private final SystemScoreRepository systemScoreRepository;
     private final RuleEvaluationService ruleEvaluationService;
+    private final SystemRepository systemRepository;
 
     @Timed("jeap.governance.service.scoring")
     @Transactional
-    public List<RuleEvaluationResult> updateSystemScore(System system, LocalDate day) {
-        log.info("Updating system score for system {}", system);
+    public List<RuleEvaluationResult> updateSystemScore(long systemId, LocalDate day) {
+        System system = systemRepository.findById(systemId).orElseThrow();
+        log.info("Updating system score for system {}", system.getName());
         List<RuleEvaluationResult> allResults = new ArrayList<>();
 
         List<ComponentScore> componentScores = system.getSystemComponents().stream()

@@ -4,11 +4,11 @@ import java.util.Optional;
 
 public interface ApiDocVersionRepository {
 
-    Optional<ApiDocVersion> findByComponentId(Long id);
+    Optional<ApiDocVersion> findByComponentId(long id);
 
     ApiDocVersion add(ApiDocVersion apiDocVersion);
 
     void delete(ApiDocVersion apiDocVersion);
 
-    void deleteAllBySystemId(Long systemId);
+    void deleteAllBySystemId(long systemId);
 }

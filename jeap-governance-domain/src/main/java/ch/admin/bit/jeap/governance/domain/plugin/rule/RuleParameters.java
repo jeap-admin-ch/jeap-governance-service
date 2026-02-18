@@ -1,4 +1,4 @@
-package ch.admin.bit.jeap.governance.domain.rule;
+package ch.admin.bit.jeap.governance.domain.plugin.rule;
 
 import java.util.HashMap;
 import java.util.Map;

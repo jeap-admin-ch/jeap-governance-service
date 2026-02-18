@@ -14,6 +14,6 @@ public interface ComponentDeletionListener {
      *
      * @param systemComponentId the unique identifier of the component to be deleted
      */
-    void preComponentDeletion(Long systemComponentId);
+    void preComponentDeletion(long systemComponentId);
 
 }

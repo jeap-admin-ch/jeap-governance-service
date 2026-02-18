@@ -25,13 +25,14 @@ class RuleEvaluator {
     private RuleEvaluationResult evaluate(RuleEvaluation ruleEvaluation, SystemComponent systemComponent) {
         return switch (ruleEvaluation.activationState()) {
             case ACTIVE -> evaluateRule(ruleEvaluation, systemComponent);
-            case EXEMPTED -> RuleEvaluationResult.exempted(ruleEvaluation);
-            case EXEMPTED_UNTIL -> RuleEvaluationResult.exemptedUntil(ruleEvaluation);
+            case EXEMPTED -> RuleEvaluationResult.exempted(ruleEvaluation.rule().metadata().ruleId());
+            case EXEMPTED_UNTIL -> RuleEvaluationResult.exemptedUntil(ruleEvaluation.rule().metadata().ruleId());
         };
     }
 
     private RuleEvaluationResult evaluateRule(RuleEvaluation ruleEvaluation, SystemComponent systemComponent) {
         var rule = ruleEvaluation.rule();
-        return rule.evaluate(systemComponent, ruleEvaluation.ruleParameters());
+        var result = rule.evaluate(systemComponent, ruleEvaluation.ruleParameters());
+        return new RuleEvaluationResult(rule.metadata().ruleId(), result.state(), result.stateComment());
     }
 }

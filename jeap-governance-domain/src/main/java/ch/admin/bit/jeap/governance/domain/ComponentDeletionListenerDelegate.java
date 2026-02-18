@@ -20,7 +20,7 @@ public class ComponentDeletionListenerDelegate {
         log.info("Initialized ComponentDeletionListenerDelegate with these listeners: {}", listeners);
     }
 
-    public void notifyPreComponentDeletion(Long systemComponentId) {
+    public void notifyPreComponentDeletion(long systemComponentId) {
         for (ComponentDeletionListener listener : listeners) {
             try {
                 listener.preComponentDeletion(systemComponentId);

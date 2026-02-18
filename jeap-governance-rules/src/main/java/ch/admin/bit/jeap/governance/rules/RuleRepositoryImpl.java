@@ -2,7 +2,11 @@ package ch.admin.bit.jeap.governance.rules;
 
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
 import ch.admin.bit.jeap.governance.domain.plugin.rule.Rule;
-import ch.admin.bit.jeap.governance.domain.rule.*;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleParameters;
+import ch.admin.bit.jeap.governance.domain.rule.RuleActivationState;
+import ch.admin.bit.jeap.governance.domain.rule.RuleEvaluation;
+import ch.admin.bit.jeap.governance.domain.rule.RuleId;
+import ch.admin.bit.jeap.governance.domain.rule.RuleRepository;
 import ch.admin.bit.jeap.governance.rules.RuleConfigurationProperties.ActiveRule;
 import ch.admin.bit.jeap.governance.rules.RuleConfigurationProperties.ComponentExemption;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +53,13 @@ class RuleRepositoryImpl implements RuleRepository {
                 .map(ActiveRule::getId)
                 .filter(rulesByIdMap::containsKey)
                 .toList();
+    }
+
+    @Override
+    public Map<RuleId, Integer> getActiveRuleWeights() {
+        return properties.getActive().stream().collect(Collectors.toMap(
+                ActiveRule::getId,
+                ActiveRule::getWeight));
     }
 
     private RuleEvaluation toRuleEvaluation(ActiveRule activeRule, SystemComponent component) {

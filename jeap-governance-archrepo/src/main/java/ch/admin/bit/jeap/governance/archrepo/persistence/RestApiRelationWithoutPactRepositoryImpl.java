@@ -14,12 +14,12 @@ public class RestApiRelationWithoutPactRepositoryImpl implements RestApiRelation
     private final JpaRestApiRelationWithoutPactRepository jpaRepository;
 
     @Override
-    public List<RestApiRelationWithoutPact> findAllByProviderSystemComponentId(Long id) {
+    public List<RestApiRelationWithoutPact> findAllByProviderSystemComponentId(long id) {
         return jpaRepository.findByProviderSystemComponentId(id);
     }
 
     @Override
-    public List<RestApiRelationWithoutPact> findAllByConsumerSystemComponentId(Long id) {
+    public List<RestApiRelationWithoutPact> findAllByConsumerSystemComponentId(long id) {
         return jpaRepository.findByConsumerSystemComponentId(id);
     }
 
@@ -34,7 +34,7 @@ public class RestApiRelationWithoutPactRepositoryImpl implements RestApiRelation
     }
 
     @Override
-    public void deleteAllByProviderSystemComponentId(Long id) {
+    public void deleteAllByProviderSystemComponentId(long id) {
         jpaRepository.deleteAllByProviderSystemComponentId(id);
     }
 }

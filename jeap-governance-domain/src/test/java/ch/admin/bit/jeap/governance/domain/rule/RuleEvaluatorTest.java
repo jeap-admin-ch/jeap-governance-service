@@ -3,6 +3,9 @@ package ch.admin.bit.jeap.governance.domain.rule;
 import ch.admin.bit.jeap.governance.domain.ComponentType;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
 import ch.admin.bit.jeap.governance.domain.plugin.rule.Rule;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleMetadata;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleParameters;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleResult;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -19,13 +22,12 @@ class RuleEvaluatorTest {
 
     private final SystemComponent component = SystemComponent.builder()
             .name("my-service")
-            .state(State.OK)
             .type(ComponentType.BACKEND_SERVICE)
             .build();
 
     @Test
     void activeRule_delegatesToRuleEvaluate() {
-        Rule rule = okRule("enforce-oauth2", 10);
+        Rule rule = okRule("enforce-oauth2");
         var evaluation = new RuleEvaluation(rule, new RuleParameters(Map.of()), RuleActivationState.ACTIVE);
         when(ruleRepository.getRulesToEvaluateForComponent(component)).thenReturn(List.of(evaluation));
 
@@ -38,7 +40,7 @@ class RuleEvaluatorTest {
 
     @Test
     void exemptedRule_returnsDisabledState() {
-        Rule rule = okRule("enforce-oauth2", 10);
+        Rule rule = okRule("enforce-oauth2");
         var evaluation = new RuleEvaluation(rule, new RuleParameters(Map.of()), RuleActivationState.EXEMPTED);
         when(ruleRepository.getRulesToEvaluateForComponent(component)).thenReturn(List.of(evaluation));
 
@@ -50,7 +52,7 @@ class RuleEvaluatorTest {
 
     @Test
     void exemptedUntilRule_returnsPausedState() {
-        Rule rule = okRule("enforce-oauth2", 10);
+        Rule rule = okRule("enforce-oauth2");
         var evaluation = new RuleEvaluation(rule, new RuleParameters(Map.of()), RuleActivationState.EXEMPTED_UNTIL);
         when(ruleRepository.getRulesToEvaluateForComponent(component)).thenReturn(List.of(evaluation));
 
@@ -62,7 +64,7 @@ class RuleEvaluatorTest {
 
     @Test
     void activeFailingRule_returnsFailState() {
-        Rule rule = failingRule("check-tls", 5);
+        Rule rule = failingRule("check-tls");
         var evaluation = new RuleEvaluation(rule, new RuleParameters(Map.of()), RuleActivationState.ACTIVE);
         when(ruleRepository.getRulesToEvaluateForComponent(component)).thenReturn(List.of(evaluation));
 
@@ -74,9 +76,9 @@ class RuleEvaluatorTest {
 
     @Test
     void multipleRules_evaluatedIndependently() {
-        Rule okRule = okRule("enforce-oauth2", 10);
-        Rule failRule = failingRule("check-tls", 5);
-        Rule exemptedRule = okRule("deprecated-rule", 3);
+        Rule okRule = okRule("enforce-oauth2");
+        Rule failRule = failingRule("check-tls");
+        Rule exemptedRule = okRule("deprecated-rule");
 
         var evaluations = List.of(
                 new RuleEvaluation(okRule, new RuleParameters(Map.of()), RuleActivationState.ACTIVE),
@@ -108,16 +110,16 @@ class RuleEvaluatorTest {
         Rule rule = new Rule() {
             @Override
             public RuleMetadata metadata() {
-                return new RuleMetadata(RuleId.of("param-rule"), "Param Rule", "http://docs", 1);
+                return new RuleMetadata(RuleId.of("param-rule"), "Param Rule");
             }
 
             @Override
-            public RuleEvaluationResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters) {
+            public RuleResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters) {
                 // Rule uses parameters to decide outcome
                 if ("10".equals(ruleParameters.parameters().get("threshold"))) {
-                    return RuleEvaluationResult.ok(new RuleEvaluation(this, ruleParameters, RuleActivationState.ACTIVE));
+                    return RuleResult.ok();
                 }
-                return RuleEvaluationResult.failed(new RuleEvaluation(this, ruleParameters, RuleActivationState.ACTIVE));
+                return RuleResult.failed();
             }
         };
         var evaluation = new RuleEvaluation(rule, parameters, RuleActivationState.ACTIVE);
@@ -132,7 +134,7 @@ class RuleEvaluatorTest {
     @Test
     void exemptedRule_doesNotCallRuleEvaluate() {
         // Even if the rule would fail when evaluated, exemption skips evaluation
-        Rule failRule = failingRule("enforce-oauth2", 10);
+        Rule failRule = failingRule("enforce-oauth2");
         var evaluation = new RuleEvaluation(failRule, new RuleParameters(Map.of()), RuleActivationState.EXEMPTED);
         when(ruleRepository.getRulesToEvaluateForComponent(component)).thenReturn(List.of(evaluation));
 
@@ -141,30 +143,30 @@ class RuleEvaluatorTest {
         assertThat(results.getFirst().state()).isEqualTo(State.DISABLED);
     }
 
-    private Rule okRule(String id, int weight) {
+    private Rule okRule(String id) {
         return new Rule() {
             @Override
             public RuleMetadata metadata() {
-                return new RuleMetadata(RuleId.of(id), "Rule " + id, "http://docs/" + id, weight);
+                return new RuleMetadata(RuleId.of(id), "Rule " + id);
             }
 
             @Override
-            public RuleEvaluationResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters) {
-                return RuleEvaluationResult.ok(new RuleEvaluation(this, ruleParameters, RuleActivationState.ACTIVE));
+            public RuleResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters) {
+                return RuleResult.ok();
             }
         };
     }
 
-    private Rule failingRule(String id, int weight) {
+    private Rule failingRule(String id) {
         return new Rule() {
             @Override
             public RuleMetadata metadata() {
-                return new RuleMetadata(RuleId.of(id), "Rule " + id, "http://docs/" + id, weight);
+                return new RuleMetadata(RuleId.of(id), "Rule " + id);
             }
 
             @Override
-            public RuleEvaluationResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters) {
-                return RuleEvaluationResult.failed(new RuleEvaluation(this, ruleParameters, RuleActivationState.ACTIVE));
+            public RuleResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters) {
+                return RuleResult.failed();
             }
         };
     }

@@ -1,9 +1,7 @@
 package ch.admin.bit.jeap.governance.rules;
 
-import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemRepository;
 import ch.admin.bit.jeap.governance.domain.rule.RuleConformanceRateService;
-import ch.admin.bit.jeap.governance.domain.rule.State;
 import ch.admin.bit.jeap.governance.domain.score.ScoringService;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.core.SimpleLock;
@@ -18,7 +16,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
@@ -53,16 +50,10 @@ class ScoringSchedulerIT {
 
     @Test
     void schedulerFiresAndCallsScoringService() {
-        System system = System.builder()
-                .name("test-system")
-                .aliases(Set.of())
-                .systemComponents(List.of())
-                .state(State.OK)
-                .build();
-        when(systemRepository.findAll()).thenReturn(List.of(system));
+        when(systemRepository.findAllIds()).thenReturn(List.of(1L));
 
         await().atMost(5, SECONDS).untilAsserted(() ->
-                verify(scoringService, atLeastOnce()).updateSystemScore(any(), any())
+                verify(scoringService, atLeastOnce()).updateSystemScore(any(Long.class), any())
         );
     }
 

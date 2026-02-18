@@ -3,7 +3,6 @@ package ch.admin.bit.jeap.governance.deploymentlog;
 import ch.admin.bit.jeap.governance.domain.ComponentType;
 import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
-import ch.admin.bit.jeap.governance.domain.rule.State;
 import lombok.experimental.UtilityClass;
 
 import java.time.ZonedDateTime;
@@ -23,7 +22,6 @@ public class TestUtility {
     public static System createSystem(String systemName) {
         return System.builder()
                 .name(systemName)
-                .state(State.OK)
                 .systemComponents(new ArrayList<>())
                 .createdAt(ZonedDateTime.now())
                 .build();
@@ -32,7 +30,6 @@ public class TestUtility {
     public static SystemComponent createSystemComponent(System system, String componentName) {
         SystemComponent systemComponent = SystemComponent.builder()
                 .name(componentName)
-                .state(State.OK)
                 .type(ComponentType.BACKEND_SERVICE)
                 .createdAt(ZonedDateTime.now())
                 .build();

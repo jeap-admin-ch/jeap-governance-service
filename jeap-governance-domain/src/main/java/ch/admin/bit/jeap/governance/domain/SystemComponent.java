@@ -1,12 +1,11 @@
 package ch.admin.bit.jeap.governance.domain;
 
-import ch.admin.bit.jeap.governance.domain.rule.State;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.ZonedDateTime;
 
-@ToString
+@ToString(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // for jpa
 @Entity(name = "SystemComponent")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -18,23 +17,18 @@ public class SystemComponent {
             sequenceName = "system_component_id_seq"
     )
     @EqualsAndHashCode.Include
+    @ToString.Include
     @Getter
     private Long id;
 
+    @ToString.Include
     @NonNull
     @Getter
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    @NonNull
-    @Getter
-    @Setter
-    private State state;
-
     @ManyToOne
     @Getter
     @Setter(AccessLevel.PACKAGE)
-    @ToString.Exclude
     private System system;
 
     @Enumerated(EnumType.STRING)
@@ -46,17 +40,16 @@ public class SystemComponent {
     @Getter
     private ZonedDateTime createdAt;
 
-    private SystemComponent(String name, State state, ComponentType type, ZonedDateTime createdAt) {
+    private SystemComponent(@NonNull String name, @NonNull ComponentType type, @NonNull ZonedDateTime createdAt) {
         this.name = name;
-        this.state = state;
         this.type = type;
         this.createdAt = createdAt;
     }
 
     @Builder
-    private static SystemComponent build(String name, State state, ComponentType type, ZonedDateTime createdAt) {
+    private static SystemComponent build(@NonNull String name, @NonNull ComponentType type, ZonedDateTime createdAt) {
         // System is set afterward when a service is added to a system
-        return new SystemComponent(name, state, type, createdAt == null ? ZonedDateTime.now() : createdAt);
+        return new SystemComponent(name, type, createdAt == null ? ZonedDateTime.now() : createdAt);
     }
 
     public void update(ComponentType type) {

@@ -1,6 +1,5 @@
 package ch.admin.bit.jeap.governance.domain;
 
-import ch.admin.bit.jeap.governance.domain.rule.State;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,7 +9,7 @@ import java.util.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // for jpa
 @Entity(name = "System")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString
+@ToString(onlyExplicitlyIncluded = true)
 public class System {
     @Getter
     @Id
@@ -19,9 +18,11 @@ public class System {
             name = "system_seq",
             sequenceName = "system_id_seq"
     )
+    @ToString.Include
     @EqualsAndHashCode.Include
     private Long id;
 
+    @ToString.Include
     @NonNull
     @Getter
     private String name;
@@ -34,32 +35,24 @@ public class System {
             cascade = CascadeType.ALL,
             fetch = FetchType.LAZY,
             orphanRemoval = true)
-    @ToString.Exclude
     private List<SystemComponent> systemComponents;
-
-    @Enumerated(EnumType.STRING)
-    @NonNull
-    @Getter
-    @Setter
-    private State state;
 
     @NonNull
     @Getter
     private ZonedDateTime createdAt;
 
-    private System(String name, Set<String> strings, List<SystemComponent> modifiableList, State state, ZonedDateTime zonedDateTime) {
+    private System(@NonNull String name, @NonNull Set<String> aliases, @NonNull List<SystemComponent> modifiableList, @NonNull ZonedDateTime zonedDateTime) {
         this.name = name;
-        this.aliases = strings;
+        this.aliases = aliases;
         this.systemComponents = modifiableList;
-        this.state = state;
         this.createdAt = zonedDateTime;
     }
 
     @Builder
-    private static System build(String name, Set<String> aliases, List<SystemComponent> systemComponents, State state, ZonedDateTime createdAt) {
+    private static System build(@NonNull String name, Set<String> aliases, @NonNull List<SystemComponent> systemComponents, ZonedDateTime createdAt) {
         //This list might be read only, we need a "normal" list
         List<SystemComponent> modifiableList = new ArrayList<>(systemComponents);
-        System system = new System(name, copyAliases(aliases), modifiableList, state, createdAt == null ? ZonedDateTime.now() : createdAt);
+        System system = new System(name, copyAliases(aliases), modifiableList, createdAt == null ? ZonedDateTime.now() : createdAt);
         //Set the system for each service
         systemComponents.forEach(x -> x.setSystem(system));
         return system;

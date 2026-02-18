@@ -50,7 +50,7 @@ class RuleConfigurationPropertiesTest {
     void activeRule_withSingleParameter() {
         var rule = properties.getActive().get(2);
 
-        assertThat(rule.getId()).isEqualTo(RuleId.of("dazit-special-rule"));
+        assertThat(rule.getId()).isEqualTo(RuleId.of("some-special-rule"));
         assertThat(rule.getParameters()).containsEntry("threshold", "10");
     }
 

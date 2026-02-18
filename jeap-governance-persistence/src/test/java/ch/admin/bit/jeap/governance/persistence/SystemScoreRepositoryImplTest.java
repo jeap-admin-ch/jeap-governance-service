@@ -1,7 +1,6 @@
 package ch.admin.bit.jeap.governance.persistence;
 
 import ch.admin.bit.jeap.governance.domain.System;
-import ch.admin.bit.jeap.governance.domain.rule.State;
 import ch.admin.bit.jeap.governance.domain.score.SystemScore;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,7 +126,6 @@ class SystemScoreRepositoryImplTest extends PostgresTestContainerBase {
         System system = System.builder()
                 .name(name)
                 .systemComponents(List.of())
-                .state(State.OK)
                 .aliases(Set.of())
                 .build();
         entityManager.persist(system);

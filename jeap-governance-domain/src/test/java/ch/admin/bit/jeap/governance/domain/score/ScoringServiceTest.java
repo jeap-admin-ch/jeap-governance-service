@@ -3,13 +3,18 @@ package ch.admin.bit.jeap.governance.domain.score;
 import ch.admin.bit.jeap.governance.domain.ComponentType;
 import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
-import ch.admin.bit.jeap.governance.domain.plugin.rule.Rule;
-import ch.admin.bit.jeap.governance.domain.rule.*;
+import ch.admin.bit.jeap.governance.domain.SystemRepository;
+import ch.admin.bit.jeap.governance.domain.rule.RuleEvaluationResult;
+import ch.admin.bit.jeap.governance.domain.rule.RuleEvaluationService;
+import ch.admin.bit.jeap.governance.domain.rule.RuleId;
+import ch.admin.bit.jeap.governance.domain.rule.RuleRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,25 +24,38 @@ import static org.mockito.Mockito.*;
 
 class ScoringServiceTest {
 
-    private final ComponentScoreCalculator componentScoreCalculator = new ComponentScoreCalculator();
+    private static final Long SYSTEM_ID = 1L;
+
+    private final RuleRepository ruleRepository = mock(RuleRepository.class);
+    private final ComponentScoreCalculator componentScoreCalculator = new ComponentScoreCalculator(ruleRepository);
     private final ComponentScoreRepository componentScoreRepository = mock(ComponentScoreRepository.class);
     private final SystemScoreCalculator systemScoreCalculator = new SystemScoreCalculator();
     private final SystemScoreRepository systemScoreRepository = mock(SystemScoreRepository.class);
     private final RuleEvaluationService ruleEvaluationService = mock(RuleEvaluationService.class);
+    private final SystemRepository systemRepository = mock(SystemRepository.class);
 
     private final ScoringService scoringService = new ScoringService(
             componentScoreCalculator, componentScoreRepository,
             systemScoreCalculator, systemScoreRepository,
-            ruleEvaluationService);
+            ruleEvaluationService, systemRepository);
 
     private static final LocalDate DAY = LocalDate.of(2025, 6, 15);
+
+    @BeforeEach
+    void setUp() {
+        when(ruleRepository.getActiveRuleWeights()).thenReturn(Map.of(
+                RuleId.of("rule-1"), 10,
+                RuleId.of("rule-2"), 5
+        ));
+    }
 
     @Test
     void updateSystemScore_evaluatesRulesForEachComponent() {
         System system = systemWithComponents("service-a", "service-b");
+        when(systemRepository.findById(SYSTEM_ID)).thenReturn(Optional.of(system));
         when(ruleEvaluationService.updateRuleStatesForComponent(any())).thenReturn(List.of());
 
-        scoringService.updateSystemScore(system, DAY);
+        scoringService.updateSystemScore(SYSTEM_ID, DAY);
 
         verify(ruleEvaluationService, times(2)).updateRuleStatesForComponent(any());
     }
@@ -45,9 +63,10 @@ class ScoringServiceTest {
     @Test
     void updateSystemScore_savesComponentScores() {
         System system = systemWithComponents("service-a");
+        when(systemRepository.findById(SYSTEM_ID)).thenReturn(Optional.of(system));
         when(ruleEvaluationService.updateRuleStatesForComponent(any())).thenReturn(List.of());
 
-        scoringService.updateSystemScore(system, DAY);
+        scoringService.updateSystemScore(SYSTEM_ID, DAY);
 
         verify(componentScoreRepository).saveOrReplaceAllForSystemAndDay(eq(system), any(), eq(DAY));
     }
@@ -55,9 +74,10 @@ class ScoringServiceTest {
     @Test
     void updateSystemScore_savesSystemScore() {
         System system = systemWithComponents("service-a");
+        when(systemRepository.findById(SYSTEM_ID)).thenReturn(Optional.of(system));
         when(ruleEvaluationService.updateRuleStatesForComponent(any())).thenReturn(List.of());
 
-        scoringService.updateSystemScore(system, DAY);
+        scoringService.updateSystemScore(SYSTEM_ID, DAY);
 
         verify(systemScoreRepository).save(argThat(score -> {
             assertThat(score.getSystem()).isEqualTo(system);
@@ -69,9 +89,10 @@ class ScoringServiceTest {
     @Test
     void updateSystemScore_noComponents_savesScoreOf100() {
         System system = systemWithComponents();
+        when(systemRepository.findById(SYSTEM_ID)).thenReturn(Optional.of(system));
         when(ruleEvaluationService.updateRuleStatesForComponent(any())).thenReturn(List.of());
 
-        scoringService.updateSystemScore(system, DAY);
+        scoringService.updateSystemScore(SYSTEM_ID, DAY);
 
         verify(componentScoreRepository).saveOrReplaceAllForSystemAndDay(eq(system), eq(List.of()), eq(DAY));
         verify(systemScoreRepository).save(argThat(score -> score.getScore() == 100));
@@ -81,14 +102,15 @@ class ScoringServiceTest {
     void updateSystemScore_usesRuleEvaluationResultsForScoring() {
         System system = systemWithComponents("service-a");
         var component = system.getSystemComponents().getFirst();
+        when(systemRepository.findById(SYSTEM_ID)).thenReturn(Optional.of(system));
 
         List<RuleEvaluationResult> results = List.of(
-                okResult("rule-1", 10),
-                okResult("rule-2", 5)
+                okResult("rule-1"),
+                okResult("rule-2")
         );
         when(ruleEvaluationService.updateRuleStatesForComponent(component)).thenReturn(results);
 
-        scoringService.updateSystemScore(system, DAY);
+        scoringService.updateSystemScore(SYSTEM_ID, DAY);
 
         // All rules OK → component score 100 → system score 100
         verify(systemScoreRepository).save(argThat(score -> score.getScore() == 100));
@@ -98,14 +120,15 @@ class ScoringServiceTest {
     void updateSystemScore_returnsAllRuleEvaluationResults() {
         System system = systemWithComponents("service-a");
         var component = system.getSystemComponents().getFirst();
+        when(systemRepository.findById(SYSTEM_ID)).thenReturn(Optional.of(system));
 
         List<RuleEvaluationResult> results = List.of(
-                okResult("rule-1", 10),
-                okResult("rule-2", 5)
+                okResult("rule-1"),
+                okResult("rule-2")
         );
         when(ruleEvaluationService.updateRuleStatesForComponent(component)).thenReturn(results);
 
-        var allResults = scoringService.updateSystemScore(system, DAY);
+        var allResults = scoringService.updateSystemScore(SYSTEM_ID, DAY);
 
         assertThat(allResults).hasSize(2);
         assertThat(allResults).containsExactlyElementsOf(results);
@@ -115,7 +138,6 @@ class ScoringServiceTest {
         List<SystemComponent> components = java.util.Arrays.stream(componentNames)
                 .map(n -> SystemComponent.builder()
                         .name(n)
-                        .state(State.OK)
                         .type(ComponentType.BACKEND_SERVICE)
                         .build())
                 .toList();
@@ -123,23 +145,10 @@ class ScoringServiceTest {
                 .name("test-system")
                 .aliases(Set.of())
                 .systemComponents(components)
-                .state(State.OK)
                 .build();
     }
 
-    private RuleEvaluationResult okResult(String ruleId, int weight) {
-        Rule rule = new Rule() {
-            @Override
-            public RuleMetadata metadata() {
-                return new RuleMetadata(RuleId.of(ruleId), "Rule", "http://docs", weight);
-            }
-
-            @Override
-            public RuleEvaluationResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters) {
-                throw new UnsupportedOperationException();
-            }
-        };
-        var evaluation = new RuleEvaluation(rule, new RuleParameters(Map.of()), RuleActivationState.ACTIVE);
-        return new RuleEvaluationResult(evaluation, State.OK, null);
+    private RuleEvaluationResult okResult(String ruleId) {
+        return RuleEvaluationResult.ok(RuleId.of(ruleId));
     }
 }

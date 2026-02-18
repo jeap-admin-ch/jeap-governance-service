@@ -37,9 +37,8 @@ public class PromTimeSeries {
     @Column(nullable = false)
     private ZonedDateTime queryTimestamp;
 
-    @NonNull
-    @Column(nullable = false)
-    private String systemComponentName;
+    @Getter
+    private long systemComponentId;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @NonNull

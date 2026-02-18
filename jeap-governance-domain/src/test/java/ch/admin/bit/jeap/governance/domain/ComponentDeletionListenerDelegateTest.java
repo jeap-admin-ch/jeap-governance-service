@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class ComponentDeletionListenerDelegateTest {
@@ -18,7 +17,7 @@ class ComponentDeletionListenerDelegateTest {
 
         ComponentDeletionListenerDelegate delegate = new ComponentDeletionListenerDelegate(listeners);
 
-        Long systemComponentId = 42L;
+        long systemComponentId = 42L;
 
         delegate.notifyPreComponentDeletion(systemComponentId);
 
@@ -29,13 +28,13 @@ class ComponentDeletionListenerDelegateTest {
     @Test
     void notifyComponentDeletion_notifyAllListenersFirstFails() {
         ComponentDeletionListener listener1 = mock(ComponentDeletionListener.class);
-        doThrow(new RuntimeException("Hoppla")).when(listener1).preComponentDeletion(any());
+        doThrow(new RuntimeException("Hoppla")).when(listener1).preComponentDeletion(anyLong());
         ComponentDeletionListener listener2 = mock(ComponentDeletionListener.class);
         List<ComponentDeletionListener> listeners = List.of(listener1, listener2);
 
         ComponentDeletionListenerDelegate delegate = new ComponentDeletionListenerDelegate(listeners);
 
-        Long systemComponentId = 42L;
+        long systemComponentId = 42L;
 
         delegate.notifyPreComponentDeletion(systemComponentId);
 

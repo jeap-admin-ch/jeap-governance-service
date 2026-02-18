@@ -3,7 +3,6 @@
     {
       "name": "jeap.governance.environment",
       "description": "Environment (DEV, REF, ABN, PROD).",
-      "optional": false,
       "type": "ch.admin.bit.jeap.governance.domain.GovernanceServiceEnvironment"
     }
   ],

@@ -49,12 +49,12 @@ public class DataImporter {
 
     private static boolean doImport(DataSourceImporter dataSourceImporter) {
         try {
-            log.debug("Import data with {}...", dataSourceImporter.getClass());
+            log.debug("Import data with {}...", dataSourceImporter.getClass().getSimpleName());
             dataSourceImporter.importData();
             log.debug("Import data done");
             return true;
         } catch (Exception e) {
-            log.error("Import data with {} failed", dataSourceImporter.getClass(), e);
+            log.error("Import data with {} failed", dataSourceImporter.getClass().getSimpleName(), e);
             return false;
         }
     }

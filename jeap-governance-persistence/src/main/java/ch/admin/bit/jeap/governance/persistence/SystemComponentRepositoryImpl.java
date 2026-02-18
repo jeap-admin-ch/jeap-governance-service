@@ -1,14 +1,15 @@
 package ch.admin.bit.jeap.governance.persistence;
 
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
+import ch.admin.bit.jeap.governance.domain.SystemComponentReference;
 import ch.admin.bit.jeap.governance.domain.SystemComponentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
@@ -19,7 +20,7 @@ public class SystemComponentRepositoryImpl implements SystemComponentRepository 
 
     @Override
     @Transactional
-    public void deleteById(Long systemComponentId) {
+    public void deleteById(long systemComponentId) {
         Optional<SystemComponent> byId = jpaComponentRepository.findById(systemComponentId);
         if (byId.isEmpty()) {
             log.info("SystemComponent with id {} not found for deletion.", systemComponentId);
@@ -36,13 +37,9 @@ public class SystemComponentRepositoryImpl implements SystemComponentRepository 
         return jpaComponentRepository.findByName(componentName);
     }
 
-    public Optional<String> findSystemComponentNameById(long systemComponentId) {
-        return jpaComponentRepository.findSystemComponentNameById(systemComponentId);
-    }
-
     @Override
-    public Set<String> findAllSystemComponentNames() {
-        return jpaComponentRepository.findAllSystemComponentNames();
+    public List<SystemComponentReference> findAllSystemComponentReferences() {
+        return jpaComponentRepository.findAllSystemComponentReferences();
     }
 
 }

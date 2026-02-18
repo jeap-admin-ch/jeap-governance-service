@@ -1,6 +1,7 @@
 package ch.admin.bit.jeap.governance.domain.rule;
 
 import ch.admin.bit.jeap.governance.domain.plugin.rule.Rule;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleParameters;
 
 /**
  * Bundles a rule with its parameters and activation state for evaluating the

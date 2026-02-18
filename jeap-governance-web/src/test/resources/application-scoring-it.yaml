@@ -3,9 +3,13 @@ jeap:
     rules:
       active:
         - id: always-ok-rule
+          weight: 30
         - id: always-fail-rule
+          weight: 20
         - id: exempted-rule
+          weight: 10
         - id: flipping-rule
+          weight: 40
       component-exemptions:
         - id: exemption-for-service-b
           component-name: service-b

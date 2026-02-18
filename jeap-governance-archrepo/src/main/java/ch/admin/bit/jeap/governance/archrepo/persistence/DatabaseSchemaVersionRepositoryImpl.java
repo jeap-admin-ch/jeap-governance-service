@@ -14,7 +14,7 @@ public class DatabaseSchemaVersionRepositoryImpl implements DatabaseSchemaVersio
     private final JpaDatabaseSchemaVersionRepository jpaRepository;
 
     @Override
-    public Optional<DatabaseSchemaVersion> findByComponentId(Long id) {
+    public Optional<DatabaseSchemaVersion> findByComponentId(long id) {
         return jpaRepository.findBySystemComponentId(id);
     }
 
@@ -29,7 +29,7 @@ public class DatabaseSchemaVersionRepositoryImpl implements DatabaseSchemaVersio
     }
 
     @Override
-    public void deleteAllBySystemId(Long systemId) {
+    public void deleteAllBySystemId(long systemId) {
         jpaRepository.deleteAllBySystemId(systemId);
     }
 }

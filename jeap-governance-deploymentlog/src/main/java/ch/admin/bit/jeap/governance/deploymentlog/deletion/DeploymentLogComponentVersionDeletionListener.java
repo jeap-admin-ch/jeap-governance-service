@@ -19,7 +19,7 @@ public class DeploymentLogComponentVersionDeletionListener implements ComponentD
 
     @Override
     @Transactional
-    public void preComponentDeletion(Long systemComponentId) {
+    public void preComponentDeletion(long systemComponentId) {
         log.debug("Deleting DeploymentLogComponentVersion entities related to system component with ID: {}", systemComponentId);
         Optional<DeploymentLogComponentVersion> byComponentId = repository.findByComponentId(systemComponentId);
         byComponentId.ifPresent(repository::delete);

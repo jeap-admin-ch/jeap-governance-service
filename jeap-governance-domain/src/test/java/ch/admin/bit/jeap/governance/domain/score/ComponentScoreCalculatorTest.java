@@ -2,8 +2,11 @@ package ch.admin.bit.jeap.governance.domain.score;
 
 import ch.admin.bit.jeap.governance.domain.ComponentType;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
-import ch.admin.bit.jeap.governance.domain.plugin.rule.Rule;
-import ch.admin.bit.jeap.governance.domain.rule.*;
+import ch.admin.bit.jeap.governance.domain.rule.RuleEvaluationResult;
+import ch.admin.bit.jeap.governance.domain.rule.RuleId;
+import ch.admin.bit.jeap.governance.domain.rule.RuleRepository;
+import ch.admin.bit.jeap.governance.domain.rule.State;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -11,24 +14,36 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class ComponentScoreCalculatorTest {
 
-    private final ComponentScoreCalculator calculator = new ComponentScoreCalculator();
+    private final RuleRepository ruleRepository = mock(RuleRepository.class);
+    private final ComponentScoreCalculator calculator = new ComponentScoreCalculator(ruleRepository);
 
     private final SystemComponent component = SystemComponent.builder()
             .name("my-service")
-            .state(State.OK)
             .type(ComponentType.BACKEND_SERVICE)
             .build();
 
     private final LocalDate today = LocalDate.of(2026, 2, 17);
 
+    @BeforeEach
+    void setUp() {
+        when(ruleRepository.getActiveRuleWeights()).thenReturn(Map.of(
+                RuleId.of("rule-1"), 10,
+                RuleId.of("rule-2"), 10,
+                RuleId.of("important-rule"), 90,
+                RuleId.of("minor-rule"), 10
+        ));
+    }
+
     @Test
     void allRulesOk_scoreIs100() {
         var results = List.of(
-                okResult("rule-1", 10),
-                okResult("rule-2", 5)
+                okResult("rule-1"),
+                okResult("rule-2")
         );
 
         ComponentScore score = calculator.calculateComponentScore(component, today, results);
@@ -47,8 +62,8 @@ class ComponentScoreCalculatorTest {
     @Test
     void disabledRulesExcludedFromCalculation() {
         var results = List.of(
-                okResult("rule-1", 10),
-                disabledResult("rule-2", 5)
+                okResult("rule-1"),
+                disabledResult("rule-2")
         );
 
         ComponentScore score = calculator.calculateComponentScore(component, today, results);
@@ -60,8 +75,8 @@ class ComponentScoreCalculatorTest {
     @Test
     void allRulesDisabled_scoreIs100() {
         var results = List.of(
-                disabledResult("rule-1", 10),
-                disabledResult("rule-2", 5)
+                disabledResult("rule-1"),
+                disabledResult("rule-2")
         );
 
         ComponentScore score = calculator.calculateComponentScore(component, today, results);
@@ -72,8 +87,8 @@ class ComponentScoreCalculatorTest {
     @Test
     void mixOfOkAndFailRules_scoreReflectsWeightedRatio() {
         var results = List.of(
-                okResult("rule-1", 10),
-                failResult("rule-2", 10)
+                okResult("rule-1"),
+                failResult("rule-2")
         );
 
         ComponentScore score = calculator.calculateComponentScore(component, today, results);
@@ -85,8 +100,8 @@ class ComponentScoreCalculatorTest {
     @Test
     void allRulesFailing_scoreIsZero() {
         var results = List.of(
-                failResult("rule-1", 10),
-                failResult("rule-2", 5)
+                failResult("rule-1"),
+                failResult("rule-2")
         );
 
         ComponentScore score = calculator.calculateComponentScore(component, today, results);
@@ -98,8 +113,8 @@ class ComponentScoreCalculatorTest {
     void pausedRulesCountTowardsScore() {
         // PAUSED (exempted until) rules are NOT disabled, so they count toward the total weight
         var results = List.of(
-                okResult("rule-1", 10),
-                pausedResult("rule-2", 10)
+                okResult("rule-1"),
+                pausedResult("rule-2")
         );
 
         ComponentScore score = calculator.calculateComponentScore(component, today, results);
@@ -111,8 +126,8 @@ class ComponentScoreCalculatorTest {
     @Test
     void weightedScoring_heavierRulesHaveMoreImpact() {
         var results = List.of(
-                okResult("important-rule", 90),
-                failResult("minor-rule", 10)
+                okResult("important-rule"),
+                failResult("minor-rule")
         );
 
         ComponentScore score = calculator.calculateComponentScore(component, today, results);
@@ -121,39 +136,24 @@ class ComponentScoreCalculatorTest {
         assertThat(score.getScore()).isEqualTo(90);
     }
 
-    private RuleEvaluationResult okResult(String ruleId, int weight) {
-        return result(ruleId, weight, State.OK, RuleActivationState.ACTIVE);
+    private RuleEvaluationResult okResult(String ruleId) {
+        return result(ruleId, State.OK);
     }
 
-    private RuleEvaluationResult failResult(String ruleId, int weight) {
-        return result(ruleId, weight, State.FAIL, RuleActivationState.ACTIVE);
+    private RuleEvaluationResult failResult(String ruleId) {
+        return result(ruleId, State.FAIL);
     }
 
-    private RuleEvaluationResult disabledResult(String ruleId, int weight) {
-        return result(ruleId, weight, State.DISABLED, RuleActivationState.EXEMPTED);
+    private RuleEvaluationResult disabledResult(String ruleId) {
+        return result(ruleId, State.DISABLED);
     }
 
-    private RuleEvaluationResult pausedResult(String ruleId, int weight) {
-        return result(ruleId, weight, State.PAUSED, RuleActivationState.EXEMPTED_UNTIL);
+    private RuleEvaluationResult pausedResult(String ruleId) {
+        return result(ruleId, State.PAUSED);
     }
 
-    private RuleEvaluationResult result(String ruleId, int weight, State state, RuleActivationState activationState) {
-        Rule rule = stubRule(ruleId, weight);
-        var evaluation = new RuleEvaluation(rule, new RuleParameters(Map.of()), activationState);
-        return new RuleEvaluationResult(evaluation, state, null);
+    private RuleEvaluationResult result(String ruleId, State state) {
+        return new RuleEvaluationResult(RuleId.of(ruleId), state, null);
     }
 
-    private Rule stubRule(String id, int weight) {
-        return new Rule() {
-            @Override
-            public RuleMetadata metadata() {
-                return new RuleMetadata(RuleId.of(id), "Rule " + id, "http://docs/" + id, weight);
-            }
-
-            @Override
-            public RuleEvaluationResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters) {
-                throw new UnsupportedOperationException("Not used in score tests");
-            }
-        };
-    }
 }

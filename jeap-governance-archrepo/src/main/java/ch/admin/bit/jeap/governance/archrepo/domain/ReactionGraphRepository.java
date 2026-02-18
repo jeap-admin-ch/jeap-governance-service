@@ -4,7 +4,7 @@ import java.util.Optional;
 
 public interface ReactionGraphRepository {
 
-    Optional<ReactionGraph> findByComponentId(Long componentId);
+    Optional<ReactionGraph> findByComponentId(long componentId);
 
     Optional<ReactionGraph> findByComponentName(String componentName);
 

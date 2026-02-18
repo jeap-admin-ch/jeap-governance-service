@@ -3,7 +3,13 @@ package ch.admin.bit.jeap.governance.rules;
 import ch.admin.bit.jeap.governance.domain.ComponentType;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
 import ch.admin.bit.jeap.governance.domain.plugin.rule.Rule;
-import ch.admin.bit.jeap.governance.domain.rule.*;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleMetadata;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleParameters;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleResult;
+import ch.admin.bit.jeap.governance.domain.rule.RuleActivationState;
+import ch.admin.bit.jeap.governance.domain.rule.RuleEvaluation;
+import ch.admin.bit.jeap.governance.domain.rule.RuleId;
+import ch.admin.bit.jeap.governance.domain.rule.RuleRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -14,7 +20,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
-import static ch.admin.bit.jeap.governance.domain.rule.State.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = {RuleRepositoryImplTest.TestConfig.class, RefreshAutoConfiguration.class})
@@ -31,17 +36,17 @@ class RuleRepositoryImplTest {
 
         @Bean
         Rule enforceOauth2Rule() {
-            return new TestRule("enforce-oauth2", "Enforce OAuth2", 10);
+            return new TestRule("enforce-oauth2", "Enforce OAuth2");
         }
 
         @Bean
         Rule checkTlsRule() {
-            return new TestRule("check-tls", "Check TLS", 5);
+            return new TestRule("check-tls", "Check TLS");
         }
 
         @Bean
         Rule unconfiguredRule() {
-            return new TestRule("unconfigured-rule", "Unconfigured Rule", 1);
+            return new TestRule("unconfigured-rule", "Unconfigured Rule");
         }
     }
 
@@ -153,7 +158,6 @@ class RuleRepositoryImplTest {
     private static SystemComponent buildComponent(String name) {
         return SystemComponent.builder()
                 .name(name)
-                .state(OK)
                 .type(ComponentType.BACKEND_SERVICE)
                 .build();
     }
@@ -162,8 +166,8 @@ class RuleRepositoryImplTest {
 
         private final RuleMetadata metadata;
 
-        TestRule(String id, String label, int weight) {
-            this.metadata = new RuleMetadata(RuleId.of(id), label, null, weight);
+        TestRule(String id, String label) {
+            this.metadata = new RuleMetadata(RuleId.of(id), label);
         }
 
         @Override
@@ -172,7 +176,7 @@ class RuleRepositoryImplTest {
         }
 
         @Override
-        public RuleEvaluationResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters) {
+        public RuleResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters) {
             throw new UnsupportedOperationException();
         }
     }

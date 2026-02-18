@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -39,7 +39,7 @@ class ArchRepoModelSynchronizerTest {
 
         verify(archRepoModelSystemSynchronizer).synchronizeWithArchRepo(systemA);
         verify(archRepoModelSystemSynchronizer).synchronizeWithArchRepo(systemB);
-        verify(archRepoModelSystemSynchronizer).deleteNoMoreExistingSystems(Arrays.asList("System A", "System B").stream().collect(Collectors.toSet()));
+        verify(archRepoModelSystemSynchronizer).deleteNoMoreExistingSystems(Set.of("System A", "System B"));
         verifyNoMoreInteractions(archRepoModelSystemSynchronizer);
     }
 }

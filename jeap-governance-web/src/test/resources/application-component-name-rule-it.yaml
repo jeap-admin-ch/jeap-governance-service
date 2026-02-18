@@ -1,0 +1,6 @@
+jeap:
+  governance:
+    rules:
+      active:
+        - id: component-naming-convention
+          weight: 10

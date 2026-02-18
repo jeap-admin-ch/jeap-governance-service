@@ -3,7 +3,6 @@ package ch.admin.bit.jeap.governance.persistence;
 import ch.admin.bit.jeap.governance.domain.ComponentType;
 import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
-import ch.admin.bit.jeap.governance.domain.rule.State;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -15,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
@@ -35,7 +33,6 @@ class SystemRepositoryImplTest extends PostgresTestContainerBase {
         System system = System.builder()
                 .name("My system")
                 .systemComponents(List.of())
-                .state(State.OK)
                 .aliases(Set.of("my-system"))
                 .build();
 
@@ -49,7 +46,6 @@ class SystemRepositoryImplTest extends PostgresTestContainerBase {
         assertTrue(result.isPresent());
         System systemResult = result.get();
         assertEquals("My system", systemResult.getName());
-        assertEquals(State.OK, systemResult.getState());
         assertEquals(Set.of("my-system"), systemResult.getAliases());
         assertEquals(List.of(), systemResult.getSystemComponents());
         assertNotNull(systemResult.getCreatedAt());
@@ -60,17 +56,14 @@ class SystemRepositoryImplTest extends PostgresTestContainerBase {
         System system = System.builder()
                 .name("My system")
                 .systemComponents(List.of())
-                .state(State.OK)
                 .build();
         SystemComponent component1 = SystemComponent.builder()
                 .name("Component 1")
                 .type(ComponentType.SELF_CONTAINED_SYSTEM)
-                .state(State.OK)
                 .build();
         SystemComponent component2 = SystemComponent.builder()
                 .name("Component 2")
                 .type(ComponentType.BACKEND_SERVICE)
-                .state(State.OK)
                 .build();
         system.addSystemComponent(component1);
         system.addSystemComponent(component2);
@@ -85,7 +78,6 @@ class SystemRepositoryImplTest extends PostgresTestContainerBase {
         assertTrue(result.isPresent());
         System systemResult = result.get();
         assertEquals("My system", systemResult.getName());
-        assertEquals(State.OK, systemResult.getState());
         assertEquals(Set.of(), systemResult.getAliases());
         assertEquals(2, systemResult.getSystemComponents().size());
         assertNotNull(systemResult.getCreatedAt());
@@ -96,7 +88,6 @@ class SystemRepositoryImplTest extends PostgresTestContainerBase {
         System system = System.builder()
                 .name("My system")
                 .systemComponents(List.of())
-                .state(State.OK)
                 .aliases(Set.of("my-system"))
                 .build();
 
@@ -112,7 +103,6 @@ class SystemRepositoryImplTest extends PostgresTestContainerBase {
         systemResult.addSystemComponent(SystemComponent.builder()
                 .name("Component 1")
                 .type(ComponentType.SELF_CONTAINED_SYSTEM)
-                .state(State.OK)
                 .build());
 
         repository.update(systemResult);
@@ -131,7 +121,6 @@ class SystemRepositoryImplTest extends PostgresTestContainerBase {
         System system = System.builder()
                 .name("My system")
                 .systemComponents(List.of())
-                .state(State.OK)
                 .aliases(Set.of("my-system"))
                 .build();
 
@@ -160,17 +149,14 @@ class SystemRepositoryImplTest extends PostgresTestContainerBase {
         System system = System.builder()
                 .name("My system")
                 .systemComponents(List.of())
-                .state(State.OK)
                 .build();
         SystemComponent component1 = SystemComponent.builder()
                 .name("Component 1")
                 .type(ComponentType.SELF_CONTAINED_SYSTEM)
-                .state(State.OK)
                 .build();
         SystemComponent component2 = SystemComponent.builder()
                 .name("Component 2")
                 .type(ComponentType.BACKEND_SERVICE)
-                .state(State.OK)
                 .build();
         system.addSystemComponent(component1);
         system.addSystemComponent(component2);

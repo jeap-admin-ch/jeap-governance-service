@@ -1,6 +1,8 @@
 package ch.admin.bit.jeap.governance.web;
 
 import ch.admin.bit.jeap.governance.dataimport.DataImportScheduler;
+import ch.admin.bit.jeap.governance.domain.SystemComponentReference;
+import ch.admin.bit.jeap.governance.domain.SystemComponentRepository;
 import ch.admin.bit.jeap.governance.prometheus.domain.PromClient;
 import ch.admin.bit.jeap.governance.prometheus.domain.PromQueryType;
 import ch.admin.bit.jeap.governance.prometheus.domain.PromTimeSeries;
@@ -14,9 +16,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
-import static ch.admin.bit.jeap.governance.web.ImportModelHelper.*;
+import static ch.admin.bit.jeap.governance.web.ImportModelHelper.DEFAULT_MODEL_COMPONENT_NAMES;
+import static ch.admin.bit.jeap.governance.web.ImportModelHelper.LESS_MODEL_COMPONENT_NAMES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -38,6 +40,9 @@ class DataImportPrometheusIT extends GovernanceIntegrationTestBase {
     private JpaPromTimeSeriesRepository promTimeSeriesRepository;
 
     @Autowired
+    private SystemComponentRepository systemComponentRepository;
+
+    @Autowired
     private DataImportScheduler dataImportScheduler;
 
     @MockitoBean
@@ -50,7 +55,7 @@ class DataImportPrometheusIT extends GovernanceIntegrationTestBase {
 
         dataImportScheduler.update();
 
-        List<PromTimeSeries> all = toList(promTimeSeriesRepository.findAll());
+        List<PromTimeSeries> all = promTimeSeriesRepository.findAll();
         assertTimeSeriesForComponents(all, DEFAULT_MODEL_COMPONENT_NAMES);
     }
 
@@ -61,17 +66,19 @@ class DataImportPrometheusIT extends GovernanceIntegrationTestBase {
 
         dataImportScheduler.update();
 
-        List<PromTimeSeries> all = toList(promTimeSeriesRepository.findAll());
+        List<PromTimeSeries> all = promTimeSeriesRepository.findAll();
         assertTimeSeriesForComponents(all, DEFAULT_MODEL_COMPONENT_NAMES);
 
         setUpImportModelLess();
 
         dataImportScheduler.update();
 
-        List<PromTimeSeries> allAfterDeletion = toList(promTimeSeriesRepository.findAll());
+        List<PromTimeSeries> allAfterDeletion = promTimeSeriesRepository.findAll();
         assertTimeSeriesForComponents(allAfterDeletion, LESS_MODEL_COMPONENT_NAMES);
+        Map<Long, String> componentNamesById = systemComponentRepository.findAllSystemComponentReferences().stream()
+                .collect(Collectors.toMap(SystemComponentReference::getId, SystemComponentReference::getName));
         assertThat(allAfterDeletion)
-                .extracting(PromTimeSeries::getSystemComponentName)
+                .extracting(ts -> componentNamesById.get(ts.getSystemComponentId()))
                 .doesNotContainAnyElementsOf(REMOVED_COMPONENTS);
     }
 
@@ -82,14 +89,14 @@ class DataImportPrometheusIT extends GovernanceIntegrationTestBase {
 
         dataImportScheduler.update();
 
-        List<PromTimeSeries> all = toList(promTimeSeriesRepository.findAll());
+        List<PromTimeSeries> all = promTimeSeriesRepository.findAll();
         assertTimeSeriesForComponents(all, LESS_MODEL_COMPONENT_NAMES);
 
         setUpImportDefaultModel();
 
         dataImportScheduler.update();
 
-        List<PromTimeSeries> allAfterAddition = toList(promTimeSeriesRepository.findAll());
+        List<PromTimeSeries> allAfterAddition = promTimeSeriesRepository.findAll();
         assertTimeSeriesForComponents(allAfterAddition, DEFAULT_MODEL_COMPONENT_NAMES);
     }
 
@@ -101,15 +108,19 @@ class DataImportPrometheusIT extends GovernanceIntegrationTestBase {
         int expectedPerComponent = 3; // 1 JAVA_VERSION + 2 DEPENDENCY_VERSION
         assertThat(timeSeries).hasSize(expectedComponents.size() * expectedPerComponent);
 
+        // Build a component ID -> name lookup map
+        Map<Long, String> componentNamesById = systemComponentRepository.findAllSystemComponentReferences().stream()
+                .collect(Collectors.toMap(SystemComponentReference::getId, SystemComponentReference::getName));
+
         // Verify that exactly the expected components are present, each with exactly 3 time series
         Map<String, Long> countsByComponent = timeSeries.stream()
-                .collect(Collectors.groupingBy(PromTimeSeries::getSystemComponentName, Collectors.counting()));
+                .collect(Collectors.groupingBy(ts -> componentNamesById.get(ts.getSystemComponentId()), Collectors.counting()));
         assertThat(countsByComponent).containsOnlyKeys(expectedComponents.toArray(String[]::new));
         assertThat(countsByComponent.values()).allSatisfy(count -> assertThat(count).isEqualTo(3L));
 
         for (String componentName : expectedComponents) {
             List<PromTimeSeries> componentSeries = timeSeries.stream()
-                    .filter(ts -> ts.getSystemComponentName().equals(componentName))
+                    .filter(ts -> componentName.equals(componentNamesById.get(ts.getSystemComponentId())))
                     .toList();
 
             // Each component has exactly 1 JAVA_VERSION record
@@ -144,10 +155,6 @@ class DataImportPrometheusIT extends GovernanceIntegrationTestBase {
                     Map.of("service", "test-service", "stage", "prod", "name", "jeap-spring-boot-starter", "version", "5.1.0", "task_revision", "10"));
             assertThat(jeapStarterSample.value()).containsExactly("1234567891", "2");
         }
-    }
-
-    private static List<PromTimeSeries> toList(Iterable<PromTimeSeries> iterable) {
-        return StreamSupport.stream(iterable.spliterator(), false).toList();
     }
 
     private void stubPromClient() {

@@ -6,12 +6,12 @@ import ch.admin.bit.jeap.governance.domain.plugin.datasource.ComponentDeletionLi
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-@Repository
+@Component
 @RequiredArgsConstructor
 @ConditionalOnProperty(name="jeap.governance.archrepo.import.apidocversion.enabled", havingValue = "true", matchIfMissing = true)
 @Slf4j
@@ -21,7 +21,7 @@ public class ApiDocVersionComponentDeletionListener implements ComponentDeletion
 
     @Override
     @Transactional
-    public void preComponentDeletion(Long systemComponentId) {
+    public void preComponentDeletion(long systemComponentId) {
         log.debug("Deleting ApiDocVersion entities related to system component with ID: {}", systemComponentId);
         Optional<ApiDocVersion> byComponentId = repository.findByComponentId(systemComponentId);
         byComponentId.ifPresent(repository::delete);

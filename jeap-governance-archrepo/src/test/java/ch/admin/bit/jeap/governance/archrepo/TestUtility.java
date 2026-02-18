@@ -4,14 +4,18 @@ import ch.admin.bit.jeap.governance.archrepo.synchronize.ComponentTechnicalIdent
 import ch.admin.bit.jeap.governance.domain.ComponentType;
 import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
-import ch.admin.bit.jeap.governance.domain.rule.State;
 import lombok.experimental.UtilityClass;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 
 @UtilityClass
 public class TestUtility {
+
+    private static final AtomicLong SYSTEM_ID_GENERATOR = new AtomicLong(1);
+    private static final AtomicLong COMPONENT_ID_GENERATOR = new AtomicLong(1);
 
     public static final String SYSTEM_NAME_A = "SystemA";
     public static final String COMPONENT_NAME_A1 = "ComponentA1";
@@ -31,21 +35,22 @@ public class TestUtility {
     public static final SystemComponent SYSTEM_COMPONENT_B2 = createSystemComponent(SYSTEM_B, COMPONENT_NAME_B2);
 
     public static System createSystem(String systemName) {
-        return System.builder()
+        System system = System.builder()
                 .name(systemName)
-                .state(State.OK)
                 .systemComponents(new ArrayList<>())
                 .createdAt(ZonedDateTime.now())
                 .build();
+        ReflectionTestUtils.setField(system, "id", SYSTEM_ID_GENERATOR.getAndIncrement());
+        return system;
     }
 
     public static SystemComponent createSystemComponent(System system, String componentName) {
         SystemComponent systemComponent = SystemComponent.builder()
                 .name(componentName)
-                .state(State.OK)
                 .type(ComponentType.BACKEND_SERVICE)
                 .createdAt(ZonedDateTime.now())
                 .build();
+        ReflectionTestUtils.setField(systemComponent, "id", COMPONENT_ID_GENERATOR.getAndIncrement());
         system.addSystemComponent(systemComponent);
         return systemComponent;
     }

@@ -6,10 +6,10 @@ import ch.admin.bit.jeap.governance.domain.plugin.datasource.ComponentDeletionLi
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Repository
+@Component
 @RequiredArgsConstructor
 @ConditionalOnProperty(name="jeap.governance.archrepo.import.restapirelationwithoutpact.enabled", havingValue = "true", matchIfMissing = true)
 @Slf4j
@@ -19,7 +19,7 @@ public class RestApiRelationWithoutPactComponentDeletionListener implements Comp
 
     @Override
     @Transactional
-    public void preComponentDeletion(Long systemComponentId) {
+    public void preComponentDeletion(long systemComponentId) {
         log.debug("Deleting RestApiRelationWithoutPact entities related to system component with ID: {}", systemComponentId);
         for (RestApiRelationWithoutPact restApiRelationWithoutPact : repository.findAllByProviderSystemComponentId(systemComponentId)) {
             repository.delete(restApiRelationWithoutPact);

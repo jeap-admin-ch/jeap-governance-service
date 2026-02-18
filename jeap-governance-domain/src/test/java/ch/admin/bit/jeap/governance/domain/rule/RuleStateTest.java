@@ -16,7 +16,6 @@ class RuleStateTest {
 
     private final SystemComponent component = SystemComponent.builder()
             .name("my-service")
-            .state(State.OK)
             .type(ComponentType.BACKEND_SERVICE)
             .build();
 

@@ -14,7 +14,7 @@ public class ApiDocVersionRepositoryImpl implements ApiDocVersionRepository {
     private final JpaApiDocVersionRepository jpaRepository;
 
     @Override
-    public Optional<ApiDocVersion> findByComponentId(Long id) {
+    public Optional<ApiDocVersion> findByComponentId(long id) {
         return jpaRepository.findBySystemComponentId(id);
     }
 
@@ -29,7 +29,7 @@ public class ApiDocVersionRepositoryImpl implements ApiDocVersionRepository {
     }
 
     @Override
-    public void deleteAllBySystemId(Long systemId) {
+    public void deleteAllBySystemId(long systemId) {
         jpaRepository.deleteAllBySystemId(systemId);
     }
 }

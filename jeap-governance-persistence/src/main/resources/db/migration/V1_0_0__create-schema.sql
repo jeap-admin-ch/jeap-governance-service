@@ -5,7 +5,6 @@ CREATE TABLE system
 (
     id         BIGINT PRIMARY KEY DEFAULT nextval('system_id_seq'),
     name       VARCHAR                  NOT NULL UNIQUE,
-    state      VARCHAR                  NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
@@ -30,7 +29,6 @@ CREATE TABLE system_component
     id         BIGINT PRIMARY KEY DEFAULT nextval('system_component_id_seq'),
     name       VARCHAR                  NOT NULL UNIQUE,
     system_id  BIGINT                   NOT NULL REFERENCES system (id),
-    state      VARCHAR                  NOT NULL,
     type       VARCHAR                  NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL
 );

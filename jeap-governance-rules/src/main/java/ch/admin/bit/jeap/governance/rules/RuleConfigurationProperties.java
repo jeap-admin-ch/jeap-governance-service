@@ -22,8 +22,12 @@ import static java.util.stream.Collectors.joining;
 ///     rules:
 ///       active:
 ///         - id: enforce-oauth2
+///           weight: 10
+///           documentation-link: https://wiki.example.com/enforce-oauth2
 ///         - id: another-rule
-///         - id: dazit-special-rule
+///           weight: 10
+///         - id: some-special-rule
+///           weight: 5
 ///           parameters:
 ///             key: value
 ///             threshold: 10
@@ -71,6 +75,17 @@ public class RuleConfigurationProperties {
          * Rule id (e.g. enforce-oauth2).
          */
         private String id;
+
+        /**
+         * Rule weight for this rule, see scoring documentation for details. Must be provided, positive integer.
+         */
+        private Integer weight;
+
+        /**
+         * Optional link to the documentation for this rule. Used when generating governance reports
+         * to provide a reference for violation explanations.
+         */
+        private String documentationLink;
 
         /**
          * Optional parameters for the rule.

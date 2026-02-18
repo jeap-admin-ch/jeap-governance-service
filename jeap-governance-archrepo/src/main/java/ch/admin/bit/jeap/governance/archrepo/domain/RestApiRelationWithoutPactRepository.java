@@ -4,13 +4,13 @@ import java.util.List;
 
 public interface RestApiRelationWithoutPactRepository {
 
-    List<RestApiRelationWithoutPact> findAllByProviderSystemComponentId(Long id);
+    List<RestApiRelationWithoutPact> findAllByProviderSystemComponentId(long id);
 
-    List<RestApiRelationWithoutPact> findAllByConsumerSystemComponentId(Long id);
+    List<RestApiRelationWithoutPact> findAllByConsumerSystemComponentId(long id);
 
     RestApiRelationWithoutPact add(RestApiRelationWithoutPact restApiRelationWithoutPact);
 
     void delete(RestApiRelationWithoutPact restApiRelationWithoutPact);
 
-    void deleteAllByProviderSystemComponentId(Long id);
+    void deleteAllByProviderSystemComponentId(long id);
 }

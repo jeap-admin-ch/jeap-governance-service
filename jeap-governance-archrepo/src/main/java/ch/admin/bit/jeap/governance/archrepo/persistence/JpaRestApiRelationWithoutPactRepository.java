@@ -1,19 +1,21 @@
 package ch.admin.bit.jeap.governance.archrepo.persistence;
 
 import ch.admin.bit.jeap.governance.archrepo.domain.RestApiRelationWithoutPact;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public interface JpaRestApiRelationWithoutPactRepository extends CrudRepository<RestApiRelationWithoutPact, Long> {
+@Repository
+public interface JpaRestApiRelationWithoutPactRepository extends JpaRepository<RestApiRelationWithoutPact, Long> {
 
-    List<RestApiRelationWithoutPact> findByProviderSystemComponentId(Long id);
+    List<RestApiRelationWithoutPact> findByProviderSystemComponentId(long id);
 
-    List<RestApiRelationWithoutPact> findByConsumerSystemComponentId(Long id);
+    List<RestApiRelationWithoutPact> findByConsumerSystemComponentId(long id);
 
     @Modifying
     @Query("DELETE FROM RestApiRelationWithoutPact a WHERE a.providerSystemComponent.id = :id")
-    void deleteAllByProviderSystemComponentId(Long id);
+    void deleteAllByProviderSystemComponentId(long id);
 }

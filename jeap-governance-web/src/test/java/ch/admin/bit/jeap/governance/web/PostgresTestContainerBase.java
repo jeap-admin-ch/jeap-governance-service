@@ -7,7 +7,7 @@ import org.testcontainers.utility.DockerImageName;
 
 public abstract class PostgresTestContainerBase {
 
-    private static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
+    private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
             DockerImageName.parse("postgres:16-alpine").asCompatibleSubstituteFor("postgres:16-alpine")
     );
 

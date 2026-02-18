@@ -2,10 +2,10 @@ package ch.admin.bit.jeap.governance.rules;
 
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
 import ch.admin.bit.jeap.governance.domain.plugin.rule.Rule;
-import ch.admin.bit.jeap.governance.domain.rule.RuleEvaluationResult;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleMetadata;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleParameters;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleResult;
 import ch.admin.bit.jeap.governance.domain.rule.RuleId;
-import ch.admin.bit.jeap.governance.domain.rule.RuleMetadata;
-import ch.admin.bit.jeap.governance.domain.rule.RuleParameters;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.system.CapturedOutput;
@@ -94,6 +94,7 @@ class RuleConfigurationValidatorTest {
         var properties = new RuleConfigurationProperties();
         var activeRule = new RuleConfigurationProperties.ActiveRule();
         activeRule.setId("enforce-oauth2");
+        activeRule.setWeight(5);
         properties.setActive(List.of(activeRule));
         var exemption = new RuleConfigurationProperties.ComponentExemption();
         exemption.setComponentName("some-service");
@@ -111,11 +112,11 @@ class RuleConfigurationValidatorTest {
         return new Rule() {
             @Override
             public RuleMetadata metadata() {
-                return new RuleMetadata(RuleId.of(id), "Rule " + id, null, 1);
+                return new RuleMetadata(RuleId.of(id), "Rule " + id);
             }
 
             @Override
-            public RuleEvaluationResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters) {
+            public RuleResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters) {
                 throw new UnsupportedOperationException();
             }
         };

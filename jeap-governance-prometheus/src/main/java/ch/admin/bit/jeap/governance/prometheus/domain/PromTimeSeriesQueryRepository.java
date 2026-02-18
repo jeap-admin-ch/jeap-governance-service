@@ -4,8 +4,7 @@ import java.util.List;
 
 public interface PromTimeSeriesQueryRepository {
 
-    List<PromTimeSeries> findBy(PromQueryType queryType, String systemComponent);
+    List<PromTimeSeries> findBy(PromQueryType queryType, long systemComponentId);
 
-    // Additional methods for querying time series to be implemented as needed by rule implementations JEAP-6590, JEAP-6588, ...
-
+    boolean anyTimeSeriesExistsBy(long systemComponentId);
 }

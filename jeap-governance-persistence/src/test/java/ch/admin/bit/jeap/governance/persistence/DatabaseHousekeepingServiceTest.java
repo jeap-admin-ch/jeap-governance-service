@@ -47,7 +47,7 @@ class DatabaseHousekeepingServiceTest extends PostgresTestContainerBase {
     @Autowired
     private JpaRuleStateRepository jpaRuleStateRepository;
 
-    private static final LocalDate TODAY = LocalDate.of(2026, 2, 17);
+    private static final LocalDate TODAY = LocalDate.now();
     private static final LocalDate OLD_DAY = LocalDate.of(2025, 1, 1);
     private static final int MAX_AGE_DAYS = 30;
 
@@ -159,18 +159,16 @@ class DatabaseHousekeepingServiceTest extends PostgresTestContainerBase {
     private System createAndPersistSystem() {
         SystemComponent component = SystemComponent.builder()
                 .name("Test Component " + randomUUID())
-                .state(State.OK)
                 .type(ComponentType.BACKEND_SERVICE)
                 .build();
         System system = System.builder()
                 .name("Test System " + randomUUID())
                 .systemComponents(List.of(component))
-                .state(State.OK)
                 .aliases(Set.of())
                 .build();
-        entityManager.persist(system);
+        System managedEntity = entityManager.persist(system);
         entityManager.flush();
-        return system;
+        return managedEntity;
     }
 
     private SystemComponent createAndPersistSystemWithComponent() {

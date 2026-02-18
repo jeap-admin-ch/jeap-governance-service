@@ -58,7 +58,7 @@ public class ArchRepoModelSystemSynchronizer {
                 });
     }
 
-    void deleteSystemComponent(Long systemComponentId) {
+    void deleteSystemComponent(long systemComponentId) {
         systemComponentService.deleteById(systemComponentId);
     }
 }

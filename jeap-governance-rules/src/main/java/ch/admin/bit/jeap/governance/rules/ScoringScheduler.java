@@ -1,6 +1,5 @@
 package ch.admin.bit.jeap.governance.rules;
 
-import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemRepository;
 import ch.admin.bit.jeap.governance.domain.rule.RuleConformanceRateService;
 import ch.admin.bit.jeap.governance.domain.rule.RuleEvaluationResult;
@@ -33,18 +32,18 @@ public class ScoringScheduler {
         log.info("Evaluating rules and score for the {}", day);
         List<RuleEvaluationResult> allResults = new ArrayList<>();
 
-        for (System system : systemRepository.findAll()) {
-            allResults.addAll(updateSystemScore(system, day));
+        for (long systemId : systemRepository.findAllIds()) {
+            allResults.addAll(updateSystemScore(systemId, day));
         }
 
         ruleConformanceRateService.updateConformanceRates(allResults, day);
     }
 
-    private List<RuleEvaluationResult> updateSystemScore(System system, LocalDate day) {
+    private List<RuleEvaluationResult> updateSystemScore(long systemId, LocalDate day) {
         try {
-            return scoringService.updateSystemScore(system, day);
+            return scoringService.updateSystemScore(systemId, day);
         } catch (Exception e) {
-            log.error("Failed to update score for system '{}'", system.getName(), e);
+            log.error("Failed to update score for system with id '{}'", systemId, e);
             return List.of();
         }
     }
