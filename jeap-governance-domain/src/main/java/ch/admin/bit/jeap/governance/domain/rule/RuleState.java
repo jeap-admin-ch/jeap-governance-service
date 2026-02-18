@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.ZonedDateTime;
+import java.util.Objects;
 
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // for jpa
@@ -64,8 +65,10 @@ public class RuleState {
     }
 
     public void modify(State state, String stateComment) {
-        this.state = state;
-        this.stateComment = stateComment;
-        this.modifiedAt = ZonedDateTime.now();
+        if (this.state != state || !Objects.equals(this.stateComment, stateComment)) {
+            this.state = state;
+            this.stateComment = stateComment;
+            this.modifiedAt = ZonedDateTime.now();
+        }
     }
 }
