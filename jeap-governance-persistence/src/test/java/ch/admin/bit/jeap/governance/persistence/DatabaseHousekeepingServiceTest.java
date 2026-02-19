@@ -3,10 +3,7 @@ package ch.admin.bit.jeap.governance.persistence;
 import ch.admin.bit.jeap.governance.domain.ComponentType;
 import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
-import ch.admin.bit.jeap.governance.domain.rule.RuleConformanceRate;
-import ch.admin.bit.jeap.governance.domain.rule.RuleId;
-import ch.admin.bit.jeap.governance.domain.rule.RuleState;
-import ch.admin.bit.jeap.governance.domain.rule.State;
+import ch.admin.bit.jeap.governance.domain.rule.*;
 import ch.admin.bit.jeap.governance.domain.score.ComponentScore;
 import ch.admin.bit.jeap.governance.domain.score.SystemScore;
 import org.junit.jupiter.api.Test;
@@ -43,6 +40,9 @@ class DatabaseHousekeepingServiceTest extends PostgresTestContainerBase {
 
     @Autowired
     private JpaRuleConformanceRateRepository jpaRuleConformanceRateRepository;
+
+    @Autowired
+    private JpaSystemRuleConformanceRateRepository jpaSystemRuleConformanceRateRepository;
 
     @Autowired
     private JpaRuleStateRepository jpaRuleStateRepository;
@@ -108,6 +108,25 @@ class DatabaseHousekeepingServiceTest extends PostgresTestContainerBase {
     }
 
     @Test
+    void performHousekeeping_shouldDeleteOldSystemRuleConformanceRates() {
+        LocalDate recentDay = TODAY.minusDays(MAX_AGE_DAYS - 1);
+
+        entityManager.persist(SystemRuleConformanceRate.builder().systemId(1L).ruleId("rule-1").conformanceRate(50).day(OLD_DAY).build());
+        entityManager.persist(SystemRuleConformanceRate.builder().systemId(1L).ruleId("rule-1").conformanceRate(95).day(recentDay).build());
+        entityManager.flush();
+        entityManager.clear();
+
+        housekeepingService.performHousekeeping(MAX_AGE_DAYS);
+        entityManager.flush();
+        entityManager.clear();
+
+        List<SystemRuleConformanceRate> remaining = jpaSystemRuleConformanceRateRepository.findBySystemIdAndDay(1L, recentDay);
+        assertThat(remaining).hasSize(1);
+        assertThat(remaining.getFirst().getConformanceRate()).isEqualTo(95);
+        assertThat(jpaSystemRuleConformanceRateRepository.findBySystemIdAndDay(1L, OLD_DAY)).isEmpty();
+    }
+
+    @Test
     void performHousekeeping_shouldDeleteOldRuleStates() {
         SystemComponent componentA = createAndPersistSystemWithComponent();
         SystemComponent componentB = createAndPersistSystemWithComponent();
@@ -141,6 +160,7 @@ class DatabaseHousekeepingServiceTest extends PostgresTestContainerBase {
         entityManager.persist(SystemScore.builder().system(system).score(80).day(recentDay).build());
         entityManager.persist(ComponentScore.builder().systemComponent(component).score(70).day(recentDay).build());
         entityManager.persist(RuleConformanceRate.builder().ruleId("rule-1").conformanceRate(90).day(recentDay).build());
+        entityManager.persist(SystemRuleConformanceRate.builder().systemId(system.getId()).ruleId("rule-1").conformanceRate(85).day(recentDay).build());
         entityManager.persist(RuleState.createWithTimestamps(
                 RuleId.of("rule-1"), component, State.OK, recentTimestamp, recentTimestamp));
         entityManager.flush();
@@ -153,6 +173,7 @@ class DatabaseHousekeepingServiceTest extends PostgresTestContainerBase {
         assertThat(jpaSystemScoreRepository.findBySystem(system)).hasSize(1);
         assertThat(jpaComponentScoreRepository.findBySystemComponent(component)).hasSize(1);
         assertThat(jpaRuleConformanceRateRepository.findByRuleId("rule-1")).hasSize(1);
+        assertThat(jpaSystemRuleConformanceRateRepository.findBySystemIdAndDay(system.getId(), recentDay)).hasSize(1);
         assertThat(jpaRuleStateRepository.findBySystemComponentAndRuleId(component, "rule-1")).isPresent();
     }
 

@@ -144,6 +144,10 @@ spring:
 
 ![Core Schema Diagram](docs/images/governance-db-schema.png)
 
+#### Scoring Schema
+
+![Scoring and Rule Schema Diagram](docs/images/scoring-db-schema.png)
+
 #### ArchRepo Schema
 
 ![ArchRepo Schema Diagram](docs/images/archrepo-db-schema.png)

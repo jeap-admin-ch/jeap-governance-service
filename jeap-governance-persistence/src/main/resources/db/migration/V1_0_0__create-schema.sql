@@ -101,6 +101,26 @@ ALTER SEQUENCE rule_conformance_rate_id_seq OWNED BY rule_conformance_rate.id;
 CREATE INDEX rule_conformance_rate_rule_id ON rule_conformance_rate (rule_id);
 CREATE INDEX rule_conformance_rate_day ON rule_conformance_rate (day);
 
+-- system_rule_conformance_rate
+CREATE SEQUENCE system_rule_conformance_rate_id_seq START WITH 1 INCREMENT BY 50;
+
+CREATE TABLE system_rule_conformance_rate
+(
+    id               BIGINT PRIMARY KEY DEFAULT nextval('system_rule_conformance_rate_id_seq'),
+    system_id        BIGINT                   NOT NULL,
+    rule_id          VARCHAR                  NOT NULL,
+    conformance_rate INTEGER                  NOT NULL,
+    day              DATE                     NOT NULL,
+    created_at       TIMESTAMP WITH TIME ZONE NOT NULL,
+    UNIQUE (system_id, rule_id, day)
+);
+
+ALTER SEQUENCE system_rule_conformance_rate_id_seq OWNED BY system_rule_conformance_rate.id;
+
+CREATE INDEX system_rule_conformance_rate_system_id ON system_rule_conformance_rate (system_id);
+CREATE INDEX system_rule_conformance_rate_rule_id ON system_rule_conformance_rate (rule_id);
+CREATE INDEX system_rule_conformance_rate_day ON system_rule_conformance_rate (day);
+
 -- rule_state
 CREATE SEQUENCE rule_state_rate_id_seq START WITH 1 INCREMENT BY 50;
 

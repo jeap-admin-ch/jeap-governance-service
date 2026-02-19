@@ -22,6 +22,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -116,6 +117,9 @@ class ScoringIT extends GovernanceIntegrationTestBase {
     private RuleConformanceRateRepository ruleConformanceRateRepository;
 
     @Autowired
+    private SystemRuleConformanceRateRepository systemRuleConformanceRateRepository;
+
+    @Autowired
     private ComponentScoreRepository componentScoreRepository;
 
     @Autowired
@@ -185,6 +189,18 @@ class ScoringIT extends GovernanceIntegrationTestBase {
         assertConformanceRate("flipping-rule", today, 0);
         // exempted-rule: OK for service-a, DISABLED for service-b (excluded) -> 1 OK / 1 total = 100%
         assertConformanceRate("exempted-rule", today, 100);
+
+        // Then: system conformance rates are calculated and persisted
+        ruleConformanceRateService.updateSystemConformanceRates(Map.of(system.getId(), results), today);
+
+        // always-ok-rule: OK for both -> 2 conformant / 2 total = 100%
+        assertSystemConformanceRate(system.getId(), "always-ok-rule", today, 100);
+        // always-fail-rule: FAIL for both -> 0 conformant / 2 total = 0%
+        assertSystemConformanceRate(system.getId(), "always-fail-rule", today, 0);
+        // flipping-rule: FAIL for both -> 0 conformant / 2 total = 0%
+        assertSystemConformanceRate(system.getId(), "flipping-rule", today, 0);
+        // exempted-rule: OK for service-a, DISABLED for service-b -> 2 conformant (OK+DISABLED) / 2 total = 100%
+        assertSystemConformanceRate(system.getId(), "exempted-rule", today, 100);
     }
 
     @Test
@@ -215,6 +231,11 @@ class ScoringIT extends GovernanceIntegrationTestBase {
         // flipping-rule: FAIL for 1 component -> 0%
         assertConformanceRate("flipping-rule", today, 0);
 
+        // Then: system conformance rates after first run
+        ruleConformanceRateService.updateSystemConformanceRates(Map.of(system.getId(), firstResults), today);
+        // flipping-rule: FAIL for 1 component -> 0 conformant / 1 total = 0%
+        assertSystemConformanceRate(system.getId(), "flipping-rule", today, 0);
+
         // When: rule outcome changes and scoring runs again
         FLIPPING_RULE_STATE.set(State.OK);
         var secondResults = scoringService.updateSystemScore(system.getId(), today);
@@ -236,12 +257,24 @@ class ScoringIT extends GovernanceIntegrationTestBase {
         ruleConformanceRateService.updateConformanceRates(secondResults, today);
         // flipping-rule: now OK for 1 component -> 100%
         assertConformanceRate("flipping-rule", today, 100);
+
+        // Then: system conformance rates are updated
+        ruleConformanceRateService.updateSystemConformanceRates(Map.of(system.getId(), secondResults), today);
+        // flipping-rule: now OK for 1 component -> 1 conformant / 1 total = 100%
+        assertSystemConformanceRate(system.getId(), "flipping-rule", today, 100);
     }
 
     private void assertConformanceRate(String ruleId, LocalDate day, int expectedRate) {
         var rate = ruleConformanceRateRepository.findByRuleIdAndDay(ruleId, day);
         assertThat(rate).as("Conformance rate for %s", ruleId).isPresent();
         assertThat(rate.get().getConformanceRate()).as("Conformance rate value for %s", ruleId).isEqualTo(expectedRate);
+    }
+
+    private void assertSystemConformanceRate(long systemId, String ruleId, LocalDate day, int expectedRate) {
+        var rates = systemRuleConformanceRateRepository.findBySystemIdAndDay(systemId, day);
+        var rate = rates.stream().filter(r -> r.getRuleId().equals(ruleId)).findFirst();
+        assertThat(rate).as("System conformance rate for %s in system %d", ruleId, systemId).isPresent();
+        assertThat(rate.get().getConformanceRate()).as("System conformance rate value for %s", ruleId).isEqualTo(expectedRate);
     }
 
     private void assertRuleState(SystemComponent component, String ruleId, State expectedState, String expectedComment) {

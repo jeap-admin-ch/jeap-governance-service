@@ -13,7 +13,9 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -31,12 +33,16 @@ public class ScoringScheduler {
         var day = LocalDate.now();
         log.info("Evaluating rules and score for the {}", day);
         List<RuleEvaluationResult> allResults = new ArrayList<>();
+        Map<Long, List<RuleEvaluationResult>> resultsBySystem = new LinkedHashMap<>();
 
         for (long systemId : systemRepository.findAllIds()) {
-            allResults.addAll(updateSystemScore(systemId, day));
+            List<RuleEvaluationResult> systemResults = updateSystemScore(systemId, day);
+            allResults.addAll(systemResults);
+            resultsBySystem.put(systemId, systemResults);
         }
 
         ruleConformanceRateService.updateConformanceRates(allResults, day);
+        ruleConformanceRateService.updateSystemConformanceRates(resultsBySystem, day);
     }
 
     private List<RuleEvaluationResult> updateSystemScore(long systemId, LocalDate day) {

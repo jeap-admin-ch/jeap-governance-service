@@ -16,6 +16,7 @@ public class DatabaseHousekeepingService {
     private final JpaSystemScoreRepository jpaSystemScoreRepository;
     private final JpaComponentScoreRepository jpaComponentScoreRepository;
     private final JpaRuleConformanceRateRepository jpaRuleConformanceRateRepository;
+    private final JpaSystemRuleConformanceRateRepository jpaSystemRuleConformanceRateRepository;
     private final JpaRuleStateRepository jpaRuleStateRepository;
 
     @Transactional
@@ -24,6 +25,7 @@ public class DatabaseHousekeepingService {
         jpaSystemScoreRepository.deleteByDayBefore(cutoffDate);
         jpaComponentScoreRepository.deleteByDayBefore(cutoffDate);
         jpaRuleConformanceRateRepository.deleteByDayBefore(cutoffDate);
+        jpaSystemRuleConformanceRateRepository.deleteByDayBefore(cutoffDate);
         ZonedDateTime cutoffTimestamp = cutoffDate.atStartOfDay(systemDefault());
         jpaRuleStateRepository.deleteByModifiedAtBefore(cutoffTimestamp);
     }
