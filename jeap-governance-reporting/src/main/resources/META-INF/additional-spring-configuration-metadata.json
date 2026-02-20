@@ -1,0 +1,70 @@
+{
+  "properties": [
+    {
+      "name": "jeap.governance.reporting.enabled",
+      "description": "Enable or disable the reporting",
+      "defaultValue": true,
+      "type": "java.lang.Boolean"
+    },
+    {
+      "name": "jeap.governance.reporting.cron-expression",
+      "description": "Cron expression for scheduling the reporting task",
+      "defaultValue": "0 55 6-20 * * MON-FRI",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jeap.governance.reporting.orphancleanup.cron-expression",
+      "description": "Cron expression for scheduling the reporting task with deleting orphaned reports",
+      "defaultValue": "0 10 3 * * MON-FRI",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jeap.governance.reporting.lock-at-least",
+      "description": "Minimum duration for which the lock should be held during the reporting task execution",
+      "defaultValue": "PT1M",
+      "type": "java.time.Duration"
+    },
+    {
+      "name": "jeap.governance.reporting.lock-at-most",
+      "description": "Maximum duration for which the lock should be held during the reporting task execution",
+      "defaultValue": "PT20M",
+      "type": "java.time.Duration"
+    },
+    {
+      "name": "jeap.governance.reporting.trendPeriodDays",
+      "description": "Number of days to consider for trend calculation in the reporting",
+      "defaultValue": "30",
+      "type": "java.lang.Integer"
+    },
+    {
+      "name": "jeap.governance.reporting.confluence.url",
+      "description": "URL of the Confluence instance to publish reports to",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jeap.governance.reporting.confluence.spaceKey",
+      "description": "Key of the Confluence space to publish reports to",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jeap.governance.reporting.confluence.rootPageName",
+      "description": "Name of the root page under which the reports will be published in Confluence",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jeap.governance.reporting.confluence.ancestorId",
+      "description": "ID of the ancestor page under which the reports will be published in Confluence.",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jeap.governance.reporting.confluence.username",
+      "description": "Username for authenticating with Confluence",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jeap.governance.reporting.confluence.password",
+      "description": "Password for authenticating with Confluence",
+      "type": "java.lang.String"
+    }
+  ]
+}

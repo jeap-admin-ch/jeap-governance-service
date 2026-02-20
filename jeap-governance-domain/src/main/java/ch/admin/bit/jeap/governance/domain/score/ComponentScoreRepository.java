@@ -16,4 +16,6 @@ public interface ComponentScoreRepository {
     List<ComponentScore> findBySystemComponent(SystemComponent systemComponent);
 
     void saveOrReplaceAllForSystemAndDay(System system, List<ComponentScore> componentScores, LocalDate day);
+
+    List<ComponentScore> findAllByDayBetweenInclusive(LocalDate fromDay, LocalDate toDay);
 }

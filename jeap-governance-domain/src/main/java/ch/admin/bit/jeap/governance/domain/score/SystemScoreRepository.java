@@ -13,4 +13,6 @@ public interface SystemScoreRepository {
     Optional<SystemScore> findBySystemAndDay(System system, LocalDate day);
 
     List<SystemScore> findBySystem(System system);
+
+    List<SystemScore> findAllByDayBetweenInclusive(LocalDate fromDay, LocalDate toDay);
 }

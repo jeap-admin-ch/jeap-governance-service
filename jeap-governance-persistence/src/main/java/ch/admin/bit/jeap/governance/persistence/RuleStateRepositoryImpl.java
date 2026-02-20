@@ -1,6 +1,7 @@
 package ch.admin.bit.jeap.governance.persistence;
 
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
+import ch.admin.bit.jeap.governance.domain.rule.NonCompliantComponentEntry;
 import ch.admin.bit.jeap.governance.domain.rule.RuleId;
 import ch.admin.bit.jeap.governance.domain.rule.RuleState;
 import ch.admin.bit.jeap.governance.domain.rule.RuleStateRepository;
@@ -24,5 +25,15 @@ public class RuleStateRepositoryImpl implements RuleStateRepository {
     @Override
     public void saveAll(List<RuleState> ruleStates) {
         jpaRuleStateRepository.saveAll(ruleStates);
+    }
+
+    @Override
+    public List<RuleState> findAll() {
+        return jpaRuleStateRepository.findAll();
+    }
+
+    @Override
+    public List<NonCompliantComponentEntry> findNonCompliantSince() {
+        return jpaRuleStateRepository.findNonCompliantSince();
     }
 }

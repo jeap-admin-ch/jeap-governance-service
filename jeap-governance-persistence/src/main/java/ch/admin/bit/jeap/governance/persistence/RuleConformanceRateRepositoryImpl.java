@@ -39,4 +39,9 @@ public class RuleConformanceRateRepositoryImpl implements RuleConformanceRateRep
     public void saveAll(List<RuleConformanceRate> rates) {
         jpaRuleConformanceRateRepository.saveAll(rates);
     }
+
+    @Override
+    public List<RuleConformanceRate> findAllByDayBetweenInclusive(LocalDate fromDay, LocalDate toDay) {
+        return jpaRuleConformanceRateRepository.findAllByDayBetweenInclusive(fromDay, toDay);
+    }
 }

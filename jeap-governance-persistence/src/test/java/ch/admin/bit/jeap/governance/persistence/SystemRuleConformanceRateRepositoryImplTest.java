@@ -9,9 +9,11 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -78,4 +80,58 @@ class SystemRuleConformanceRateRepositoryImplTest extends PostgresTestContainerB
         assertThat(repository.findBySystemIdAndDay(1L, LocalDate.of(2026, 1, 15))).isEmpty();
         assertThat(repository.findBySystemIdAndDay(1L, LocalDate.of(2026, 1, 16))).hasSize(1);
     }
+
+    @Test
+    void findLatestPerRuleIdAndSystemId() {
+        entityManager.persist(createRate(1L, "rule-1", 85, LocalDate.of(2026, 1, 15)));
+        entityManager.persist(createRate(1L, "rule-1", 85, LocalDate.of(2026, 1, 16)));
+        entityManager.persist(createRate(1L, "rule-1", 90, LocalDate.of(2026, 1, 17)));
+        entityManager.flush();
+        entityManager.clear();
+
+        List<SystemRuleConformanceRate> result = repository.findLatestPerRuleIdAndSystemId();
+        assertEquals(1, result.size());
+        SystemRuleConformanceRate latestRate = result.getFirst();
+        assertEquals(1L, latestRate.getSystemId());
+        assertEquals("rule-1", latestRate.getRuleId());
+        assertEquals(90, latestRate.getConformanceRate());
+        assertEquals(LocalDate.of(2026, 1, 17), latestRate.getDay());
+    }
+
+    @Test
+    void findLatestPerRuleIdAndSystemId_severalEntries() {
+        entityManager.persist(createRate(1L, "rule-1", 85, LocalDate.of(2026, 1, 15)));
+        entityManager.persist(createRate(1L, "rule-1", 85, LocalDate.of(2026, 1, 16)));
+        entityManager.persist(createRate(1L, "rule-1", 90, LocalDate.of(2026, 1, 17)));
+        entityManager.persist(createRate(1L, "rule-2", 85, LocalDate.of(2026, 1, 15)));
+        entityManager.persist(createRate(1L, "rule-2", 85, LocalDate.of(2026, 1, 16)));
+        entityManager.persist(createRate(1L, "rule-2", 90, LocalDate.of(2026, 1, 17)));
+
+        entityManager.persist(createRate(2L, "rule-1", 85, LocalDate.of(2026, 1, 15)));
+        entityManager.persist(createRate(2L, "rule-1", 85, LocalDate.of(2026, 1, 16)));
+        entityManager.persist(createRate(2L, "rule-1", 90, LocalDate.of(2026, 1, 17)));
+        entityManager.persist(createRate(2L, "rule-2", 85, LocalDate.of(2026, 1, 15)));
+        entityManager.persist(createRate(2L, "rule-2", 85, LocalDate.of(2026, 1, 16)));
+        entityManager.persist(createRate(2L, "rule-2", 90, LocalDate.of(2026, 1, 17)));
+        entityManager.flush();
+        entityManager.clear();
+
+        List<SystemRuleConformanceRate> result = repository.findLatestPerRuleIdAndSystemId();
+        assertEquals(4, result.size());
+        for (SystemRuleConformanceRate rate : result) {
+            assertEquals(90, rate.getConformanceRate());
+            assertEquals(LocalDate.of(2026, 1, 17), rate.getDay());
+        }
+    }
+
+    private SystemRuleConformanceRate createRate(long systemId, String ruleId, int conformanceRate, LocalDate day) {
+        return SystemRuleConformanceRate.builder()
+                .systemId(systemId)
+                .ruleId(ruleId)
+                .conformanceRate(conformanceRate)
+                .day(day)
+                .createdAt(ZonedDateTime.of(day, java.time.LocalTime.NOON, java.time.ZoneId.systemDefault()))
+                .build();
+    }
+
 }

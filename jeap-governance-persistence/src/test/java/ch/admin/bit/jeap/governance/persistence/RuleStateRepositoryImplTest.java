@@ -3,6 +3,7 @@ package ch.admin.bit.jeap.governance.persistence;
 import ch.admin.bit.jeap.governance.domain.ComponentType;
 import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
+import ch.admin.bit.jeap.governance.domain.rule.NonCompliantComponentEntry;
 import ch.admin.bit.jeap.governance.domain.rule.RuleId;
 import ch.admin.bit.jeap.governance.domain.rule.RuleState;
 import ch.admin.bit.jeap.governance.domain.rule.State;
@@ -13,11 +14,15 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -110,6 +115,70 @@ class RuleStateRepositoryImplTest extends PostgresTestContainerBase {
 
         assertThat(repository.findBySystemComponentAndRuleId(component, RuleId.of("RULE-001"))).isPresent();
         assertThat(repository.findBySystemComponentAndRuleId(component, RuleId.of("RULE-002"))).isPresent();
+    }
+
+    @Test
+    void findAll() {
+        SystemComponent component = createAndPersistSystemWithComponent();
+
+        // Persist an existing (managed) entity
+        entityManager.persist(RuleState.builder()
+                .ruleId(RuleId.of("RULE-001")).systemComponent(component)
+                .state(State.OK).build());
+        entityManager.flush();
+
+        List<RuleState> allRuleStates = repository.findAll();
+        assertThat(allRuleStates).hasSize(1);
+    }
+
+    @Test
+    void findAll_severalEntries() {
+        SystemComponent component1 = createAndPersistSystemWithComponent("System 1", "Component 1");
+        SystemComponent component2 = createAndPersistSystemWithComponent("System 2", "Component 2");
+
+        // Persist an existing (managed) entity
+        entityManager.persist(RuleState.builder()
+                .ruleId(RuleId.of("RULE-001")).systemComponent(component1)
+                .state(State.OK).build());
+        entityManager.persist(RuleState.builder()
+                .ruleId(RuleId.of("RULE-002")).systemComponent(component1)
+                .state(State.OK).build());
+        entityManager.persist(RuleState.builder()
+                .ruleId(RuleId.of("RULE-001")).systemComponent(component2)
+                .state(State.OK).build());
+        entityManager.flush();
+
+        List<RuleState> allRuleStates = repository.findAll();
+        assertThat(allRuleStates).hasSize(3);
+    }
+
+    @Test
+    void findNonCompliantSince() {
+        ZonedDateTime timestamp1 = ZonedDateTime.now().minusDays(10);
+        ZonedDateTime timestamp2 = ZonedDateTime.now().minusDays(9);
+        ZonedDateTime timestamp3 = ZonedDateTime.now().minusDays(8);
+        SystemComponent component1 = createAndPersistSystemWithComponent("System 1", "Component 1");
+        SystemComponent component2 = createAndPersistSystemWithComponent("System 2", "Component 2");
+
+        entityManager.persist(RuleState.createWithTimestamps(RuleId.of("RULE-001"), component1, State.OK, ZonedDateTime.now(), timestamp1));
+        entityManager.persist(RuleState.createWithTimestamps(RuleId.of("RULE-002"), component1, State.FAIL, ZonedDateTime.now(), timestamp2));
+        entityManager.persist(RuleState.createWithTimestamps(RuleId.of("RULE-003"), component1, State.PAUSED, ZonedDateTime.now(), timestamp3));
+        entityManager.persist(RuleState.createWithTimestamps(RuleId.of("RULE-001"), component2, State.DISABLED, ZonedDateTime.now(), timestamp1));
+        entityManager.persist(RuleState.createWithTimestamps(RuleId.of("RULE-002"), component2, State.FAIL, ZonedDateTime.now(), timestamp2));
+        entityManager.persist(RuleState.createWithTimestamps(RuleId.of("RULE-003"), component2, State.OK, ZonedDateTime.now(), timestamp3));
+
+
+        entityManager.flush();
+
+        List<NonCompliantComponentEntry> result = repository.findNonCompliantSince();
+        assertThat(result).hasSize(2);
+        for (NonCompliantComponentEntry entry : result) {
+            assertNotNull(entry.getSystemId());
+            assertNotNull(entry.getSystemComponentId());
+            assertNotNull(entry.getSystemComponentName());
+            assertEquals("RULE-002", entry.getRuleId());
+            assertEquals(timestamp2.truncatedTo(ChronoUnit.MILLIS).toInstant(), entry.getNonCompliantSince().truncatedTo(ChronoUnit.MILLIS).toInstant());
+        }
     }
 
     private SystemComponent createAndPersistSystemWithComponent() {

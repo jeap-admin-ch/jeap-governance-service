@@ -25,4 +25,7 @@ interface JpaRuleConformanceRateRepository extends JpaRepository<RuleConformance
     @Modifying
     @Query("DELETE FROM RuleConformanceRate rcr WHERE rcr.day = :day")
     void deleteByDay(@Param("day") LocalDate day);
+
+    @Query("SELECT rcr FROM RuleConformanceRate rcr WHERE rcr.day >= :fromDay AND rcr.day <= :toDay")
+    List<RuleConformanceRate> findAllByDayBetweenInclusive(LocalDate fromDay, LocalDate toDay);
 }

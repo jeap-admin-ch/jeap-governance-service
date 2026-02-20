@@ -28,4 +28,9 @@ public class SystemRuleConformanceRateRepositoryImpl implements SystemRuleConfor
     public List<SystemRuleConformanceRate> findBySystemIdAndDay(long systemId, LocalDate day) {
         return jpaSystemRuleConformanceRateRepository.findBySystemIdAndDay(systemId, day);
     }
+
+    @Override
+    public List<SystemRuleConformanceRate> findLatestPerRuleIdAndSystemId() {
+        return jpaSystemRuleConformanceRateRepository.findLatestPerRuleIdAndSystemId();
+    }
 }

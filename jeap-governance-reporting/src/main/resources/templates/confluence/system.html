@@ -1,0 +1,111 @@
+<th:block xmlns:th="http://www.thymeleaf.org">
+    <div th:replace="~{fragment/generated-infoblock :: generated-infoblock}"></div>
+
+
+    <!-- Title -->
+    <h1 th:text="${model.systemName + model.pageSuffix}">System Score Report</h1>
+
+    <!-- Score & Trend Summary Panel -->
+    <ac:structured-macro ac:name="panel" ac:schema-version="1">
+        <ac:parameter ac:name="title">Overall Score</ac:parameter>
+        <ac:parameter ac:name="borderStyle">solid</ac:parameter>
+        <ac:parameter ac:name="borderColor">#cccccc</ac:parameter>
+        <ac:parameter ac:name="titleBGColor">#f0f0f0</ac:parameter>
+        <ac:rich-text-body>
+            <table class="wrapped" style="width: 40%;">
+                <tbody>
+                <tr>
+                    <th>System</th>
+                    <td th:text="${model.systemName}">-</td>
+                </tr>
+                <tr>
+                    <th>Score [%]</th>
+                    <td th:text="${model.score}" th:style="${model.getBackgroundColor()}"></td>
+                </tr>
+                <tr>
+                    <th>Trend</th>
+                    <td>
+                        <ac:emoticon th:if="${model.trend.emoticon != null}"
+                                     th:ac:name="${model.trend.emoticon}"/>
+                        <ac:hipchat-emoticon th:if="${model.trend.hipchatEmoticon != null}"
+                                             th:ac:shortcut="${model.trend.hipchatEmoticon}"/>
+                        <span th:if="${model.trend.unicode != null}"
+                              th:text="${model.trend.unicode}"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </ac:rich-text-body>
+    </ac:structured-macro>
+
+    <!-- Component Scores Table -->
+    <h2>Component Scores</h2>
+            <table class="wrapped relative-table" style="width: 80.0%;">
+                <colgroup>
+                    <col style="width: 33.0%;"/>
+                    <col style="width: 33.0%;"/>
+                    <col style="width: 34.0%;"/>
+                </colgroup>
+                <thead>
+                <tr>
+                    <th colspan="1">Component</th>
+                    <th colspan="1">Score [%]</th>
+                    <th colspan="1">Trend indicator</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="entry : ${model.componentScores}">
+                    <td colspan="1">
+                        <ac:link>
+                            <ri:page th:ri:content-title="${entry.componentName + entry.pageSuffix}"/>
+                            <ac:plain-text-link-body>
+                                <![CDATA[[[${entry.componentName}]]]]>
+                            </ac:plain-text-link-body>
+                        </ac:link>
+                    </td>
+                    <td th:text="${entry.score}" th:style="${entry.getBackgroundColor()}"></td>
+                    <td colspan="1">
+                        <span th:title="${entry.trend.description}">
+                          <ac:emoticon th:if="${entry.trend.emoticon != null}"
+                                       th:ac:name="${entry.trend.emoticon}"/>
+                          <ac:hipchat-emoticon th:if="${entry.trend.hipchatEmoticon != null}"
+                                               th:ac:shortcut="${entry.trend.hipchatEmoticon}"/>
+                          <span th:if="${entry.trend.unicode != null}"
+                                th:text="${entry.trend.unicode}"></span>
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+    <!-- Score History Chart -->
+    <h2>Score history</h2>
+    <ac:structured-macro ac:name="chart" ac:schema-version="1">
+        <ac:parameter ac:name="type">timeSeries</ac:parameter>
+        <ac:parameter ac:name="dataOrientation">vertical</ac:parameter>
+        <ac:parameter ac:name="timePeriod">Day</ac:parameter>
+        <ac:parameter ac:name="dateFormat">dd.MM.yyyy</ac:parameter>
+        <ac:parameter ac:name="dataDisplay">false</ac:parameter>
+        <ac:parameter ac:name="width">600</ac:parameter>
+        <ac:parameter ac:name="height">300</ac:parameter>
+        <ac:parameter ac:name="xLabel">Date</ac:parameter>
+        <ac:parameter ac:name="yLabel">Score [%]</ac:parameter>
+        <ac:rich-text-body>
+            <table class="wrapped">
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th th:text="${model.systemName}">Score</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="s : ${model.scores}">
+                    <td th:text="${#temporals.format(s.day, 'dd.MM.yyyy')}">-</td>
+                    <td th:text="${s.score}">-</td>
+                </tr>
+                </tbody>
+            </table>
+        </ac:rich-text-body>
+    </ac:structured-macro>
+
+</th:block>

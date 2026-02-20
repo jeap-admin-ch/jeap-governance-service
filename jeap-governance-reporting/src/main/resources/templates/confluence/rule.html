@@ -1,0 +1,85 @@
+<th:block xmlns:th="http://www.thymeleaf.org">
+    <div th:replace="~{fragment/generated-infoblock :: generated-infoblock}"></div>
+    <h1 th:text="${model.name}">Rule Name</h1>
+
+    <!-- Rule Details Panel -->
+    <ac:structured-macro ac:name="panel" ac:schema-version="1">
+        <ac:parameter ac:name="title">Rule Details</ac:parameter>
+        <ac:parameter ac:name="borderStyle">solid</ac:parameter>
+        <ac:parameter ac:name="borderColor">#cccccc</ac:parameter>
+        <ac:parameter ac:name="titleBGColor">#f0f0f0</ac:parameter>
+        <ac:rich-text-body>
+            <table class="wrapped" style="width: 40%;">
+                <tbody>
+                <tr>
+                    <th>Rule id</th>
+                    <td th:text="${model.ruleId}">-</td>
+                </tr>
+                <tr>
+                    <th>Documentation link</th>
+                    <td><a th:href="${model.documentationLink}" th:text="${model.documentationLink}">-</a></td>
+                </tr>
+                <tr th:style="${model.getBackgroundColor()}">
+                    <th>Conformance rate [%]</th>
+                    <td th:text="${model.conformanceRate}">-</td>
+                </tr>
+                </tbody>
+            </table>
+        </ac:rich-text-body>
+    </ac:structured-macro>
+
+    <h2>Systems</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>System</th>
+            <th>Conformance rate [%]</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="system : ${model.systems}">
+            <td>
+                <ac:link>
+                    <ri:page th:ri:content-title="${system.name + system.pageSuffix}"/>
+                    <ac:plain-text-link-body>
+                        <![CDATA[[[${system.name}]]]]>
+                    </ac:plain-text-link-body>
+                </ac:link>
+            </td>
+            <td th:text="${system.conformanceRate}" th:style="${system.getBackgroundColor()}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2>Non-Compliant Components</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>System</th>
+            <th>Component</th>
+            <th>Non-Compliant Since</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="component : ${model.nonCompliantComponents}">
+            <td>
+                <ac:link>
+                    <ri:page th:ri:content-title="${component.systemName + component.systemPageSuffix}"/>
+                    <ac:plain-text-link-body>
+                        <![CDATA[[[${component.systemName}]]]]>
+                    </ac:plain-text-link-body>
+                </ac:link>
+            </td>
+            <td>
+                <ac:link>
+                    <ri:page th:ri:content-title="${component.name + component.pageSuffix}"/>
+                    <ac:plain-text-link-body>
+                        <![CDATA[[[${component.name}]]]]>
+                    </ac:plain-text-link-body>
+                </ac:link>
+            </td>
+            <td th:text="${#temporals.format(component.nonCompliantSince, 'dd.MM.yyyy')}"></td>
+        </tr>
+        </tbody>
+    </table>
+</th:block>

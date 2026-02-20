@@ -2,6 +2,8 @@ package ch.admin.bit.jeap.governance.rules;
 
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
 import ch.admin.bit.jeap.governance.domain.plugin.rule.Rule;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleInfo;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleMetadata;
 import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleParameters;
 import ch.admin.bit.jeap.governance.domain.rule.RuleActivationState;
 import ch.admin.bit.jeap.governance.domain.rule.RuleEvaluation;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -52,6 +55,21 @@ class RuleRepositoryImpl implements RuleRepository {
         return properties.getActive().stream()
                 .map(ActiveRule::getId)
                 .filter(rulesByIdMap::containsKey)
+                .toList();
+    }
+
+    @Override
+    public List<RuleInfo> getActiveRuleInfos() {
+        return properties.getActive().stream()
+                .map(activeRule -> {
+                    Rule rule = rulesByIdMap.get(activeRule.getId());
+                    if (rule == null) {
+                        return null;
+                    }
+                    RuleMetadata metadata = rule.metadata();
+                    return new RuleInfo(metadata.ruleId(), metadata.label(), activeRule.getDocumentationLink());
+                })
+                .filter(Objects::nonNull)
                 .toList();
     }
 

@@ -1,6 +1,11 @@
 package ch.admin.bit.jeap.governance.domain.rule;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -31,6 +36,7 @@ public class RuleConformanceRate {
     private int conformanceRate;
 
     @Column(nullable = false)
+    @Getter
     private LocalDate day;
 
     @Getter
@@ -44,7 +50,7 @@ public class RuleConformanceRate {
     }
 
     @Builder
-    private static RuleConformanceRate build(@NonNull String ruleId, int conformanceRate, @NonNull LocalDate day) {
-        return new RuleConformanceRate(ruleId, conformanceRate, day, ZonedDateTime.now());
+    private static RuleConformanceRate build(@NonNull String ruleId, int conformanceRate, @NonNull LocalDate day, ZonedDateTime createdAt) {
+        return new RuleConformanceRate(ruleId, conformanceRate, day, createdAt == null ? ZonedDateTime.now() : createdAt);
     }
 }

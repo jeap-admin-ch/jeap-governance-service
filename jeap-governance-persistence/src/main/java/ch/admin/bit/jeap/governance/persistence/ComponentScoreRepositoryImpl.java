@@ -39,4 +39,9 @@ public class ComponentScoreRepositoryImpl implements ComponentScoreRepository {
         jpaComponentScoreRepository.deleteBySystemAndDay(system, day);
         jpaComponentScoreRepository.saveAll(componentScores);
     }
+
+    @Override
+    public List<ComponentScore> findAllByDayBetweenInclusive(LocalDate fromDay, LocalDate toDay) {
+        return jpaComponentScoreRepository.findAllByDayBetweenInclusive(fromDay, toDay);
+    }
 }

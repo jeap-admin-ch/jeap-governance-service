@@ -14,7 +14,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -120,6 +122,62 @@ class SystemScoreRepositoryImplTest extends PostgresTestContainerBase {
         List<SystemScore> result = repository.findBySystem(system);
 
         assertEquals(2, result.size());
+    }
+
+    @Test
+    void findAllByDayBetweenInclusive_shouldReturnAllScoresWithinTimeframe() {
+        LocalDate from = LocalDate.of(2026, 1, 1);
+        LocalDate to = LocalDate.of(2026, 1, 31);
+        System system1 = createAndPersistSystem("Test System 1");
+        entityManager.persist(SystemScore.builder()
+                .system(system1).score(77).day(LocalDate.of(2025, 12, 31)).build());
+        entityManager.persist(SystemScore.builder()
+                .system(system1).score(80).day(LocalDate.of(2026, 1, 1)).build());
+        entityManager.persist(SystemScore.builder()
+                .system(system1).score(90).day(LocalDate.of(2026, 1, 2)).build());
+        entityManager.persist(SystemScore.builder()
+                .system(system1).score(90).day(LocalDate.of(2026, 2, 1)).build());
+        entityManager.flush();
+
+        List<SystemScore> result = repository.findAllByDayBetweenInclusive(from, to);
+
+        assertEquals(2, result.size());
+    }
+
+
+    @Test
+    void findAllByDayBetweenInclusive_shouldReturnAllScoresWithinTimeframe_severalSystems() {
+        LocalDate from = LocalDate.of(2026, 1, 1);
+        LocalDate to = LocalDate.of(2026, 1, 31);
+        System system1 = createAndPersistSystem("Test System 1");
+        System system2 = createAndPersistSystem("Test System 2");
+        entityManager.persist(SystemScore.builder()
+                .system(system1).score(77).day(LocalDate.of(2025, 12, 31)).build());
+        entityManager.persist(SystemScore.builder()
+                .system(system1).score(80).day(LocalDate.of(2026, 1, 1)).build());
+        entityManager.persist(SystemScore.builder()
+                .system(system1).score(90).day(LocalDate.of(2026, 1, 2)).build());
+        entityManager.persist(SystemScore.builder()
+                .system(system1).score(90).day(LocalDate.of(2026, 2, 1)).build());
+        entityManager.persist(SystemScore.builder()
+                .system(system2).score(82).day(LocalDate.of(2026, 1, 1)).build());
+        entityManager.persist(SystemScore.builder()
+                .system(system2).score(82).day(LocalDate.of(2026, 2, 3)).build());
+        entityManager.flush();
+
+        List<SystemScore> result = repository.findAllByDayBetweenInclusive(from, to);
+
+        assertEquals(3, result.size());
+    }
+
+    @Test
+    void findAllByDayBetweenInclusive_shouldReturnEmpty_whneNoneExist() {
+        LocalDate from = LocalDate.of(2026, 1, 1);
+        LocalDate to = LocalDate.of(2026, 1, 31);
+
+        List<SystemScore> result = repository.findAllByDayBetweenInclusive(from, to);
+
+        assertTrue(result.isEmpty());
     }
 
     private System createAndPersistSystem(String name) {

@@ -27,4 +27,7 @@ interface JpaComponentScoreRepository extends JpaRepository<ComponentScore, Long
     @Modifying
     @Query("DELETE FROM ComponentScore cs WHERE cs.day < :cutoffDate")
     void deleteByDayBefore(@Param("cutoffDate") LocalDate cutoffDate);
+
+    @Query("SELECT cs FROM ComponentScore cs JOIN FETCH cs.systemComponent sc JOIN FETCH sc.system WHERE cs.day >= :fromDay AND cs.day <= :toDay")
+    List<ComponentScore> findAllByDayBetweenInclusive(LocalDate fromDay, LocalDate toDay);
 }

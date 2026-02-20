@@ -1,0 +1,116 @@
+<th:block xmlns:th="http://www.thymeleaf.org">
+    <div th:replace="~{fragment/generated-infoblock :: generated-infoblock}"></div>
+
+    <!-- Title -->
+    <h1 th:text="${model.componentName + model.pageSuffix}">Component Score Report</h1>
+
+    <!-- Score & Trend Summary Panel -->
+    <ac:structured-macro ac:name="panel" ac:schema-version="1">
+        <ac:parameter ac:name="title">Overall Score</ac:parameter>
+        <ac:parameter ac:name="borderStyle">solid</ac:parameter>
+        <ac:parameter ac:name="borderColor">#cccccc</ac:parameter>
+        <ac:parameter ac:name="titleBGColor">#f0f0f0</ac:parameter>
+        <ac:rich-text-body>
+            <table class="wrapped" style="width: 40%;">
+                <tbody>
+                <tr>
+                    <th>Component</th>
+                    <td th:text="${model.componentName}">-</td>
+                </tr>
+                <tr th:style="${model.getBackgroundColor()}">
+                    <th>Score [%]</th>
+                    <td th:text="${model.score}">-</td>
+                </tr>
+                <tr>
+                    <th>Trend</th>
+                    <td>
+                        <ac:emoticon th:if="${model.trend.emoticon != null}"
+                                     th:ac:name="${model.trend.emoticon}"/>
+                        <ac:hipchat-emoticon th:if="${model.trend.hipchatEmoticon != null}"
+                                             th:ac:shortcut="${model.trend.hipchatEmoticon}"/>
+                        <span th:if="${model.trend.unicode != null}"
+                              th:text="${model.trend.unicode}"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </ac:rich-text-body>
+    </ac:structured-macro>
+
+    <!-- Rule States Table -->
+    <h2>Rule states</h2>
+            <table class="wrapped relative-table" style="width: 100%;">
+                <colgroup>
+                    <col style="width: 35.0%;"/>
+                    <col style="width: 10.0%;"/>
+                    <col style="width: 40.0%;"/>
+                    <col style="width: 15.0%;"/>
+                </colgroup>
+                <thead>
+                <tr>
+                    <th colspan="1">Rule</th>
+                    <th colspan="1">State</th>
+                    <th colspan="1">Comment</th>
+                    <th colspan="1">Last validation</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="rule : ${model.ruleStates}">
+                    <td colspan="1">
+                        <ac:link>
+                            <ri:page th:ri:content-title="${rule.label}"/>
+                            <ac:plain-text-link-body>
+                                <![CDATA[[[${rule.label}]]]]>
+                            </ac:plain-text-link-body>
+                        </ac:link>
+                        <span style="color: #707070; font-size: 0.85em;"
+                              th:text="${' (' + rule.ruleId + ')'}"></span>
+                    </td>
+                    <td colspan="1" th:style="${rule.getBackgroundColor()}">
+                        <span th:title="${rule.state.name()}">
+                            <ac:emoticon th:if="${rule.state.emoticon != null}"
+                                                 th:ac:name="${rule.state.emoticon}"/>
+                            <ac:hipchat-emoticon th:if="${rule.state.hipchatEmoticon != null}"
+                                                 th:ac:shortcut="${rule.state.hipchatEmoticon}"/>
+                            <span th:if="${rule.state.unicode != null}"
+                                  th:text="${rule.state.unicode}"></span>
+                            </span>
+                    </td>
+                    <td colspan="1" th:text="${rule.stateComment}">-</td>
+                    <td colspan="1"
+                        th:text="${rule.modifiedAt != null ? #temporals.format(rule.modifiedAt, 'dd.MM.yyyy HH:mm') : '-'}">-</td>
+                </tr>
+                </tbody>
+            </table>
+
+    <!-- Score History Chart -->
+    <h2>Score history</h2>
+    <ac:structured-macro ac:name="chart" ac:schema-version="1">
+        <ac:parameter ac:name="type">timeSeries</ac:parameter>
+        <ac:parameter ac:name="dataOrientation">vertical</ac:parameter>
+        <ac:parameter ac:name="timePeriod">Day</ac:parameter>
+        <ac:parameter ac:name="dateFormat">dd.MM.yyyy</ac:parameter>
+        <ac:parameter ac:name="dataDisplay">false</ac:parameter>
+        <ac:parameter ac:name="width">600</ac:parameter>
+        <ac:parameter ac:name="height">300</ac:parameter>
+        <ac:parameter ac:name="xLabel">Date</ac:parameter>
+        <ac:parameter ac:name="yLabel">Score [%]</ac:parameter>
+        <ac:rich-text-body>
+            <table class="wrapped">
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th th:text="${model.componentName}">Score</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="s : ${model.scores}">
+                    <td th:text="${#temporals.format(s.day, 'dd.MM.yyyy')}">-</td>
+                    <td th:text="${s.score}">-</td>
+                </tr>
+                </tbody>
+            </table>
+        </ac:rich-text-body>
+    </ac:structured-macro>
+
+</th:block>

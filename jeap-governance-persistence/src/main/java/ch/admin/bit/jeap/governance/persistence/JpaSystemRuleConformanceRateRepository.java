@@ -22,4 +22,9 @@ interface JpaSystemRuleConformanceRateRepository extends JpaRepository<SystemRul
     @Modifying
     @Query("DELETE FROM SystemRuleConformanceRate r WHERE r.day = :day")
     void deleteByDay(@Param("day") LocalDate day);
+
+    @Query("SELECT r FROM SystemRuleConformanceRate r WHERE r.createdAt = (" +
+            "SELECT MAX(r2.createdAt) FROM SystemRuleConformanceRate r2 " +
+            "WHERE r2.ruleId = r.ruleId AND r2.systemId = r.systemId)")
+    List<SystemRuleConformanceRate> findLatestPerRuleIdAndSystemId();
 }

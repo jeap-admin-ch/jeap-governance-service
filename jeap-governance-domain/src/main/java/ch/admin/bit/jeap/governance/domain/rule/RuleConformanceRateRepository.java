@@ -15,4 +15,6 @@ public interface RuleConformanceRateRepository {
     void deleteAllByDay(LocalDate day);
 
     void saveAll(List<RuleConformanceRate> rates);
+
+    List<RuleConformanceRate> findAllByDayBetweenInclusive(LocalDate fromDay, LocalDate toDay);
 }

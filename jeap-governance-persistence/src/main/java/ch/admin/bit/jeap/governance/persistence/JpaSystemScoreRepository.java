@@ -26,4 +26,7 @@ interface JpaSystemScoreRepository extends JpaRepository<SystemScore, Long> {
     @Modifying
     @Query("DELETE FROM SystemScore ss WHERE ss.day < :cutoffDate")
     void deleteByDayBefore(@Param("cutoffDate") LocalDate cutoffDate);
+
+    @Query("SELECT ss FROM SystemScore ss JOIN FETCH ss.system WHERE ss.day >= :fromDay AND ss.day <= :toDay")
+    List<SystemScore> findAllByDayBetweenInclusive(LocalDate fromDay, LocalDate toDay);
 }

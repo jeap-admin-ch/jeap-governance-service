@@ -33,4 +33,8 @@ public class SystemScoreRepositoryImpl implements SystemScoreRepository {
     public List<SystemScore> findBySystem(System system) {
         return jpaSystemScoreRepository.findBySystem(system);
     }
+
+    public List<SystemScore> findAllByDayBetweenInclusive(LocalDate fromDay, LocalDate toDay) {
+        return jpaSystemScoreRepository.findAllByDayBetweenInclusive(fromDay, toDay);
+    }
 }

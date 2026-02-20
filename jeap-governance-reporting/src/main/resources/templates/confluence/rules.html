@@ -1,0 +1,43 @@
+<th:block xmlns:th="http://www.thymeleaf.org">
+    <div th:replace="~{fragment/generated-infoblock :: generated-infoblock}"></div>
+    <h1 th:text="${model.title}">Rules Report</h1>
+    <table class="wrapped relative-table" style="width: 80.0%;">
+        <colgroup>
+            <col style="width: 50.0%;"/>
+            <col style="width: 25.0%;"/>
+            <col style="width: 25.0%;"/>
+        </colgroup>
+        <thead>
+        <tr>
+            <th colspan="1">Rule</th>
+            <th colspan="1">Conformance rate [%]</th>
+            <th colspan="1">Trend</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="rule : ${model.rules}">
+            <td colspan="1">
+                <ac:link>
+                    <ri:page th:ri:content-title="${rule.name}"/>
+                    <ac:plain-text-link-body>
+                        <![CDATA[[[${rule.name}]]]]>
+                    </ac:plain-text-link-body>
+                </ac:link>
+                <span style="color: #707070; font-size: 0.85em;"
+                      th:text="${' (' + rule.ruleId + ')'}"></span>
+            </td>
+            <td colspan="1" th:text="${rule.conformanceRate}" th:style="${rule.getBackgroundColor()}"></td>
+            <td colspan="1">
+                <span th:title="${rule.trend.description}">
+                    <ac:emoticon th:if="${rule.trend.emoticon != null}"
+                                 th:ac:name="${rule.trend.emoticon}"/>
+                    <ac:hipchat-emoticon th:if="${rule.trend.hipchatEmoticon != null}"
+                                         th:ac:shortcut="${rule.trend.hipchatEmoticon}"/>
+                    <span th:if="${rule.trend.unicode != null}"
+                          th:text="${rule.trend.unicode}"></span>
+                </span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</th:block>

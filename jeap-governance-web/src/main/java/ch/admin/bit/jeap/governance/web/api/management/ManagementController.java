@@ -1,6 +1,7 @@
 package ch.admin.bit.jeap.governance.web.api.management;
 
 import ch.admin.bit.jeap.governance.dataimport.DataImportScheduler;
+import ch.admin.bit.jeap.governance.reporting.ReportingScheduler;
 import ch.admin.bit.jeap.governance.rules.ScoringScheduler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -18,6 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Optional;
+import java.util.function.Consumer;
+
 @RestController
 @RequestMapping("/api/management")
 @RequiredArgsConstructor
@@ -27,6 +31,7 @@ public class ManagementController {
 
     private final DataImportScheduler dataImportScheduler;
     private final ScoringScheduler scoringScheduler;
+    private final Optional<ReportingScheduler> reportingScheduler;
 
     @PostMapping
     @Operation(
@@ -46,8 +51,25 @@ public class ManagementController {
         switch (jobDto.type()) {
             case DATA_IMPORT -> dataImportScheduler.update();
             case SCORING -> scoringScheduler.updateScores();
+            case REPORTING -> generateDocumentation();
+            case REPORTING_WITH_ORPHAN_CLEANUP -> generateDocumentationWithOrphanCleanup();
             default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Unsupported job type: " + jobDto.type());
         }
+    }
+
+    private void generateDocumentation() {
+        generateDocumentation(ReportingScheduler::generateDocumentation);
+    }
+
+    private void generateDocumentationWithOrphanCleanup() {
+        generateDocumentation(ReportingScheduler::generateDocumentationWithOrphanCleanup);
+    }
+
+    private void generateDocumentation(Consumer<ReportingScheduler> reportingSchedulerConsumer) {
+        if (reportingScheduler.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Reporting scheduler is not available, please enable reporting module");
+        }
+        reportingSchedulerConsumer.accept(reportingScheduler.get());
     }
 }

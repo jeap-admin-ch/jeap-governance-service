@@ -10,4 +10,6 @@ public interface SystemRuleConformanceRateRepository {
     void saveAll(List<SystemRuleConformanceRate> rates);
 
     List<SystemRuleConformanceRate> findBySystemIdAndDay(long systemId, LocalDate day);
+
+    List<SystemRuleConformanceRate> findLatestPerRuleIdAndSystemId();
 }

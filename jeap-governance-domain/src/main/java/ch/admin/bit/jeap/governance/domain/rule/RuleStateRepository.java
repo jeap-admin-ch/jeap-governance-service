@@ -10,4 +10,8 @@ public interface RuleStateRepository {
     Optional<RuleState> findBySystemComponentAndRuleId(SystemComponent systemComponent, RuleId ruleId);
 
     void saveAll(List<RuleState> ruleStates);
+
+    List<RuleState> findAll();
+
+    List<NonCompliantComponentEntry> findNonCompliantSince();
 }

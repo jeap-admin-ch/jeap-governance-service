@@ -1,6 +1,7 @@
 package ch.admin.bit.jeap.governance.persistence;
 
 import ch.admin.bit.jeap.governance.domain.System;
+import ch.admin.bit.jeap.governance.domain.SystemReference;
 import ch.admin.bit.jeap.governance.domain.SystemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -49,5 +50,10 @@ public class SystemRepositoryImpl implements SystemRepository {
     @Transactional
     public void delete(System system) {
         jpaSystemRepository.delete(system);
+    }
+
+    @Override
+    public List<SystemReference> findAllSystemReferences() {
+        return jpaSystemRepository.findAllSystemReferences();
     }
 }

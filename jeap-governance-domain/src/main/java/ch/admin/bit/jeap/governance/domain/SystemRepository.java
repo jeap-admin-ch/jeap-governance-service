@@ -20,4 +20,6 @@ public interface SystemRepository {
     void delete(System system);
 
     void update(System system);
+
+    List<SystemReference> findAllSystemReferences();
 }

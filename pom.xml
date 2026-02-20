@@ -28,19 +28,20 @@
     <parent>
         <groupId>ch.admin.bit.jeap</groupId>
         <artifactId>jeap-spring-boot-parent</artifactId>
-        <version>30.16.0</version>
+        <version>30.18.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <artifactId>jeap-governance-service</artifactId>
     <name>${project.groupId}:${project.artifactId}</name>
-    <version>0.0.12-SNAPSHOT</version>
+    <version>0.0.13-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
         <asciidoc-confluence-publisher-client.version>0.30.2</asciidoc-confluence-publisher-client.version>
         <maven.javadoc.skip>false</maven.javadoc.skip>
         <java.version>25</java.version>
+        <maven.compiler.release>25</maven.compiler.release>
     </properties>
 
     <modules>
@@ -51,7 +52,7 @@
         <module>jeap-governance-rules-core</module>
         <module>jeap-governance-archrepo</module>
         <module>jeap-governance-web</module>
-        <module>jeap-governance-docgen</module>
+        <module>jeap-governance-reporting</module>
         <module>jeap-governance-prometheus</module>
         <module>jeap-governance-pactbroker</module>
         <module>jeap-governance-deploymentlog</module>
@@ -65,72 +66,72 @@
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-dataimport</artifactId>
-                <version>0.0.12-SNAPSHOT</version>
+                <version>0.0.13-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-domain</artifactId>
-                <version>0.0.12-SNAPSHOT</version>
+                <version>0.0.13-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-persistence</artifactId>
-                <version>0.0.12-SNAPSHOT</version>
+                <version>0.0.13-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-rules</artifactId>
-                <version>0.0.12-SNAPSHOT</version>
+                <version>0.0.13-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-rules-core</artifactId>
-                <version>0.0.12-SNAPSHOT</version>
+                <version>0.0.13-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-archrepo</artifactId>
-                <version>0.0.12-SNAPSHOT</version>
+                <version>0.0.13-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-deploymentlog</artifactId>
-                <version>0.0.12-SNAPSHOT</version>
+                <version>0.0.13-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-web</artifactId>
-                <version>0.0.12-SNAPSHOT</version>
+                <version>0.0.13-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
-                <artifactId>jeap-governance-docgen</artifactId>
-                <version>0.0.12-SNAPSHOT</version>
+                <artifactId>jeap-governance-reporting</artifactId>
+                <version>0.0.13-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-prometheus</artifactId>
-                <version>0.0.12-SNAPSHOT</version>
+                <version>0.0.13-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-pactbroker</artifactId>
-                <version>0.0.12-SNAPSHOT</version>
+                <version>0.0.13-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-secscan</artifactId>
-                <version>0.0.12-SNAPSHOT</version>
+                <version>0.0.13-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-rules-messaging</artifactId>
-                <version>0.0.12-SNAPSHOT</version>
+                <version>0.0.13-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-service-instance</artifactId>
-                <version>0.0.12-SNAPSHOT</version>
+                <version>0.0.13-SNAPSHOT</version>
             </dependency>
 
             <dependency>

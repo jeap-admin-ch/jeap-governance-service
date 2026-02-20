@@ -9,10 +9,13 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -72,5 +75,62 @@ class RuleConformanceRateRepositoryImplTest extends PostgresTestContainerBase {
         List<RuleConformanceRate> result = repository.findByRuleId("RULE-001");
 
         assertEquals(2, result.size());
+    }
+
+    @Test
+    void findAllByDayBetweenInclusive_oneRule() {
+        LocalDate day1 = LocalDate.of(2026, 1, 1);
+        LocalDate day2 = LocalDate.of(2026, 1, 2);
+        LocalDate day3 = LocalDate.of(2026, 1, 3);
+        LocalDate day4 = LocalDate.of(2026, 1, 4);
+        entityManager.persist(createRate("RULE-001", 90, day1));
+        entityManager.persist(createRate("RULE-001", 95, day2));
+        entityManager.persist(createRate("RULE-001", 95, day3));
+        entityManager.persist(createRate("RULE-001", 90, day4));
+        entityManager.flush();
+
+        List<RuleConformanceRate> result = repository.findAllByDayBetweenInclusive(day2, day3);
+        assertEquals(2, result.size());
+        for (RuleConformanceRate rate : result) {
+            assertEquals(95, rate.getConformanceRate());
+        }
+    }
+
+    @Test
+    void findAllByDayBetweenInclusive_severalRules() {
+        LocalDate day1 = LocalDate.of(2026, 1, 1);
+        LocalDate day2 = LocalDate.of(2026, 1, 2);
+        LocalDate day3 = LocalDate.of(2026, 1, 3);
+        LocalDate day4 = LocalDate.of(2026, 1, 4);
+        entityManager.persist(createRate("RULE-001", 90, day1));
+        entityManager.persist(createRate("RULE-001", 95, day2));
+        entityManager.persist(createRate("RULE-001", 95, day3));
+        entityManager.persist(createRate("RULE-001", 90, day4));
+        entityManager.persist(createRate("RULE-002", 90, day1));
+        entityManager.persist(createRate("RULE-002", 95, day2));
+        entityManager.persist(createRate("RULE-002", 95, day3));
+        entityManager.persist(createRate("RULE-002", 90, day4));
+        entityManager.persist(createRate("RULE-003", 90, day1));
+        entityManager.persist(createRate("RULE-003", 95, day2));
+        entityManager.persist(createRate("RULE-003", 95, day3));
+        entityManager.persist(createRate("RULE-003", 90, day4));
+
+
+        entityManager.flush();
+
+        List<RuleConformanceRate> result = repository.findAllByDayBetweenInclusive(day2, day3);
+        assertEquals(6, result.size());
+        for (RuleConformanceRate rate : result) {
+            assertEquals(95, rate.getConformanceRate());
+        }
+    }
+
+    private RuleConformanceRate createRate(String ruleId, int conformanceRate, LocalDate day) {
+        return RuleConformanceRate.builder()
+                .ruleId(ruleId)
+                .conformanceRate(conformanceRate)
+                .day(day)
+                .createdAt(ZonedDateTime.of(day, java.time.LocalTime.NOON, java.time.ZoneId.systemDefault()))
+                .build();
     }
 }

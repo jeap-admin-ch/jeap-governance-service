@@ -34,6 +34,7 @@ public class ComponentScore {
     @ToString.Exclude
     private SystemComponent systemComponent;
 
+    @Getter
     @Column(nullable = false)
     private LocalDate day;
 
