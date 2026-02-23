@@ -171,8 +171,7 @@ class DataImportSecscanIT extends GovernanceIntegrationTestBase {
         List<Map<String, Object>> states = querySecscanStates(COMPONENT_A1_NAME);
         assertThat(states).hasSize(1);
         String scanMessage = (String) states.getFirst().get("scan_message");
-        assertThat(scanMessage).contains("Ignoring");
-        assertThat(scanMessage).contains("test ignore");
+        assertThat(scanMessage).contains("Ignoring").contains("test ignore");
 
         List<Map<String, Object>> flagged = queryFlaggedEndpoints(COMPONENT_A1_NAME);
         assertThat(flagged).isEmpty();
@@ -207,7 +206,7 @@ class DataImportSecscanIT extends GovernanceIntegrationTestBase {
         // Verify state and flagged endpoints unchanged
         List<Map<String, Object>> statesAfterSecond = querySecscanStates(COMPONENT_A1_NAME);
         assertThat(statesAfterSecond).hasSize(1);
-        assertThat(statesAfterSecond.getFirst().get("scan_timestamp")).isEqualTo(firstScanTimestamp);
+        assertThat(statesAfterSecond.getFirst()).containsEntry("scan_timestamp", firstScanTimestamp);
 
         List<Map<String, Object>> flaggedAfterSecond = queryFlaggedEndpoints(COMPONENT_A1_NAME);
         assertThat(flaggedAfterSecond).hasSize(1);
@@ -225,7 +224,7 @@ class DataImportSecscanIT extends GovernanceIntegrationTestBase {
 
         List<Map<String, Object>> flaggedAfterFirst = queryFlaggedEndpoints(COMPONENT_A1_NAME);
         assertThat(flaggedAfterFirst).hasSize(1);
-        assertThat(flaggedAfterFirst.getFirst().get("path")).isEqualTo("/api/old-endpoint");
+        assertThat(flaggedAfterFirst.getFirst()).containsEntry("path", "/api/old-endpoint");
 
         // Second import: 3 endpoints, 2 flagged (lastUpdated must be after first scan timestamp to trigger rescan)
         secscanMockServer.resetAll();

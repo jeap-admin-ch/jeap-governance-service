@@ -147,7 +147,7 @@ class SecscanStateRepositoryImplTest extends PostgresTestContainerBase {
 
         int deletedCount = repository.deleteBySystemComponentId(componentA.getId());
 
-        assertThat(deletedCount).isEqualTo(0);
+        assertThat(deletedCount).isZero();
         assertThat(entityManager.find(SecscanState.class, stateB.getId())).isNotNull();
     }
 

@@ -25,15 +25,18 @@ This repository is Open Source Software licensed under the [Apache License 2.0](
 - [Module Overview](#module-overview)
 - [Domain Model](#domain-model)
   - [Core Model](#core-model)
+  - [Scoring and Rule Models](#scoring-and-rule-models)
   - [ArchRepo Model](#archrepo-model)
   - [DeploymentLog Model](#deploymentlog-model)
   - [Prometheus Model](#prometheus-time-series-model)
+  - [Security Scan Model](#security-scan-model)
 - [Database](#database)
   - [Flyway Migration Strategy](#flyway-migration-strategy)
   - [Core Schema](#core-schema)
   - [ArchRepo Schema](#archrepo-schema)
   - [DeploymentLog Schema](#deploymentlog-schema)
   - [Prometheus Schema](#prometheus-time-series-schema)
+  - [Security Scan Schema](#security-scan-schema)
 - [Configuration](#configuration)
   - [Example Configuration](#example-configuration)
 - [Plugin Mechanism](#plugin-mechanism)
@@ -55,6 +58,7 @@ This repository is Open Source Software licensed under the [Apache License 2.0](
 | `jeap-governance-pactbroker`       | Imports data from a PACT broker instance                                                                                                                                                                                     | -                                                                                    |
 | `jeap-governance-persistence`      | Provides flyway migration scripts and JPA repositories                                                                                                                                                                       | -                                                                                    |
 | `jeap-governance-prometheus`       | Handles integration with a Prometheus server. Queries the latest samples of selected standard jEAP metrics for the system's service components and persists them to the database.                                            | See [Configuration](#configuration)                                                  |
+| `jeap-governance-secscan`          | Scans the known HTTP APIs of the system components for unprotected endpoints and persists the flagged endpoints in the database.                                                                                             | See [Configuration](#configuration)                                                  |
 | `jeap-governance-rules`            | Provides the infrastructure to evaluate governance rules and score services/systems on a regular basis                                                                                                                       | Instances can define this as their parent                                            |
 | `jeap-governance-rules-core`       | Built-in governance rules shipped with the service                                                                                                                                                                           | Included transitively via `jeap-governance-rules`                                    |
 | `jeap-governance-service-instance` | Module for easily creating an instance of the governance service                                                                                                                                                             | Instances can define this as their parent                                            |
@@ -116,6 +120,18 @@ implementation straightforward.
 
 ![Prometheus Model Diagram](docs/images/prometheus-domain-model.png)
 
+#### Security Scan Model
+
+The secscan module implements a security scan of known system component APIs to identify unprotected endpoints. Known
+APIs of a system component are identified via the API discovery service. This service queries a jEAP architecture
+repository instance for a system component's REST endpoints. Those endpoints are then checked for security by executing
+HTTP requests on them. Endpoints accepting and not rejecting the requests are flagged as unprotected. The scan
+result details for flagged endpoints are persisted to SecscanFlaggedEndpoint entities. In addition, a summarizing scan
+message is persisted per system component in a SecscanState entity. A configurable endpoint filter allows to filter out
+certain APIs and endpoints from the scan, e.g. to exclude APIs or endpoints that are expected to be unprotected.
+
+![Security Scan Model Diagram](docs/images/secscan-domain-model.png)
+
 ### Database
 
 #### Flyway Migration Strategy
@@ -165,45 +181,55 @@ storage) to keep both the data model and the implementation straightforward.
 
 ![Prometheus Time Series Schema Diagram](docs/images/prometheus-db-schema.png)
 
+#### Security Scan Schema
+
+![Security Scan Schema Diagram](docs/images/secscan-db-schema.png)
+
 ### Configuration
 
 All configuration properties support Spring Boot's standard configuration mechanisms (application.yml, environment variables, etc.).
 
-| Property                                                             | Description                                                                       | Default                       | Required                      |
-|----------------------------------------------------------------------|-----------------------------------------------------------------------------------|-------------------------------|-------------------------------|
-| `jeap.governance.environment`                                        | Environment of the service(DEV, REF, ABN, PROD).                                  | -                             | Yes                           |
-| `jeap.governance.archrepo.url`                                       | URL of the Architecture Repository                                                | -                             | Yes                           |
-| `jeap.governance.dataimport.cron-expression`                         | Cron expression to schedule the data import job                                   | `0 15 6,10,14,18 * * MON-FRI` | No                            |
-| `jeap.governance.dataimport.lock-at-least`                           | Minimum duration for which the lock should be held during the data import job     | `PT30M`                       | No                            |
-| `jeap.governance.dataimport.lock-at-most`                            | Maximum lock duration for the data import job                                     | `PT2H`                        | No                            |
-| `jeap.governance.archrepo.timeout`                                   | Connection timeout for Architecture Repository integration                        | `PT5M`                        | No                            |
-| `jeap.governance.archrepo.import.apidocversion.enabled`              | Enable/disable import of API documentation versions from ArchRepo                 | `true`                        | No                            |
-| `jeap.governance.archrepo.import.databaseschemaversion.enabled`      | Enable/disable import of database schema versions from ArchRepo                   | `true`                        | No                            |
-| `jeap.governance.archrepo.import.reactiongraph.enabled`              | Enable/disable import of reaction graphs from ArchRepo                            | `true`                        | No                            |
-| `jeap.governance.archrepo.import.restapirelationwithoutpact.enabled` | Enable/disable import of REST API relations without Pact from ArchRepo            | `true`                        | No                            |
-| `jeap.governance.deploymentlog.enabled`                              | Enable/disable import of data from the of DeploymentLog                           | `true`                        | No                            |
-| `jeap.governance.deploymentlog.url`                                  | URL of the DeploymentLog                                                          | -                             | Yes, if deploymentlog enabled |
-| `jeap.governance.deploymentlog.username`                             | Username to access the DeploymentLog                                              | -                             | Yes, if deploymentlog enabled |
-| `jeap.governance.deploymentlog.password`                             | Password to access the DeploymentLog                                              | -                             | Yes, if deploymentlog enabled |
-| `jeap.governance.deploymentlog.timeout`                              | DeploymentLog connection timeout duration.                                        | 'PT5M'                        | No                            |
-| `jeap.governance.prometheus.enablede`                                | Enable/disable the import of time series from Prometheus                          | 'true'                        | No                            |
-| `jeap.governance.prometheus.amp.host`                                | Amazon Managed Prometheus host URL                                                | -                             | Yes, if enabled               |
-| `jeap.governance.prometheus.amp.workspace`                           | Amazon Managed Prometheus workspace id                                            | -                             | Yes, if enabled               |
-| `jeap.governance.prometheus.amp.role-arn`                            | ARN of the role to assume for accessing the Amazon Managed Prometheus             | -                             | Yes, if enabled               |
-| `jeap.governance.prometheus.amp.role-session-name`                   | Name of the session to be used for accessing the Amazon Managed Prometheus        | -                             | Yes, if enabled               |
-| `jeap.governance.rules.active[].id`                                  | Rule identifier, must match a known rule implementation                           | -                             | Yes                           |
-| `jeap.governance.rules.active[].weight`                              | Rule weight for scoring (positive integer, >= 1)                                  | -                             | Yes                           |
-| `jeap.governance.rules.active[].documentation-link`                  | Optional link to the documentation for this rule, used in governance reports      | -                             | No                            |
-| `jeap.governance.rules.active[].parameters`                          | Optional key-value parameters passed to the rule                                  | `{}`                          | No                            |
-| `jeap.governance.rules.component-exemptions[].id`                    | Unique exemption identifier                                                       | -                             | Yes                           |
-| `jeap.governance.rules.component-exemptions[].component-name`        | Name of the component this exemption applies to                                   | -                             | Yes                           |
-| `jeap.governance.rules.component-exemptions[].rule-id`               | List of rule IDs this exemption covers                                            | -                             | Yes                           |
-| `jeap.governance.rules.component-exemptions[].reason`                | Explanation for the exemption                                                     | -                             | Yes                           |
-| `jeap.governance.rules.component-exemptions[].until`                 | Expiry date (ISO-8601 `yyyy-MM-dd`). If absent, the exemption is permanent        | -                             | No                            |
-| `jeap.governance.rules.component-exemptions[].parameters`            | Optional key-value parameters to further scope the exemption                      | `{}`                          | No                            |
-| `jeap.governance.scoring.cron-expression`                            | Cron expression to schedule the rule evaluation and scoring of components/systems | `0 0,45 6-20 * * MON-FRI`     | No                            |
-| `jeap.governance.scoring.lock-at-least`                              | Minimum duration for which the lock should be held during the data import job     | `PT1M`                        | No                            |
-| `jeap.governance.scoring.lock-at-most`                               | Maximum lock duration for the data import job                                     | `PT15M`                       | No                            |
+| Property                                                             | Description                                                                                               | Default                       | Required                      |
+|----------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|-------------------------------|-------------------------------|
+| `jeap.governance.environment`                                        | Environment of the service(DEV, REF, ABN, PROD).                                                          | -                             | Yes                           |
+| `jeap.governance.archrepo.url`                                       | URL of the Architecture Repository                                                                        | -                             | Yes                           |
+| `jeap.governance.dataimport.cron-expression`                         | Cron expression to schedule the data import job                                                           | `0 15 6,10,14,18 * * MON-FRI` | No                            |
+| `jeap.governance.dataimport.lock-at-least`                           | Minimum duration for which the lock should be held during the data import job                             | `PT30M`                       | No                            |
+| `jeap.governance.dataimport.lock-at-most`                            | Maximum lock duration for the data import job                                                             | `PT2H`                        | No                            |
+| `jeap.governance.archrepo.timeout`                                   | Connection timeout for Architecture Repository integration                                                | `PT5M`                        | No                            |
+| `jeap.governance.archrepo.import.apidocversion.enabled`              | Enable/disable import of API documentation versions from ArchRepo                                         | `true`                        | No                            |
+| `jeap.governance.archrepo.import.databaseschemaversion.enabled`      | Enable/disable import of database schema versions from ArchRepo                                           | `true`                        | No                            |
+| `jeap.governance.archrepo.import.reactiongraph.enabled`              | Enable/disable import of reaction graphs from ArchRepo                                                    | `true`                        | No                            |
+| `jeap.governance.archrepo.import.restapirelationwithoutpact.enabled` | Enable/disable import of REST API relations without Pact from ArchRepo                                    | `true`                        | No                            |
+| `jeap.governance.deploymentlog.enabled`                              | Enable/disable import of data from the of DeploymentLog                                                   | `true`                        | No                            |
+| `jeap.governance.deploymentlog.url`                                  | URL of the DeploymentLog                                                                                  | -                             | Yes, if deploymentlog enabled |
+| `jeap.governance.deploymentlog.username`                             | Username to access the DeploymentLog                                                                      | -                             | Yes, if deploymentlog enabled |
+| `jeap.governance.deploymentlog.password`                             | Password to access the DeploymentLog                                                                      | -                             | Yes, if deploymentlog enabled |
+| `jeap.governance.deploymentlog.timeout`                              | DeploymentLog connection timeout duration.                                                                | 'PT5M'                        | No                            |
+| `jeap.governance.prometheus.enablede`                                | Enable/disable the import of time series from Prometheus                                                  | 'true'                        | No                            |
+| `jeap.governance.prometheus.amp.host`                                | Amazon Managed Prometheus host URL                                                                        | -                             | Yes, if enabled               |
+| `jeap.governance.prometheus.amp.workspace`                           | Amazon Managed Prometheus workspace id                                                                    | -                             | Yes, if enabled               |
+| `jeap.governance.prometheus.amp.role-arn`                            | ARN of the role to assume for accessing the Amazon Managed Prometheus                                     | -                             | Yes, if enabled               |
+| `jeap.governance.prometheus.amp.role-session-name`                   | Name of the session to be used for accessing the Amazon Managed Prometheus                                | -                             | Yes, if enabled               |
+| `jeap.governance.secscan.enabled`                                    | Enable/disable the security scan of known system component APIs                                           | true                          | No                            |
+| `jeap.governance.secscan.dataimport.target-environment`              | Environment to perform the security scan on                                                               | REF                           | No                            |
+| `jeap.governance.secscan.apidiscovery.url-template`                  | URL template of the API discovery service containing the parameters {env} and {systemComponentName}       | true                          | No                            |
+| `jeap.governance.secscan.apidiscovery.timeout`                       | Timout (specified as duration) for the connect and read timeouts when accessing the API discovery service | true                          | No                            |
+| `jeap.governance.secscan.httpcheck.connect-timeout`                  | Timout (specified as duration) for the connect timeout when checking an HTTP endpoint                     | true                          | No                            |
+| `jeap.governance.secscan.httpcheck.read-timeout`                     | Timout (specified as duration) for the read timeout when checking an HTTP endpoint                        | true                          | No                            |
+| `jeap.governance.rules.active[].id`                                  | Rule identifier, must match a known rule implementation                                                   | -                             | Yes                           |
+| `jeap.governance.rules.active[].weight`                              | Rule weight for scoring (positive integer, >= 1)                                                          | -                             | Yes                           |
+| `jeap.governance.rules.active[].documentation-link`                  | Optional link to the documentation for this rule, used in governance reports                              | -                             | No                            |
+| `jeap.governance.rules.active[].parameters`                          | Optional key-value parameters passed to the rule                                                          | `{}`                          | No                            |
+| `jeap.governance.rules.component-exemptions[].id`                    | Unique exemption identifier                                                                               | -                             | Yes                           |
+| `jeap.governance.rules.component-exemptions[].component-name`        | Name of the component this exemption applies to                                                           | -                             | Yes                           |
+| `jeap.governance.rules.component-exemptions[].rule-id`               | List of rule IDs this exemption covers                                                                    | -                             | Yes                           |
+| `jeap.governance.rules.component-exemptions[].reason`                | Explanation for the exemption                                                                             | -                             | Yes                           |
+| `jeap.governance.rules.component-exemptions[].until`                 | Expiry date (ISO-8601 `yyyy-MM-dd`). If absent, the exemption is permanent                                | -                             | No                            |
+| `jeap.governance.rules.component-exemptions[].parameters`            | Optional key-value parameters to further scope the exemption                                              | `{}`                          | No                            |
+| `jeap.governance.scoring.cron-expression`                            | Cron expression to schedule the rule evaluation and scoring of components/systems                         | `0 0,45 6-20 * * MON-FRI`     | No                            |
+| `jeap.governance.scoring.lock-at-least`                              | Minimum duration for which the lock should be held during the data import job                             | `PT1M`                        | No                            |
+| `jeap.governance.scoring.lock-at-most`                               | Maximum lock duration for the data import job                                                             | `PT15M`                       | No                            |
 
 #### Example Configuration
 
@@ -244,6 +270,12 @@ jeap:
         workspace: "ws-4f9f438a-efdf-4081-9745-fc4a0ad35f32b2"
         role-arn: "arn:aws:iam::892367255812:role/amp-read-assume-role"
         role-session-name: mySession
+    secscan:
+        enabled: true
+        dataimport:
+          target-environment: REF
+        apidiscovery:
+            url-template: "https://api-discovery.{env}-example.com/apis/{systemComponentName}"            
     rules:
       active:
         - id: component-name

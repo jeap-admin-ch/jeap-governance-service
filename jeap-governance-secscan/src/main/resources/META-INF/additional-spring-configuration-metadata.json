@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "jeap.governance.secscan.enabled",
+      "description": "Enable or disable the security scan data import.",
+      "defaultValue": true,
+      "type": "java.lang.Boolean"
+    }
+  ]
+}

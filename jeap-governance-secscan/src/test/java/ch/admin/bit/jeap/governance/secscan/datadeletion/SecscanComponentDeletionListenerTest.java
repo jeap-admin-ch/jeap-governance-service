@@ -88,6 +88,7 @@ class SecscanComponentDeletionListenerTest extends PostgresTestContainerBase {
         assertThat(findAllFlaggedEndpoints()).hasSize(1);
     }
 
+    @SuppressWarnings("SameParameterValue")
     private void persistState(long systemComponentId, String scanMessage) {
         SecscanState state = SecscanState.builder()
                 .systemComponentId(systemComponentId)

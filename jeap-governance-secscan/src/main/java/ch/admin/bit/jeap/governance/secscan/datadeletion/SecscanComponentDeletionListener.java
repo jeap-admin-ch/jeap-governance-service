@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 public class SecscanComponentDeletionListener implements ComponentDeletionListener {
 
     private final SecscanStateRepository secscanStateRepository;

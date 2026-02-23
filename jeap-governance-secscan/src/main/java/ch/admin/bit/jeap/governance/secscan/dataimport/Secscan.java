@@ -19,7 +19,6 @@ import static ch.admin.bit.jeap.governance.secscan.dataimport.SystemComponentSec
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 public class Secscan implements DataSourceImporter {
 
     private final DataimportConfigurationProperties configProperties;
@@ -27,7 +26,7 @@ public class Secscan implements DataSourceImporter {
     private final SystemComponentHttpApiDiscoveryClient apiDiscoveryClient;
     private final SystemComponentHttpApiIgnoreFilter apiFilter;
     private final HttpEndpointSecurityChecker endpointSecurityChecker;
-    private final Transactions transactions;
+    private final SecscanTransactions secscanTransactions;
     private final SecscanFlaggedEndpointRepository flaggedEndpointRepository;
     private final SecscanStateRepository secscanStateRepository;
 
@@ -51,7 +50,7 @@ public class Secscan implements DataSourceImporter {
     }
 
     private void updateSecscanData(SystemComponentSecscanResult result) {
-        transactions.inNewTransaction(() -> {
+        secscanTransactions.inNewTransaction(() -> {
             if (result.resultType().isUpdateSecscanData()) {
                 log.info("Updating the security scan data for the system component '{}' in the environment '{}'.",
                         result.systemComponentReference().getName(), result.environment());

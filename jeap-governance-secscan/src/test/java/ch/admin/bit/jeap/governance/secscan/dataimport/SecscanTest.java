@@ -42,7 +42,7 @@ class SecscanTest {
     @Mock
     private HttpEndpointSecurityChecker endpointSecurityChecker;
     @Mock
-    private Transactions transactions;
+    private SecscanTransactions secscanTransactions;
     @Mock
     private SecscanFlaggedEndpointRepository flaggedEndpointRepository;
     @Mock
@@ -367,7 +367,7 @@ class SecscanTest {
         verify(secscanStateRepository, never()).save(any());
         verify(flaggedEndpointRepository, never()).deleteBySystemComponentId(anyLong());
         verify(flaggedEndpointRepository, never()).saveAll(any());
-        verify(transactions, never()).inNewTransaction(any());
+        verify(secscanTransactions, never()).inNewTransaction(any());
     }
 
     @Test
@@ -424,7 +424,7 @@ class SecscanTest {
             Runnable runnable = invocation.getArgument(0);
             runnable.run();
             return null;
-        }).when(transactions).inNewTransaction(any());
+        }).when(secscanTransactions).inNewTransaction(any());
     }
 
     @SuppressWarnings("SameParameterValue")

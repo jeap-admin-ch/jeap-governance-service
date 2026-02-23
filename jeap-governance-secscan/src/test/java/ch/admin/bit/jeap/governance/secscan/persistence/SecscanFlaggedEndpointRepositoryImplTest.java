@@ -140,7 +140,7 @@ class SecscanFlaggedEndpointRepositoryImplTest extends PostgresTestContainerBase
 
         int deletedCount = repository.deleteBySystemComponentId(componentA.getId());
 
-        assertThat(deletedCount).isEqualTo(0);
+        assertThat(deletedCount).isZero();
         assertThat(entityManager.find(SecscanFlaggedEndpoint.class, epB1.getId())).isNotNull();
     }
 

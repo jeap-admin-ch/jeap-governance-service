@@ -1,6 +1,6 @@
 package ch.admin.bit.jeap.governance.secscan.domain;
 
-public interface Transactions {
+public interface SecscanTransactions {
 
     void inNewTransaction(Runnable runnable);
 
