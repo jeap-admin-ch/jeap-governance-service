@@ -8,6 +8,10 @@ public record RuleResult(State state, String stateComment) {
         return new RuleResult(State.OK, null);
     }
 
+    public static RuleResult ok(String stateComment) {
+        return new RuleResult(State.OK, stateComment);
+    }
+
     public static RuleResult failed() {
         return new RuleResult(State.FAIL, null);
     }

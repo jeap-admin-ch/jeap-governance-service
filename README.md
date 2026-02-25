@@ -390,10 +390,11 @@ basis. Besides using predefined rules, you may also provide custom rules specifi
 
 The `jeap-governance-rules-core` module ships the following built-in rules:
 
-| Rule ID                       | Description                                                                               |
-|-------------------------------|-------------------------------------------------------------------------------------------|
-| `component-naming-convention` | Validates that component names follow the convention `{system-name}-{context}-{type-id}`. |
-| `component-produces-metrics`  | Checks that a component has Prometheus metrics data available.                            |
+| Rule ID                        | Description                                                                               |
+|--------------------------------|-------------------------------------------------------------------------------------------|
+| `component-naming-convention`  | Validates that component names follow the convention `{system-name}-{context}-{type-id}`. |
+| `component-produces-metrics`   | Checks that a component has Prometheus metrics data available.                            |
+| `component-publishes-dbschema` | Checks that a component publishes its database schema in the architecture repository.     |
 
 **Component Naming Convention Rule** (`component-naming-convention`)
 
@@ -411,6 +412,36 @@ Names with fewer than 3 parts fail immediately.
 Verifies that at least one Prometheus time series exists for the component. This ensures that the
 `jeap-spring-boot-monitoring-starter` dependency is added and the monitoring configuration is working correctly.
 Requires the Prometheus module to be enabled (`jeap.governance.prometheus.enabled=true`).
+
+**Component Publishes DB Schema Rule** (`component-publishes-dbschema`)
+
+This rule verifies that a component publishes its database schema to the architecture repository.
+
+Some components can be excluded from this check using the `ignored-service-names` parameter. This is useful for services that:
+
+- Do not use a database
+- Are not required to publish a database schema
+
+Multiple service names can be specified as a comma-separated list (concatenated with `,`).
+
+Configuration Example:
+
+```yaml
+jeap:
+  governance:
+    rules:
+      active:
+        - id: component-publishes-dbschema
+          weight: 3
+          parameters:
+            ignored-service-names: ignored-service,foobar-service
+
+```
+
+To use this rule, the following modules must be enabled:
+- Prometheus module (`jeap.governance.prometheus.enabled=true`)
+- DeploymentLog module (`jeap.governance.deploymentlog.enabled=true`)
+- Database Schema Version in ArchRepo module (`jeap.governance.archrepo.import.databaseschemaversion.enabled=true`)
 
 ### Metrics
 
