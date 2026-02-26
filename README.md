@@ -390,11 +390,12 @@ basis. Besides using predefined rules, you may also provide custom rules specifi
 
 The `jeap-governance-rules-core` module ships the following built-in rules:
 
-| Rule ID                        | Description                                                                               |
-|--------------------------------|-------------------------------------------------------------------------------------------|
-| `component-naming-convention`  | Validates that component names follow the convention `{system-name}-{context}-{type-id}`. |
-| `component-produces-metrics`   | Checks that a component has Prometheus metrics data available.                            |
-| `component-publishes-dbschema` | Checks that a component publishes its database schema in the architecture repository.     |
+| Rule ID                           | Description                                                                                 |
+|-----------------------------------|---------------------------------------------------------------------------------------------|
+| `component-naming-convention`     | Validates that component names follow the convention `{system-name}-{context}-{type-id}`.   |
+| `component-produces-metrics`      | Checks that a component has Prometheus metrics data available.                              |
+| `component-publishes-dbschema`    | Checks that a component publishes its database schema in the architecture repository.       |
+| `component-publishes-openapispec` | Checks that a component publishes its OpenAPI specification in the architecture repository. |
 
 **Component Naming Convention Rule** (`component-naming-convention`)
 
@@ -442,6 +443,14 @@ To use this rule, the following modules must be enabled:
 - Prometheus module (`jeap.governance.prometheus.enabled=true`)
 - DeploymentLog module (`jeap.governance.deploymentlog.enabled=true`)
 - Database Schema Version in ArchRepo module (`jeap.governance.archrepo.import.databaseschemaversion.enabled=true`)
+
+**Component Publishes OpenAPI Specification Rule** (`component-publishes-openapispec`)
+
+This rule verifies that a component publishes its OpenAPI specification to the architecture repository.
+
+To use this rule, the following modules must be enabled:
+- DeploymentLog module (`jeap.governance.deploymentlog.enabled=true`)
+- API Doc Version in ArchRepo module (`jeap.governance.archrepo.import.apidocversion.enabled=true`)
 
 ### Metrics
 
