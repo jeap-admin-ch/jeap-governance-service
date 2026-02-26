@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -10,34 +10,36 @@
         <version>0.0.11-SNAPSHOT</version>
     </parent>
 
-    <artifactId>jeap-governance-dataimport</artifactId>
+    <artifactId>jeap-governance-rules-messaging</artifactId>
     <name>${project.groupId}:${project.artifactId}</name>
 
     <dependencies>
         <dependency>
             <groupId>ch.admin.bit.jeap</groupId>
             <artifactId>jeap-governance-domain</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>net.javacrumbs.shedlock</groupId>
-            <artifactId>shedlock-spring</artifactId>
+            <groupId>ch.admin.bit.jeap</groupId>
+            <artifactId>jeap-governance-archrepo</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-core</artifactId>
+            <groupId>ch.admin.bit.jeap</groupId>
+            <artifactId>jeap-governance-deploymentlog</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.admin.bit.jeap</groupId>
+            <artifactId>jeap-governance-prometheus</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
+            <artifactId>spring-boot-autoconfigure</artifactId>
         </dependency>
 
-        <!-- TEST -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
+
 </project>
