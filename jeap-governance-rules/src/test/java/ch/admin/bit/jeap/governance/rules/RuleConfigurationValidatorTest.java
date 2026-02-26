@@ -108,6 +108,55 @@ class RuleConfigurationValidatorTest {
         assertThat(output).doesNotContain("unknown rule ID(s)");
     }
 
+    @Test
+    void validateParameters_delegatesToRule(CapturedOutput output) {
+        var properties = new RuleConfigurationProperties();
+        var activeRule = new RuleConfigurationProperties.ActiveRule();
+        activeRule.setId("validating-rule");
+        activeRule.setWeight(5);
+        activeRule.setParameters(java.util.Map.of("key", "valid-value"));
+        properties.setActive(List.of(activeRule));
+
+        var validator = new RuleConfigurationValidator(List.of(testRuleWithValidation("validating-rule")), properties);
+
+        validator.validateConfiguration(true);
+
+        assertThat(output).doesNotContain("invalid parameters");
+    }
+
+    @Test
+    void validateParameters_invalidParams_failOnError_throws(CapturedOutput output) {
+        var properties = new RuleConfigurationProperties();
+        var activeRule = new RuleConfigurationProperties.ActiveRule();
+        activeRule.setId("validating-rule");
+        activeRule.setWeight(5);
+        activeRule.setParameters(java.util.Map.of("key", "invalid"));
+        properties.setActive(List.of(activeRule));
+
+        var validator = new RuleConfigurationValidator(List.of(testRuleWithValidation("validating-rule")), properties);
+
+        assertThatThrownBy(() -> validator.validateConfiguration(true))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("invalid value");
+        assertThat(output).contains("Active rule 'validating-rule' has invalid parameters");
+    }
+
+    @Test
+    void validateParameters_invalidParams_noFailOnError_logsOnly(CapturedOutput output) {
+        var properties = new RuleConfigurationProperties();
+        var activeRule = new RuleConfigurationProperties.ActiveRule();
+        activeRule.setId("validating-rule");
+        activeRule.setWeight(5);
+        activeRule.setParameters(java.util.Map.of("key", "invalid"));
+        properties.setActive(List.of(activeRule));
+
+        var validator = new RuleConfigurationValidator(List.of(testRuleWithValidation("validating-rule")), properties);
+
+        validator.validateConfiguration(false);
+
+        assertThat(output).contains("Active rule 'validating-rule' has invalid parameters");
+    }
+
     private static Rule testRule(String id) {
         return new Rule() {
             @Override
@@ -118,6 +167,28 @@ class RuleConfigurationValidatorTest {
             @Override
             public RuleResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters) {
                 throw new UnsupportedOperationException();
+            }
+        };
+    }
+
+    private static Rule testRuleWithValidation(String id) {
+        return new Rule() {
+            @Override
+            public RuleMetadata metadata() {
+                return new RuleMetadata(RuleId.of(id), "Rule " + id);
+            }
+
+            @Override
+            public RuleResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void validateParameters(RuleParameters ruleParameters) {
+                String value = ruleParameters.parameters().getOrDefault("key", "");
+                if ("invalid".equals(value)) {
+                    throw new IllegalStateException("invalid value for key");
+                }
             }
         };
     }

@@ -1,9 +1,9 @@
 package ch.admin.bit.jeap.governance.secscan.apidiscovery;
 
 import ch.admin.bit.jeap.governance.domain.GovernanceServiceEnvironment;
-import ch.admin.bit.jeap.governance.secscan.domain.HttpApi;
-import ch.admin.bit.jeap.governance.secscan.domain.HttpEndpoint;
-import ch.admin.bit.jeap.governance.secscan.domain.SystemComponentHttpApi;
+import ch.admin.bit.jeap.governance.domain.plugin.security.api.HttpApi;
+import ch.admin.bit.jeap.governance.domain.plugin.security.api.HttpEndpoint;
+import ch.admin.bit.jeap.governance.domain.plugin.security.api.SystemComponentHttpApi;
 import ch.admin.bit.jeap.governance.secscan.domain.SystemComponentHttpApiDiscoveryClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

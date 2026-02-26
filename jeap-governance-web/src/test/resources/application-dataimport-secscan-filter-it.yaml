@@ -1,0 +1,36 @@
+jeap:
+  governance:
+    secscan:
+      enabled: true
+      dataimport:
+        target-environment: REF
+    rules:
+      active:
+        - id: endpoints-protected
+          weight: 5
+          parameters:
+            exempt-methods:
+              - OPTIONS
+            exempt-paths:
+              - /public/*
+            exempt-endpoints:
+              - DELETE:/admin/*
+            exempt-api-url-not-containing:
+              - ingress
+              - internal-csp
+            exempt-api-url-containing:
+              - egress
+            exempt-component-names:
+              - "*-exemptbyname-svc"
+      component-exemptions:
+        - id: filter-exempted-test
+          component-name: sysa-comp3-svc
+          rule-id:
+            - endpoints-protected
+          reason: "Exempted for filter testing"
+        - id: filter-exempted-until-test
+          component-name: sysb-comp3-svc
+          rule-id:
+            - endpoints-protected
+          reason: "Temporarily exempted for filter testing"
+          until: "2099-12-31"

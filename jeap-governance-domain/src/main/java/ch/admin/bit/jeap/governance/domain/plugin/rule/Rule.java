@@ -11,4 +11,7 @@ public interface Rule {
 
     RuleResult evaluate(SystemComponent systemComponent, RuleParameters ruleParameters);
 
+    default void validateParameters(RuleParameters ruleParameters) {
+    }
+
 }

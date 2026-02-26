@@ -1,6 +1,7 @@
 package ch.admin.bit.jeap.governance.secscan.httpcheck;
 
 import ch.admin.bit.jeap.governance.secscan.domain.HttpEndpointSecurityChecker;
+
 import ch.admin.bit.jeap.rest.tracing.AddSenderSystemHeaderToRestClient;
 import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
 import org.springframework.context.annotation.Bean;

@@ -1,6 +1,7 @@
 package ch.admin.bit.jeap.governance.secscan.apidiscovery;
 
 import ch.admin.bit.jeap.governance.secscan.domain.SystemComponentHttpApiDiscoveryClient;
+
 import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

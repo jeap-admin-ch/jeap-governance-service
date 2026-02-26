@@ -2,6 +2,7 @@ package ch.admin.bit.jeap.governance.secscan.datadeletion;
 
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
 import ch.admin.bit.jeap.governance.domain.SystemComponentRepository;
+import ch.admin.bit.jeap.governance.domain.rule.RuleRepository;
 import ch.admin.bit.jeap.governance.secscan.SecscanAutoconfiguration;
 import ch.admin.bit.jeap.governance.secscan.domain.HttpEndpointSecurityChecker;
 import ch.admin.bit.jeap.governance.secscan.domain.SecscanFlaggedEndpoint;
@@ -33,6 +34,9 @@ class SecscanComponentDeletionListenerTest extends PostgresTestContainerBase {
 
     @MockitoBean
     private HttpEndpointSecurityChecker httpEndpointSecurityChecker;
+
+    @MockitoBean
+    private RuleRepository ruleRepository;
 
     @Autowired
     private SecscanComponentDeletionListener deletionListener;

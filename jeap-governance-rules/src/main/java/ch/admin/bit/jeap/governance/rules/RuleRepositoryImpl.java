@@ -80,6 +80,15 @@ class RuleRepositoryImpl implements RuleRepository {
                 ActiveRule::getWeight));
     }
 
+    @Override
+    public Optional<Map<String, String>> getActiveRuleParameters(RuleId ruleId) {
+        return properties.getActive().stream()
+                .filter(activeRule -> activeRule.getId().equals(ruleId))
+                .filter(activeRule -> rulesByIdMap.containsKey(activeRule.getId()))
+                .findFirst()
+                .map(ActiveRule::getParameters);
+    }
+
     private RuleEvaluation toRuleEvaluation(ActiveRule activeRule, SystemComponent component) {
         var rule = rulesByIdMap.get(activeRule.getId());
         var optionalExemption = findExemption(rule.metadata().ruleId(), component);

@@ -81,7 +81,7 @@ class DataImportSecscanIT extends GovernanceIntegrationTestBase {
         cleanSecscanTables();
         secscanMockServer.resetAll();
         when(apiIgnoreFilter.shouldIgnoreApi(any())).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
-        when(apiIgnoreFilter.shouldIgnoreEndpoint(any(), any())).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
+        when(apiIgnoreFilter.shouldIgnoreEndpoint(any(), any(), any())).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
     }
 
     @Test

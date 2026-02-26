@@ -4,6 +4,9 @@ import ch.admin.bit.jeap.governance.domain.GovernanceServiceEnvironment;
 import ch.admin.bit.jeap.governance.domain.SystemComponentReference;
 import ch.admin.bit.jeap.governance.domain.SystemComponentRepository;
 import ch.admin.bit.jeap.governance.domain.plugin.datasource.DataSourceImporter;
+import ch.admin.bit.jeap.governance.domain.plugin.security.api.HttpApi;
+import ch.admin.bit.jeap.governance.domain.plugin.security.api.HttpEndpoint;
+import ch.admin.bit.jeap.governance.domain.plugin.security.api.SystemComponentHttpApi;
 import ch.admin.bit.jeap.governance.secscan.domain.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,9 +58,9 @@ public class Secscan implements DataSourceImporter {
                 log.info("Updating the security scan data for the system component '{}' in the environment '{}'.",
                         result.systemComponentReference().getName(), result.environment());
                 updateSecscanStateForSystemComponent(result);
-                updateFlaggedEnpointsForSystemComponent(result);
+                updateFlaggedEndpointsForSystemComponent(result);
             } else {
-                log.info("Security scan data for the system component '{}' in the environment is '{}' unchanged.",
+                log.info("Security scan data for the system component '{}' in the environment '{}' is unchanged.",
                         result.systemComponentReference().getName(), result.environment());
             }
         });
@@ -73,10 +76,10 @@ public class Secscan implements DataSourceImporter {
         log.info("Writing the security scan state for the system component '{}'.", systemComponentName);
         SecscanState newSecscanState = createSecScanState(systemComponentId, result.scanMessage(), result.scanTimestamp());
         secscanStateRepository.save(newSecscanState);
-        log.debug("Updated the scurity scan state for the system component '{}'.", systemComponentName);
+        log.debug("Updated the security scan state for the system component '{}'.", systemComponentName);
     }
 
-    private void updateFlaggedEnpointsForSystemComponent(SystemComponentSecscanResult result) {
+    private void updateFlaggedEndpointsForSystemComponent(SystemComponentSecscanResult result) {
         long systemComponentId = result.systemComponentReference().getId();
         String systemComponentName = result.systemComponentReference().getName();
         List<SecscanFlaggedEndpoint> flaggedEndpoints = result.flaggedEndpoints();
@@ -178,7 +181,7 @@ public class Secscan implements DataSourceImporter {
         GovernanceServiceEnvironment environment = systemComponentApi.environment();
         List<SecscanFlaggedEndpoint> flaggedEndpoints = new ArrayList<>();
         for (HttpEndpoint endpoint : httpApi.endpoints()) {
-            var shouldIgnoreEndpoint = apiFilter.shouldIgnoreEndpoint(systemComponentName, endpoint);
+            var shouldIgnoreEndpoint = apiFilter.shouldIgnoreEndpoint(systemComponentName, endpoint, environment.name());
             if (shouldIgnoreEndpoint.ignore()) {
                 log.info("Ignoring the endpoint '{}' of the system component '{}' in the environment '{}' in the HTTP API security scan. Reason: {}",
                         endpoint, systemComponentName, environment, shouldIgnoreEndpoint.reason());

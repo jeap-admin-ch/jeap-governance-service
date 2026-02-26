@@ -1,6 +1,7 @@
 package ch.admin.bit.jeap.governance.rules;
 
 import ch.admin.bit.jeap.governance.domain.plugin.rule.Rule;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleParameters;
 import ch.admin.bit.jeap.governance.domain.rule.RuleId;
 import ch.admin.bit.jeap.governance.rules.RuleConfigurationProperties.ActiveRule;
 import jakarta.annotation.PostConstruct;
@@ -10,7 +11,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -22,12 +25,13 @@ import java.util.stream.Collectors;
 class RuleConfigurationValidator {
 
     private final Set<RuleId> knownRuleIds;
+    private final Map<RuleId, Rule> rulesByRuleId;
     private final RuleConfigurationProperties properties;
 
     RuleConfigurationValidator(List<Rule> rules, RuleConfigurationProperties properties) {
-        this.knownRuleIds = rules.stream()
-                .map(rule -> rule.metadata().ruleId())
-                .collect(Collectors.toSet());
+        this.rulesByRuleId = rules.stream()
+                .collect(Collectors.toMap(rule -> rule.metadata().ruleId(), Function.identity()));
+        this.knownRuleIds = rulesByRuleId.keySet();
         this.properties = properties;
     }
 
@@ -44,6 +48,12 @@ class RuleConfigurationValidator {
     }
 
     void validateConfiguration(boolean failOnError) {
+        validateUnknownRuleIds(failOnError);
+        validateRuleWeights(failOnError);
+        validateRuleParameters(failOnError);
+    }
+
+    private void validateUnknownRuleIds(boolean failOnError) {
         List<RuleId> unknownActiveRuleIds = properties.getActive().stream()
                 .map(ActiveRule::getId)
                 .filter(id -> !knownRuleIds.contains(id))
@@ -64,7 +74,9 @@ class RuleConfigurationValidator {
         if (failOnError && (!unknownActiveRuleIds.isEmpty() || !unknownExemptionRuleIds.isEmpty())) {
             throw new IllegalStateException("Rule configuration references unknown rule ID(s)");
         }
+    }
 
+    private void validateRuleWeights(boolean failOnError) {
         List<RuleId> rulesWithInvalidWeight = properties.getActive().stream()
                 .filter(activeRule -> activeRule.getWeight() == null || activeRule.getWeight() < 1)
                 .map(ActiveRule::getId).toList();
@@ -72,6 +84,22 @@ class RuleConfigurationValidator {
             log.error("Active rule(s) have invalid weight (must be >= 1): {}", rulesWithInvalidWeight);
             if (failOnError) {
                 throw new IllegalStateException("Active rule(s) have invalid weight (must be >= 1)");
+            }
+        }
+    }
+
+    private void validateRuleParameters(boolean failOnError) {
+        for (ActiveRule activeRule : properties.getActive()) {
+            Rule rule = rulesByRuleId.get(activeRule.getId());
+            if (rule != null) {
+                try {
+                    rule.validateParameters(new RuleParameters(activeRule.getParameters()));
+                } catch (Exception e) {
+                    log.error("Active rule '{}' has invalid parameters: {}", activeRule.getId(), e.getMessage());
+                    if (failOnError) {
+                        throw e;
+                    }
+                }
             }
         }
     }

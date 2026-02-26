@@ -21,6 +21,11 @@ class SecscanFlaggedEndpointRepositoryImpl implements SecscanFlaggedEndpointRepo
     }
 
     @Override
+    public List<SecscanFlaggedEndpoint> findBySystemComponentId(long systemComponentId) {
+        return secscanFlaggedEndpointJpaRepository.findBySystemComponentId(systemComponentId);
+    }
+
+    @Override
     public int deleteBySystemComponentId(long systemComponentId) {
         return secscanFlaggedEndpointJpaRepository.deleteBySystemComponentId(systemComponentId);
     }

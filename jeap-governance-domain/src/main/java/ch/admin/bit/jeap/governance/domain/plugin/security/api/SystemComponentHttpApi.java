@@ -1,4 +1,4 @@
-package ch.admin.bit.jeap.governance.secscan.domain;
+package ch.admin.bit.jeap.governance.domain.plugin.security.api;
 
 import ch.admin.bit.jeap.governance.domain.GovernanceServiceEnvironment;
 

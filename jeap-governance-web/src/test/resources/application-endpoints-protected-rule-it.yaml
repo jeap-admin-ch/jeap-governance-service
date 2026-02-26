@@ -1,0 +1,32 @@
+jeap:
+  governance:
+    secscan:
+      enabled: true
+      dataimport:
+        target-environment: REF
+    rules:
+      active:
+        - id: endpoints-protected
+          weight: 5
+          parameters:
+            exempt-methods:
+              - OPTIONS
+            exempt-paths:
+              - /exempt/pathonly
+            exempt-endpoints:
+              - GET:/exempt/path
+              - POST:/exempt/wildcard/*
+            exempt-component-names:
+              - "*-exemptbyname-service"
+      component-exemptions:
+        - id: rule-it-exempted
+          component-name: secscanexemptedcomp-app-service
+          rule-id:
+            - endpoints-protected
+          reason: "Permanently exempted for rule IT"
+        - id: rule-it-exempted-until
+          component-name: secscanexempteduntilcomp-app-service
+          rule-id:
+            - endpoints-protected
+          reason: "Temporarily exempted for rule IT"
+          until: "2099-12-31"

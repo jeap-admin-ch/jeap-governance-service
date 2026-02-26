@@ -419,12 +419,13 @@ basis. Besides using predefined rules, you may also provide custom rules specifi
 
 The `jeap-governance-rules-core` module ships the following built-in rules:
 
-| Rule ID                           | Description                                                                                 |
-|-----------------------------------|---------------------------------------------------------------------------------------------|
-| `component-naming-convention`     | Validates that component names follow the convention `{system-name}-{context}-{type-id}`.   |
-| `component-produces-metrics`      | Checks that a component has Prometheus metrics data available.                              |
-| `component-publishes-dbschema`    | Checks that a component publishes its database schema in the architecture repository.       |
-| `component-publishes-openapispec` | Checks that a component publishes its OpenAPI specification in the architecture repository. |
+| Rule ID                           | Description                                                                                     |
+|-----------------------------------|-------------------------------------------------------------------------------------------------|
+| `component-naming-convention`     | Validates that component names follow the convention `{system-name}-{context}-{type-id}`.       |
+| `component-produces-metrics`      | Checks that a component has Prometheus metrics data available.                                  |
+| `component-publishes-dbschema`    | Checks that a component publishes its database schema in the architecture repository.           |
+| `component-publishes-openapispec` | Checks that a component publishes its OpenAPI specification in the architecture repository.     |
+| `endpoints-protected-by-jwt`      | Checks that REST endpoints are protected by a JWT bearer token based on a corresponding metric. |
 
 **Component Naming Convention Rule** (`component-naming-convention`)
 
@@ -482,6 +483,56 @@ This rule verifies that a component publishes its OpenAPI specification to the a
 To use this rule, the following modules must be enabled:
 - DeploymentLog module (`jeap.governance.deploymentlog.enabled=true`)
 - API Doc Version in ArchRepo module (`jeap.governance.archrepo.import.apidocversion.enabled=true`)
+
+**REST Endpoint Security (Monitoring) Rule** (`endpoints-protected-by-jwt`)
+
+This rule checks that REST endpoints of a component are protected by JWT authentication, based on Prometheus monitoring
+data. Endpoints detected without JWT protection are reported as violations.
+
+The rule applies several default exclusions, i.e. some endpoints are always ignored (unless disabled via the
+`disable-default-exemptions` parameter):
+
+- Actuator endpoints (any path containing `/actuator`)
+- API docs and Swagger UI endpoints (`/api-docs`, `/swagger-ui`) on the `ref` environment only
+- Wildcard frontend endpoints (`/**`, `/`)
+- Configuration API calls (matching the pattern `/(ui-)?(ui)?(api)?(/)?(\w)*/((\\w)*-)?configuration(\S)*`)
+
+The following exemption parameters can be used to exclude additional components or endpoints from being checked.
+All list parameters support YAML list syntax. Wildcard matching is supported using `*` for prefix matching (e.g.,
+`/api/*` matches all paths starting with `/api/`) and suffix matching (e.g., `*-service` matches all names ending
+with `-service`).
+
+| Parameter                    | Description                                                                 |
+|------------------------------|-----------------------------------------------------------------------------|
+| `exempt-component-names`     | List of component names to exclude entirely (wildcards supported).          |
+| `exempt-methods`             | List of HTTP methods to exclude (e.g., `OPTIONS`). Case-insensitive.       |
+| `exempt-paths`               | List of URL paths to exclude (wildcards supported).                         |
+| `exempt-endpoints`           | List of `METHOD:PATH` pairs to exclude (e.g., `GET:/api/public/*`).        |
+| `disable-default-exemptions` | Set to `true` to disable all default exemptions listed above.              |
+
+Configuration Example:
+
+```yaml
+jeap:
+  governance:
+    rules:
+      active:
+        - id: endpoints-protected-by-jwt
+          weight: 5
+          parameters:
+            exempt-component-names:
+              - "*-testagent-service"
+            exempt-methods:
+              - OPTIONS
+            exempt-paths:
+              - /public/*
+            exempt-endpoints:
+              - GET:/api/public/*
+              - POST:/api/webhooks/*
+```
+
+To use this rule, the following module must be enabled:
+- Prometheus module (`jeap.governance.prometheus.enabled=true`)
 
 #### Built-in Messaging Rules
 
@@ -560,6 +611,87 @@ jeap:
 
 To use this rule, the following modules must be enabled:
 - Prometheus module (`jeap.governance.prometheus.enabled=true`)
+
+#### Built-in Security Scan Rules
+
+The `jeap-governance-secscan` module provides the following built-in rules:
+
+| Rule ID               | Description                                                                                       |
+|-----------------------|---------------------------------------------------------------------------------------------------|
+| `endpoints-protected` | Checks that REST endpoints are properly protected, based on active HTTP security scanning.        |
+
+**REST Endpoint Security (Scanner) Rule** (`endpoints-protected`)
+
+This rule checks that REST endpoints of a component are properly protected by actively scanning them via HTTP requests.
+Unlike the monitoring-based `endpoints-protected-by-jwt` rule, this rule does not rely on Prometheus metrics but instead
+performs actual HTTP requests against the discovered API endpoints.
+
+The rule consists of two phases:
+
+1. **Scanning (data import):** During the scheduled data import, the security scanner discovers the HTTP APIs of all
+   system components and performs HTTP requests against each endpoint to check if it is properly protected. Endpoints
+   that respond unexpectedly (e.g., HTTP 200 without authentication) are flagged and stored in the database. The
+   scanning targets a configurable environment (default: `REF`). Exemption parameters are applied during scanning to
+   skip entire APIs, components, or individual endpoints.
+2. **Rule evaluation:** During the scheduled rule evaluation, the rule checks the stored scan results. If flagged
+   endpoints exist that are not covered by exemptions, they are reported as violations.
+
+The rule applies several default exclusions, i.e. some endpoints are always ignored (unless disabled via the
+`disable-default-exemptions` parameter):
+
+- Actuator endpoints (any path containing `/actuator`)
+- API docs and Swagger UI endpoints (`/api-docs`, `/swagger-ui`) on the `ref` environment only
+- Wildcard frontend endpoints (`/**`, `/`)
+- Configuration API calls (matching the pattern `/(ui-)?(ui)?(api)?(/)?(\w)*/((\\w)*-)?configuration(\S)*`)
+
+The following exemption parameters can be used to exclude additional components, APIs, or endpoints from being checked.
+All list parameters support YAML list syntax. Wildcard matching is supported using `*` for prefix matching (e.g.,
+`/api/*` matches all paths starting with `/api/`) and suffix matching (e.g., `*-service` matches all names ending
+with `-service`).
+
+| Parameter                      | Description                                                                                                           | Applied during          |
+|--------------------------------|-----------------------------------------------------------------------------------------------------------------------|-------------------------|
+| `exempt-component-names`       | List of component names to exclude entirely (wildcards supported).                                                    | Scanning & Evaluation   |
+| `exempt-environments`          | List of environment names to exclude (e.g., `ABN`). Case-insensitive.                                                | Scanning                |
+| `exempt-api-url-not-containing`| List of strings — exempt an API if its URL does **not** contain **any** of them.                                      | Scanning                |
+| `exempt-api-url-containing`    | List of strings — exempt an API if its URL **does** contain any of them.                                              | Scanning                |
+| `exempt-methods`               | List of HTTP methods to exclude (e.g., `OPTIONS`). Case-insensitive.                                                  | Scanning & Evaluation   |
+| `exempt-paths`                 | List of URL paths to exclude (wildcards supported).                                                                    | Scanning & Evaluation   |
+| `exempt-endpoints`             | List of `METHOD:PATH` pairs to exclude (e.g., `GET:/api/public/*`).                                                  | Scanning & Evaluation   |
+| `disable-default-exemptions`   | Set to `true` to disable all default exemptions listed above.                                                         | Scanning & Evaluation   |
+
+Configuration Example:
+
+```yaml
+jeap:
+  governance:
+    secscan:
+      enabled: true
+      dataimport:
+        target-environment: REF
+    rules:
+      active:
+        - id: endpoints-protected
+          weight: 5
+          parameters:
+            exempt-component-names:
+              - "*-testagent-service"
+            exempt-methods:
+              - OPTIONS
+            exempt-paths:
+              - /public/*
+            exempt-endpoints:
+              - GET:/api/public/*
+              - POST:/api/webhooks/*
+            exempt-api-url-not-containing:
+              - our-platform-name
+            exempt-environments:
+              - prod
+              - abn
+```
+
+To use this rule, the following module must be enabled:
+- Security Scan module (`jeap.governance.secscan.enabled=true`)
 
 ### Reporting
 

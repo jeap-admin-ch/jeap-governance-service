@@ -5,6 +5,7 @@ import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleInfo;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface RuleRepository {
 
@@ -15,4 +16,6 @@ public interface RuleRepository {
     List<RuleInfo> getActiveRuleInfos();
 
     Map<RuleId, Integer> getActiveRuleWeights();
+
+    Optional<Map<String, String>> getActiveRuleParameters(RuleId ruleId);
 }

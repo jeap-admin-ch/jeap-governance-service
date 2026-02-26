@@ -3,6 +3,9 @@ package ch.admin.bit.jeap.governance.secscan.dataimport;
 import ch.admin.bit.jeap.governance.domain.GovernanceServiceEnvironment;
 import ch.admin.bit.jeap.governance.domain.SystemComponentReference;
 import ch.admin.bit.jeap.governance.domain.SystemComponentRepository;
+import ch.admin.bit.jeap.governance.domain.plugin.security.api.HttpApi;
+import ch.admin.bit.jeap.governance.domain.plugin.security.api.HttpEndpoint;
+import ch.admin.bit.jeap.governance.domain.plugin.security.api.SystemComponentHttpApi;
 import ch.admin.bit.jeap.governance.secscan.domain.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -188,7 +191,7 @@ class SecscanTest {
                 .scanTimestamp(lastScanTimestamp)
                 .build();
         when(secscanStateRepository.findBySystemComponentId(COMPONENT_A_ID)).thenReturn(Optional.of(existingState));
-        when(apiFilter.shouldIgnoreEndpoint(eq(COMPONENT_A), any())).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
+        when(apiFilter.shouldIgnoreEndpoint(eq(COMPONENT_A), any(), eq(ENV.name()))).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
         when(endpointSecurityChecker.check(any(), any())).thenReturn(new HttpEndpointSecurityChecker.Result(false, "passed"));
 
         secscan.importData();
@@ -207,7 +210,7 @@ class SecscanTest {
                 createSystemComponentHttpApi(COMPONENT_A, List.of(endpoint), apiLastUpdated));
         when(apiFilter.shouldIgnoreApi(any())).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
         when(secscanStateRepository.findBySystemComponentId(COMPONENT_A_ID)).thenReturn(Optional.empty());
-        when(apiFilter.shouldIgnoreEndpoint(eq(COMPONENT_A), any())).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
+        when(apiFilter.shouldIgnoreEndpoint(eq(COMPONENT_A), any(), eq(ENV.name()))).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
         when(endpointSecurityChecker.check(any(), any())).thenReturn(new HttpEndpointSecurityChecker.Result(false, "passed"));
 
         secscan.importData();
@@ -224,7 +227,7 @@ class SecscanTest {
         when(apiDiscoveryClient.discover(COMPONENT_A, ENV)).thenReturn(
                 createSystemComponentHttpApi(COMPONENT_A, List.of(endpoint), null));
         when(apiFilter.shouldIgnoreApi(any())).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
-        when(apiFilter.shouldIgnoreEndpoint(eq(COMPONENT_A), any())).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
+        when(apiFilter.shouldIgnoreEndpoint(eq(COMPONENT_A), any(), eq(ENV.name()))).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
         when(endpointSecurityChecker.check(any(), any())).thenReturn(new HttpEndpointSecurityChecker.Result(false, "passed"));
 
         secscan.importData();
@@ -242,7 +245,7 @@ class SecscanTest {
         when(apiDiscoveryClient.discover(COMPONENT_A, ENV)).thenReturn(
                 createSystemComponentHttpApi(COMPONENT_A, List.of(endpoint1, endpoint2), null));
         when(apiFilter.shouldIgnoreApi(any())).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
-        when(apiFilter.shouldIgnoreEndpoint(eq(COMPONENT_A), any())).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
+        when(apiFilter.shouldIgnoreEndpoint(eq(COMPONENT_A), any(), eq(ENV.name()))).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
         when(endpointSecurityChecker.check(any(), any())).thenReturn(
                 new HttpEndpointSecurityChecker.Result(false, "Endpoint passed check by returning status 401 UNAUTHORIZED."));
 
@@ -266,7 +269,7 @@ class SecscanTest {
         when(apiDiscoveryClient.discover(COMPONENT_A, ENV)).thenReturn(
                 createSystemComponentHttpApi(COMPONENT_A, List.of(securedEndpoint, unsecuredEndpoint), null));
         when(apiFilter.shouldIgnoreApi(any())).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
-        when(apiFilter.shouldIgnoreEndpoint(eq(COMPONENT_A), any())).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
+        when(apiFilter.shouldIgnoreEndpoint(eq(COMPONENT_A), any(), eq(ENV.name()))).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
         when(endpointSecurityChecker.check("http://example.com", securedEndpoint))
                 .thenReturn(new HttpEndpointSecurityChecker.Result(false, "passed"));
         when(endpointSecurityChecker.check("http://example.com", unsecuredEndpoint))
@@ -298,8 +301,8 @@ class SecscanTest {
         when(apiDiscoveryClient.discover(COMPONENT_A, ENV)).thenReturn(
                 createSystemComponentHttpApi(COMPONENT_A, List.of(getEndpoint, postEndpoint), null));
         when(apiFilter.shouldIgnoreApi(any())).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
-        when(apiFilter.shouldIgnoreEndpoint(COMPONENT_A, getEndpoint)).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
-        when(apiFilter.shouldIgnoreEndpoint(COMPONENT_A, postEndpoint)).thenReturn(
+        when(apiFilter.shouldIgnoreEndpoint(COMPONENT_A, getEndpoint, ENV.name())).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
+        when(apiFilter.shouldIgnoreEndpoint(COMPONENT_A, postEndpoint, ENV.name())).thenReturn(
                 SystemComponentHttpApiIgnoreFilter.Result.ignoredWithReason("Only GET requests"));
         when(endpointSecurityChecker.check("http://example.com", getEndpoint))
                 .thenReturn(new HttpEndpointSecurityChecker.Result(false, "passed"));
@@ -319,7 +322,7 @@ class SecscanTest {
         when(apiDiscoveryClient.discover(COMPONENT_A, ENV)).thenReturn(
                 createSystemComponentHttpApi(COMPONENT_A, List.of(postEndpoint, putEndpoint), null));
         when(apiFilter.shouldIgnoreApi(any())).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
-        when(apiFilter.shouldIgnoreEndpoint(eq(COMPONENT_A), any())).thenReturn(
+        when(apiFilter.shouldIgnoreEndpoint(eq(COMPONENT_A), any(), eq(ENV.name()))).thenReturn(
                 SystemComponentHttpApiIgnoreFilter.Result.ignoredWithReason("Only GET requests"));
 
         secscan.importData();
@@ -343,7 +346,7 @@ class SecscanTest {
         when(apiDiscoveryClient.discover(COMPONENT_A, ENV)).thenReturn(
                 createSystemComponentHttpApi(COMPONENT_A, List.of(endpoint), null));
         when(apiFilter.shouldIgnoreApi(any())).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
-        when(apiFilter.shouldIgnoreEndpoint(eq(COMPONENT_A), any())).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
+        when(apiFilter.shouldIgnoreEndpoint(eq(COMPONENT_A), any(), eq(ENV.name()))).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
         when(endpointSecurityChecker.check(any(), any())).thenThrow(new RuntimeException("Connection refused"));
 
         secscan.importData();
@@ -399,7 +402,7 @@ class SecscanTest {
         when(apiDiscoveryClient.discover(COMPONENT_A, ENV)).thenReturn(
                 createSystemComponentHttpApi(COMPONENT_A, List.of(ep1, ep2, ep3), null));
         when(apiFilter.shouldIgnoreApi(any())).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
-        when(apiFilter.shouldIgnoreEndpoint(eq(COMPONENT_A), any())).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
+        when(apiFilter.shouldIgnoreEndpoint(eq(COMPONENT_A), any(), eq(ENV.name()))).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
         when(endpointSecurityChecker.check(any(), any()))
                 .thenReturn(new HttpEndpointSecurityChecker.Result(true, "returned 200"));
 

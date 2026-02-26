@@ -1,6 +1,6 @@
 package ch.admin.bit.jeap.governance.secscan.httpcheck;
 
-import ch.admin.bit.jeap.governance.secscan.domain.HttpEndpoint;
+import ch.admin.bit.jeap.governance.domain.plugin.security.api.HttpEndpoint;
 import ch.admin.bit.jeap.governance.secscan.domain.HttpEndpointSecurityChecker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;

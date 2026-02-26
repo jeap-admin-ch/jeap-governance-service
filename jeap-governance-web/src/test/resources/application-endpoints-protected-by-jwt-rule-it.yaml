@@ -1,0 +1,26 @@
+jeap:
+  governance:
+    rules:
+      active:
+        - id: endpoints-protected-by-jwt
+          weight: 5
+          parameters:
+            exempt-paths:
+              - /exempt/path
+              - /exempt/wildcard/*
+            exempt-endpoints:
+              - GET:/exempt/endpoint
+            exempt-methods:
+              - OPTIONS
+      component-exemptions:
+        - id: jwt-rule-it-exempted
+          component-name: jwtexemptedcomp-app-service
+          rule-id:
+            - endpoints-protected-by-jwt
+          reason: "Permanently exempted for JWT rule IT"
+        - id: jwt-rule-it-exempted-until
+          component-name: jwtexempteduntilcomp-app-service
+          rule-id:
+            - endpoints-protected-by-jwt
+          reason: "Temporarily exempted for JWT rule IT"
+          until: "2099-12-31"

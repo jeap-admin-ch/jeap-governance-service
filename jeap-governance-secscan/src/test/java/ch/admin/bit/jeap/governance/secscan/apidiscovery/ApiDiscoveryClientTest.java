@@ -1,7 +1,7 @@
 package ch.admin.bit.jeap.governance.secscan.apidiscovery;
 
 import ch.admin.bit.jeap.governance.domain.GovernanceServiceEnvironment;
-import ch.admin.bit.jeap.governance.secscan.domain.SystemComponentHttpApi;
+import ch.admin.bit.jeap.governance.domain.plugin.security.api.SystemComponentHttpApi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
