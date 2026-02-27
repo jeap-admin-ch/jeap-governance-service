@@ -460,10 +460,26 @@ The `jeap-governance-rules-messaging` module ships the following built-in rules:
 | Rule ID                                | Description                                           |
 |----------------------------------------|-------------------------------------------------------|
 | `component-defines-messagingcontracts` | Validates that component defines messaging contracts. |
+| `component-consumes-signedmessages`    | Validates that component consumes signed messages.    |
+| `component-produces-signedmessages`    | Validates that component produces signed messages.    |
 
 **Component Defines Messaging Contracts Rule** (`component-defines-messagingcontracts`)
 
 This rule verifies that a component defines messaging contracts.
+
+To use this rule, the following modules must be enabled:
+- Prometheus module (`jeap.governance.prometheus.enabled=true`)
+
+**Component Consumes Signed Messages** (`component-consumes-signedmessages`)
+
+This rule verifies that a component consumes signed messages.
+
+To use this rule, the following modules must be enabled:
+- Prometheus module (`jeap.governance.prometheus.enabled=true`)
+
+**Component Produces Signed Messages** (`component-produces-signedmessages`)
+
+This rule verifies that a component produces signed messages.
 
 To use this rule, the following modules must be enabled:
 - Prometheus module (`jeap.governance.prometheus.enabled=true`)

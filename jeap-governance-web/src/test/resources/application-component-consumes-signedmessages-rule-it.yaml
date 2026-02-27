@@ -1,0 +1,6 @@
+jeap:
+  governance:
+    rules:
+      active:
+        - id: component-consumes-signedmessages
+          weight: 3
