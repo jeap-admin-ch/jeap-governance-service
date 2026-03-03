@@ -101,13 +101,15 @@ class PrometheusImporterTest {
         int numQueryTypes = PromQueryType.values().length;
         assertThat(allTimeSeries).hasSize(2 * numQueryTypes);
         List<PromTimeSeries> serviceAData = filterByComponent(allTimeSeries, "service-a");
-        assertThat(serviceAData).hasSize(numQueryTypes);
-        assertThat(serviceAData).allMatch(ts -> ts.getSample().value().equals(List.of("1770812157.00", "1.00")));
+        assertThat(serviceAData)
+                .hasSize(numQueryTypes)
+                .allMatch(ts -> ts.getSample().value().equals(List.of("1770812157.00", "1.00")));
         assertThat(serviceAData.stream().map(PromTimeSeries::getPrometheusQueryType).collect(Collectors.toSet()))
                 .isEqualTo(allQueryTypes());
         List<PromTimeSeries> serviceBData = filterByComponent(allTimeSeries, "service-b");
-        assertThat(serviceBData).hasSize(numQueryTypes);
-        assertThat(serviceBData).allMatch(ts -> ts.getSample().value().equals(List.of("1770812157.00", "2.00")));
+        assertThat(serviceBData)
+                .hasSize(numQueryTypes)
+                .allMatch(ts -> ts.getSample().value().equals(List.of("1770812157.00", "2.00")));
         assertThat(serviceBData.stream().map(PromTimeSeries::getPrometheusQueryType).collect(Collectors.toSet()))
                 .isEqualTo(allQueryTypes());
     }
@@ -131,13 +133,14 @@ class PrometheusImporterTest {
         List<PromTimeSeries> allTimeSeries = findAllTimeSeriesInNewTransaction();
         // Old data deleted, new data inserted (one per query type)
         int numQueryTypes = PromQueryType.values().length;
-        assertThat(allTimeSeries).hasSize(numQueryTypes);
-        // All entries have the new sample value, none have the old values
-        assertThat(allTimeSeries).allSatisfy(ts -> {
-            assertThat(ts.getSystemComponentId()).isEqualTo(component.getId());
-            assertThat(ts.getSample().value()).isEqualTo(List.of("1770812157.00", "25.00"));
-            assertThat(ts.getQueryTimestamp()).isAfter(oldTimestamp);
-        });
+        assertThat(allTimeSeries)
+                .hasSize(numQueryTypes)
+                // All entries have the new sample value, none have the old values
+                .allSatisfy(ts -> {
+                    assertThat(ts.getSystemComponentId()).isEqualTo(component.getId());
+                    assertThat(ts.getSample().value()).isEqualTo(List.of("1770812157.00", "25.00"));
+                    assertThat(ts.getQueryTimestamp()).isAfter(oldTimestamp);
+                });
         assertThat(allTimeSeries.stream().map(PromTimeSeries::getPrometheusQueryType).collect(Collectors.toSet()))
                 .isEqualTo(allQueryTypes());
     }
@@ -158,8 +161,9 @@ class PrometheusImporterTest {
 
         List<PromTimeSeries> allTimeSeries = findAllTimeSeriesInNewTransaction();
         List<PromTimeSeries> myServiceData = filterByComponent(allTimeSeries, "my-service");
-        assertThat(myServiceData).hasSize(PromQueryType.values().length);
-        assertThat(myServiceData).allMatch(ts -> ts.getSample().value().equals(List.of("1770812157.00", "25.00")));
+        assertThat(myServiceData)
+                .hasSize(PromQueryType.values().length)
+                .allMatch(ts -> ts.getSample().value().equals(List.of("1770812157.00", "25.00")));
         List<PromTimeSeries> otherServiceData = filterByComponent(allTimeSeries, "other-service");
         assertThat(otherServiceData).hasSize(1);
         assertThat(otherServiceData.getFirst().getSample().value()).isEqualTo(List.of("1770812157.00", "42.00"));
@@ -226,11 +230,12 @@ class PrometheusImporterTest {
 
         List<PromTimeSeries> allTimeSeries = findAllTimeSeriesInNewTransaction();
         int numQueryTypes = PromQueryType.values().length;
-        assertThat(allTimeSeries).hasSize(numQueryTypes);
-        assertThat(allTimeSeries).allSatisfy(ts -> {
-            assertThat(ts.getSystemComponentId()).isEqualTo(workingComponent.getId());
-            assertThat(ts.getSample().value()).isEqualTo(List.of("1770812157.00", "1.00"));
-        });
+        assertThat(allTimeSeries)
+                .hasSize(numQueryTypes)
+                .allSatisfy(ts -> {
+                    assertThat(ts.getSystemComponentId()).isEqualTo(workingComponent.getId());
+                    assertThat(ts.getSample().value()).isEqualTo(List.of("1770812157.00", "1.00"));
+                });
     }
 
     @Test
@@ -295,7 +300,7 @@ class PrometheusImporterTest {
     }
 
     private void persistTimeSeriesInNewTransaction(SystemComponent systemComponent, PromQueryType queryType,
-                                                    ZonedDateTime queryTimestamp, String sampleValue) {
+                                                   ZonedDateTime queryTimestamp, String sampleValue) {
         transactions.inNewTransaction(() -> {
             SystemComponent managedComponent = entityManager.find(SystemComponent.class, systemComponent.getId());
             PromTimeSeries timeSeries = PromTimeSeries.builder()

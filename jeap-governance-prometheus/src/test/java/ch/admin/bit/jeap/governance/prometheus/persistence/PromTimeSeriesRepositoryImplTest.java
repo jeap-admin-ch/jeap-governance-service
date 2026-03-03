@@ -108,7 +108,7 @@ class PromTimeSeriesRepositoryImplTest {
 
         int deletedCount = repository.deleteBySystemComponentId(componentA.getId());
 
-        assertThat(deletedCount).isEqualTo(0);
+        assertThat(deletedCount).isZero();
         assertThat(entityManager.find(PromTimeSeries.class, tsB1.getId())).isNotNull();
     }
 

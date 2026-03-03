@@ -37,7 +37,7 @@ class ConfluenceAdapterImpl implements ConfluenceAdapter {
         try {
             contentId = this.confluenceClient.getPageByTitle(properties.getConfluenceSpaceKey(), ancestorId, pageName);
             updatePage(contentId, ancestorId, pageName, content);
-        } catch (NotFoundException e) {
+        } catch (NotFoundException _) {
             log.info("Creating page {}", pageName);
             contentId = this.confluenceClient.addPageUnderAncestor(properties.getConfluenceSpaceKey(), ancestorId, pageName, content, VERSION_MESSAGE);
             this.confluenceClient.setPropertyByKey(contentId, CONTENT_HASH_PROPERTY_KEY, hash(content));

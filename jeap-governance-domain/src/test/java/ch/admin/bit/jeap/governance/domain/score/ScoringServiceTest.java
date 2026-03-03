@@ -130,8 +130,9 @@ class ScoringServiceTest {
 
         var allResults = scoringService.updateSystemScore(SYSTEM_ID, DAY);
 
-        assertThat(allResults).hasSize(2);
-        assertThat(allResults).containsExactlyElementsOf(results);
+        assertThat(allResults)
+                .hasSize(2)
+                .containsExactlyElementsOf(results);
     }
 
     private System systemWithComponents(String... componentNames) {

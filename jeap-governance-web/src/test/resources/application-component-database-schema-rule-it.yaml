@@ -5,4 +5,6 @@ jeap:
         - id: component-publishes-dbschema
           weight: 3
           parameters:
-            ignored-service-names: ignored-service,foobar-service
+            ignored-service-names:
+              - "ignored-service"
+              - "foobar-service"

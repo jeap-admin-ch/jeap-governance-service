@@ -158,7 +158,7 @@ public class AmazonManagedPromClient implements PromClient {
                 .mapToInt(rev -> {
                     try {
                         return Integer.parseInt(rev);
-                    } catch (NumberFormatException e) {
+                    } catch (NumberFormatException _) {
                         return Integer.MIN_VALUE;
                     }
                 })

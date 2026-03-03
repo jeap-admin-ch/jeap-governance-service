@@ -23,6 +23,7 @@ Apache License Version 2.0
  * ch.admin.bit.jeap:jeap-governance-reporting - [ch.admin.bit.jeap:jeap-governance-reporting](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-reporting)
  * ch.admin.bit.jeap:jeap-governance-rules - [ch.admin.bit.jeap:jeap-governance-rules](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-rules)
  * ch.admin.bit.jeap:jeap-governance-rules-core - [ch.admin.bit.jeap:jeap-governance-rules-core](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-rules-core)
+ * ch.admin.bit.jeap:jeap-governance-rules-dependency - [ch.admin.bit.jeap:jeap-governance-rules-dependency](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-rules-dependency)
  * ch.admin.bit.jeap:jeap-governance-rules-messaging - [ch.admin.bit.jeap:jeap-governance-rules-messaging](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-rules-messaging)
  * ch.admin.bit.jeap:jeap-governance-secscan - [ch.admin.bit.jeap:jeap-governance-secscan](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-secscan)
  * ch.admin.bit.jeap:jeap-governance-web - [ch.admin.bit.jeap:jeap-governance-web](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-web)

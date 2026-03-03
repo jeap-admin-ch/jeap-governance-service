@@ -1,0 +1,17 @@
+jeap:
+  governance:
+    rules:
+      active:
+        - id: component-dependencies-versions
+          weight: 3
+          parameters:
+            versions:
+            - "ch.admin.bit.jeap:jeap-spring-boot-application-starter:18.2.0"
+            - "ch.admin.bit.jeap:jeap-messaging:9.3.1"
+            - "ch.admin.bit.jeap:jeap-messaging-outbox:9.3.1"
+            - "ch.admin.bit.jeap:jeap-messaging-sequential-inbox:9.3.1"
+            - "ch.admin.bit.jeap:jeap-crypto:4.2.0"
+            - "ch.admin.bit.jeap:jeap-error-handling-service:14.0.0"
+            - "ch.admin.bit.jeap:jeap-process-context-scs:13.25.0"
+            - "ch.admin.bit.jeap:jeap-process-archive-service:9.5.0"
+            - "spring.boot:3.5.6"

@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,9 +84,8 @@ public class ComponentPublishesDbSchemaRule implements Rule {
     }
 
     private boolean ignoreComponent(RuleParameters ruleParameters, String serviceName) {
-        if (!ruleParameters.parameters().isEmpty() && ruleParameters.parameters().get("ignored-service-names") != null) {
-            List<String> ignoredServiceNames = Arrays.stream(ruleParameters.parameters().get("ignored-service-names").split(",")).toList();
-            for (String ignoredServiceName : ignoredServiceNames) {
+        if (!ruleParameters.parameters().isEmpty()) {
+            for (String ignoredServiceName : ruleParameters.getParameterAsList("ignored-service-names")) {
                 if (serviceName.contains(ignoredServiceName.trim())) {
                     return true;
                 }

@@ -87,7 +87,7 @@ class ComponentPublishesDbSchemaRuleTest {
         SystemComponent component = mockComponent(name);
 
         //when
-        RuleResult result = rule.evaluate(component, new RuleParameters(Map.of("ignored-service-names", "mock,-testagent-service,-test-agent-service,-test-agent")));
+        RuleResult result = rule.evaluate(component, RuleParameters.ofList("ignored-service-names", List.of("mock","-testagent-service","-test-agent-service","-test-agent")));
 
         //then
         assertThat(result.state()).isEqualTo(State.OK);

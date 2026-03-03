@@ -112,8 +112,9 @@ class RuleRepositoryImplTest {
 
         List<RuleEvaluation> evaluations = ruleRepository.getRulesToEvaluateForComponent(component);
 
-        assertThat(evaluations).hasSize(2);
-        assertThat(evaluations).noneMatch(e -> e.rule().metadata().ruleId().id().equals("unconfigured-rule"));
+        assertThat(evaluations)
+                .hasSize(2)
+                .noneMatch(e -> e.rule().metadata().ruleId().id().equals("unconfigured-rule"));
     }
 
     @Test
@@ -122,8 +123,9 @@ class RuleRepositoryImplTest {
 
         List<RuleEvaluation> evaluations = ruleRepository.getRulesToEvaluateForComponent(component);
 
-        assertThat(evaluations).hasSize(2);
-        assertThat(evaluations).allMatch(e -> e.activationState() == RuleActivationState.ACTIVE);
+        assertThat(evaluations)
+                .hasSize(2)
+                .allMatch(e -> e.activationState() == RuleActivationState.ACTIVE);
     }
 
     @Test

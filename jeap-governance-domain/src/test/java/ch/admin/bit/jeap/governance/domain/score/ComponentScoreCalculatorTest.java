@@ -106,7 +106,7 @@ class ComponentScoreCalculatorTest {
 
         ComponentScore score = calculator.calculateComponentScore(component, today, results);
 
-        assertThat(score.getScore()).isEqualTo(0);
+        assertThat(score.getScore()).isZero();
     }
 
     @Test

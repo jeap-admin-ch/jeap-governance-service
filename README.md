@@ -62,6 +62,7 @@ This repository is Open Source Software licensed under the [Apache License 2.0](
 | `jeap-governance-secscan`          | Scans the known HTTP APIs of the system components for unprotected endpoints and persists the flagged endpoints in the database.                                                                                             | See [Configuration](#configuration)                                                        |
 | `jeap-governance-rules`            | Provides the infrastructure to evaluate governance rules and score services/systems on a regular basis                                                                                                                       | Instances can define this as their parent                                                  |
 | `jeap-governance-rules-core`       | Built-in governance rules shipped with the service                                                                                                                                                                           | Included transitively via `jeap-governance-rules`                                          |
+| `jeap-governance-rules-dependency` | Built-in governance dependencies rules shipped with the service                                                                                                                                                              | Included transitively via `jeap-governance-rules`   
 | `jeap-governance-rules-messaging`  | Built-in governance messaging rules shipped with the service                                                                                                                                                                 | Included transitively via `jeap-governance-rules`                                          |
 | `jeap-governance-service-instance` | Module for easily creating an instance of the governance service                                                                                                                                                             | Instances can define this as their parent                                                  |
 | `jeap-governance-web`              | Contains REST interfaces and the application itself                                                                                                                                                                          | -                                                                                          |
@@ -289,12 +290,12 @@ jeap:
         dataimport:
           target-environment: REF
         apidiscovery:
-            url-template: "https://api-discovery.{env}-example.com/apis/{systemComponentName}"
+          url-template: "https://api-discovery.{env}-example.com/apis/{systemComponentName}"
     reporting:
       enabled: true
       cron-expression: "0 55 6-20 * * MON-FRI"
       orphancleanup:
-            cron-expression: "0 10 3 * * MON-FRI"
+        cron-expression: "0 10 3 * * MON-FRI"
       lock-at-least: PT1M
       lock-at-most: PT20M
       trendPeriodDays: 30
@@ -451,7 +452,7 @@ Some components can be excluded from this check using the `ignored-service-names
 - Do not use a database
 - Are not required to publish a database schema
 
-Multiple service names can be specified as a comma-separated list (concatenated with `,`).
+Multiple service names can be specified as list elements.
 
 Configuration Example:
 
@@ -463,7 +464,9 @@ jeap:
         - id: component-publishes-dbschema
           weight: 3
           parameters:
-            ignored-service-names: ignored-service,foobar-service
+            ignored-service-names: 
+              - ignored-service
+              - foobar-service
 
 ```
 
@@ -511,9 +514,56 @@ This rule verifies that a component produces signed messages.
 To use this rule, the following modules must be enabled:
 - Prometheus module (`jeap.governance.prometheus.enabled=true`)
 
+#### Built-in Dependency Rules
+
+The `jeap-governance-rules-dependency` module provides the following built-in rules:
+
+| Rule ID                             | Description                                                        |
+|-------------------------------------|--------------------------------------------------------------------|
+| `component-dependencies-versions`   | Ensures that a component uses defined minimum dependency versions. |
+
+**Component Dependencies Versions** (`component-dependencies-versions`)
+
+This rule validates that a component depends on at least the configured minimum versions of specific libraries.
+
+If a component uses a lower version than configured, the rule is violated.
+
+Configuration:
+
+The dependencies to validate must be provided as rule parameters using one of the following formats:
+- groupId:artifactId:minimumVersion
+- artifactId:minimumVersion (if groupId is not required)
+
+Each entry defines the minimum allowed version for the dependency.
+
+Configuration Example:
+
+```yaml
+jeap:
+  governance:
+    rules:
+      active:
+        - id: component-dependencies-versions
+          weight: 3
+          parameters:
+            versions:
+              - "ch.admin.bit.jeap:jeap-spring-boot-application-starter:18.2.0"
+              - "ch.admin.bit.jeap:jeap-messaging:9.3.1"
+              - "ch.admin.bit.jeap:jeap-messaging-outbox:9.3.1"
+              - "ch.admin.bit.jeap:jeap-messaging-sequential-inbox:9.3.1"
+              - "ch.admin.bit.jeap:jeap-crypto:4.2.0"
+              - "ch.admin.bit.jeap:jeap-error-handling-service:14.0.0"
+              - "ch.admin.bit.jeap:jeap-process-context-scs:13.25.0"
+              - "ch.admin.bit.jeap:jeap-process-archive-service:9.5.0"
+              - "spring.boot:3.5.6"
+```
+
+To use this rule, the following modules must be enabled:
+- Prometheus module (`jeap.governance.prometheus.enabled=true`)
+
 ### Reporting
 
-The reporting module periodically generates and publishes Confluence pages that provide an overview of the governance status across all systems and components. 
+The reporting module periodically generates and publishes Confluence pages that provide an overview of the governance status across all systems and components.
 It presents scores, trends, and rule conformance rates, giving teams and administrators a central place to monitor compliance with defined governance policies.
 
 The module generates the following Confluence pages:
@@ -567,7 +617,6 @@ The governance service provides the following Prometheus-compatible metrics for 
 | `jeap_governance_service_reporting_rules_overall_seconds_count`       | **Counter** The number of rule report runs executed                                                                                                                                                                                               | see @Timed annotation                                                                                                                                                                                                                         | `jeap_governance_service_reporting_rules_overall_seconds_count 97395.00`                                                            | 
 | `jeap_governance_service_reporting_rules_overall_seconds_sum`         | **Summary** The cumulative duration in seconds of rule report runs executed                                                                                                                                                                       | see @Timed annotation                                                                                                                                                                                                                         | `jeap_governance_service_reporting_rules_overall_seconds_sum 32431.0`                                                               |
 | `jeap_governance_service_reporting_rules_overall_seconds_max`         | **Gauge** The maximum observed duration in seconds of a rule report run                                                                                                                                                                           | see @Timed annotation                                                                                                                                                                                                                         | `jeap_governance_service_reporting_rules_overall_seconds_max 7.3`                                                                   |
-
 
 
 ### Recommended Alerts

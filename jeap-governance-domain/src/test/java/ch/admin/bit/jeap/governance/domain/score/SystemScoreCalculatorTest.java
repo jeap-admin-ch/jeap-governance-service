@@ -88,7 +88,7 @@ class SystemScoreCalculatorTest {
 
         SystemScore score = calculator.calculateSystemScore(system, today, componentScores);
 
-        assertThat(score.getScore()).isEqualTo(0);
+        assertThat(score.getScore()).isZero();
     }
 
     private System system(String name, String... componentNames) {
