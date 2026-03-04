@@ -1,16 +1,12 @@
 <th:block xmlns:th="http://www.thymeleaf.org">
     <div th:replace="~{fragment/generated-infoblock :: generated-infoblock}"></div>
 
-
     <!-- Title -->
     <h1 th:text="${model.systemName + model.pageSuffix}">System Score Report</h1>
 
     <!-- Score & Trend Summary Panel -->
     <ac:structured-macro ac:name="panel" ac:schema-version="1">
         <ac:parameter ac:name="title">Overall Score</ac:parameter>
-        <ac:parameter ac:name="borderStyle">solid</ac:parameter>
-        <ac:parameter ac:name="borderColor">#cccccc</ac:parameter>
-        <ac:parameter ac:name="titleBGColor">#f0f0f0</ac:parameter>
         <ac:rich-text-body>
             <table class="wrapped" style="width: 40%;">
                 <tbody>
@@ -20,7 +16,10 @@
                 </tr>
                 <tr>
                     <th>Score [%]</th>
-                    <td th:text="${model.score}" th:style="${model.getBackgroundColor()}"></td>
+                    <td th:text="${model.score}"
+                        th:with="highlight=${model.getHighlightColor()}"
+                        th:class="${highlight != null ? 'highlight-' + highlight : ''}"
+                        th:attr="data-highlight-colour=${highlight}"></td>
                 </tr>
                 <tr>
                     <th>Trend</th>
@@ -40,43 +39,46 @@
 
     <!-- Component Scores Table -->
     <h2>Component Scores</h2>
-            <table class="wrapped relative-table" style="width: 80.0%;">
-                <colgroup>
-                    <col style="width: 33.0%;"/>
-                    <col style="width: 33.0%;"/>
-                    <col style="width: 34.0%;"/>
-                </colgroup>
-                <thead>
-                <tr>
-                    <th colspan="1">Component</th>
-                    <th colspan="1">Score [%]</th>
-                    <th colspan="1">Trend indicator</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="entry : ${model.componentScores}">
-                    <td colspan="1">
-                        <ac:link>
-                            <ri:page th:ri:content-title="${entry.componentName + entry.pageSuffix}"/>
-                            <ac:plain-text-link-body>
-                                <![CDATA[[[${entry.componentName}]]]]>
-                            </ac:plain-text-link-body>
-                        </ac:link>
-                    </td>
-                    <td th:text="${entry.score}" th:style="${entry.getBackgroundColor()}"></td>
-                    <td colspan="1">
-                        <span th:title="${entry.trend.description}">
-                          <ac:emoticon th:if="${entry.trend.emoticon != null}"
-                                       th:ac:name="${entry.trend.emoticon}"/>
-                          <ac:hipchat-emoticon th:if="${entry.trend.hipchatEmoticon != null}"
-                                               th:ac:shortcut="${entry.trend.hipchatEmoticon}"/>
-                          <span th:if="${entry.trend.unicode != null}"
-                                th:text="${entry.trend.unicode}"></span>
-                        </span>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+    <table class="wrapped relative-table" style="width: 80.0%;">
+        <colgroup>
+            <col style="width: 33.0%;"/>
+            <col style="width: 33.0%;"/>
+            <col style="width: 34.0%;"/>
+        </colgroup>
+        <thead>
+        <tr>
+            <th colspan="1">Component</th>
+            <th colspan="1">Score [%]</th>
+            <th colspan="1">Trend indicator</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="entry : ${model.componentScores}">
+            <td colspan="1">
+                <ac:link>
+                    <ri:page th:ri:content-title="${entry.componentName + entry.pageSuffix}"/>
+                    <ac:plain-text-link-body>
+                        <![CDATA[[[${entry.componentName}]]]]>
+                    </ac:plain-text-link-body>
+                </ac:link>
+            </td>
+            <td th:text="${entry.score}"
+                th:with="highlight=${entry.getHighlightColor()}"
+                th:class="${highlight != null ? 'highlight-' + highlight : ''}"
+                th:attr="data-highlight-colour=${highlight}"></td>
+            <td colspan="1">
+                <span th:title="${entry.trend.description}">
+                    <ac:emoticon th:if="${entry.trend.emoticon != null}"
+                                 th:ac:name="${entry.trend.emoticon}"/>
+                    <ac:hipchat-emoticon th:if="${entry.trend.hipchatEmoticon != null}"
+                                         th:ac:shortcut="${entry.trend.hipchatEmoticon}"/>
+                    <span th:if="${entry.trend.unicode != null}"
+                          th:text="${entry.trend.unicode}"></span>
+                </span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
     <!-- Score History Chart -->
     <h2>Score history</h2>

@@ -1,13 +1,9 @@
 <th:block xmlns:th="http://www.thymeleaf.org">
     <div th:replace="~{fragment/generated-infoblock :: generated-infoblock}"></div>
     <h1 th:text="${model.name}">Rule Name</h1>
-
     <!-- Rule Details Panel -->
     <ac:structured-macro ac:name="panel" ac:schema-version="1">
         <ac:parameter ac:name="title">Rule Details</ac:parameter>
-        <ac:parameter ac:name="borderStyle">solid</ac:parameter>
-        <ac:parameter ac:name="borderColor">#cccccc</ac:parameter>
-        <ac:parameter ac:name="titleBGColor">#f0f0f0</ac:parameter>
         <ac:rich-text-body>
             <table class="wrapped" style="width: 40%;">
                 <tbody>
@@ -19,15 +15,17 @@
                     <th>Documentation link</th>
                     <td><a th:href="${model.documentationLink}" th:text="${model.documentationLink}">-</a></td>
                 </tr>
-                <tr th:style="${model.getBackgroundColor()}">
+                <tr>
                     <th>Conformance rate [%]</th>
-                    <td th:text="${model.conformanceRate}">-</td>
+                    <td th:text="${model.conformanceRate}"
+                        th:with="highlight=${model.getHighlightColor()}"
+                        th:class="${highlight != null ? 'highlight-' + highlight : ''}"
+                        th:attr="data-highlight-colour=${highlight}">-</td>
                 </tr>
                 </tbody>
             </table>
         </ac:rich-text-body>
     </ac:structured-macro>
-
     <h2>Systems</h2>
     <table>
         <thead>
@@ -46,11 +44,13 @@
                     </ac:plain-text-link-body>
                 </ac:link>
             </td>
-            <td th:text="${system.conformanceRate}" th:style="${system.getBackgroundColor()}"></td>
+            <td th:text="${system.conformanceRate}"
+                th:with="highlight=${system.getHighlightColor()}"
+                th:class="${highlight != null ? 'highlight-' + highlight : ''}"
+                th:attr="data-highlight-colour=${highlight}"></td>
         </tr>
         </tbody>
     </table>
-
     <h2>Non-Compliant Components</h2>
     <table>
         <thead>

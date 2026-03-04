@@ -26,7 +26,7 @@ public class ReportingRulesPreparation {
     private final ReportingDataAccess dataAccess;
 
     @TransactionalReadReplica
-    @Timed("jeap.governance.service.reporting.rules.prepararation")
+    @Timed("jeap.governance.service.reporting.rules.preparation")
     public List<ReportingRule> prepareAllRules(LocalDate fromDay, LocalDate toDay) {
         List<RuleConformanceRate> latestRuleConformanceRatesPerRuleId = dataAccess.findAllRuleConformanceByDayBetweenInclusive(fromDay, toDay);
         List<SystemRuleConformanceRate> latestPerRuleIdAndSystemId = dataAccess.findLatestPerRuleIdAndSystemId();

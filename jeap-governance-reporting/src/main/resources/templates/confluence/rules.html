@@ -23,10 +23,13 @@
                         <![CDATA[[[${rule.name}]]]]>
                     </ac:plain-text-link-body>
                 </ac:link>
-                <span style="color: #707070; font-size: 0.85em;"
+                <span style="opacity: 0.6; font-size: 0.85em;"
                       th:text="${' (' + rule.ruleId + ')'}"></span>
             </td>
-            <td colspan="1" th:text="${rule.conformanceRate}" th:style="${rule.getBackgroundColor()}"></td>
+            <td colspan="1" th:text="${rule.conformanceRate}"
+                th:with="highlight=${rule.getHighlightColor()}"
+                th:class="${highlight != null ? 'highlight-' + highlight : ''}"
+                th:attr="data-highlight-colour=${highlight}"></td>
             <td colspan="1">
                 <span th:title="${rule.trend.description}">
                     <ac:emoticon th:if="${rule.trend.emoticon != null}"

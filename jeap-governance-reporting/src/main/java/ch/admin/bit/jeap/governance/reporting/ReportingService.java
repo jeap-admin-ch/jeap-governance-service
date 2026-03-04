@@ -33,7 +33,7 @@ public class ReportingService {
         timed(() -> doGenerateRulesReport(untilDay, withOrphanCleanup), withOrphanCleanup, "jeap.governance.service.reporting.rules.overall");
     }
 
-    public void timed(Runnable runnable, boolean withOrphanCleanup, String metricsName) {
+    private void timed(Runnable runnable, boolean withOrphanCleanup, String metricsName) {
         Timer.Sample sample = Timer.start(meterRegistry);
         try {
             runnable.run();
@@ -44,7 +44,7 @@ public class ReportingService {
         }
     }
 
-    public void doGenerateRulesReport(LocalDate untilDay, boolean withOrphanCleanup) {
+    private void doGenerateRulesReport(LocalDate untilDay, boolean withOrphanCleanup) {
         int trendPeriodDays = reportingProperties.getTrendPeriodDays();
         LocalDate fromDay = untilDay.minusDays(trendPeriodDays);
 

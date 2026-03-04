@@ -1,6 +1,6 @@
 package ch.admin.bit.jeap.governance.reporting.confluence.model;
 
-import ch.admin.bit.jeap.governance.reporting.confluence.style.BackgroundUtility;
+import ch.admin.bit.jeap.governance.reporting.confluence.style.ColorUtility;
 import ch.admin.bit.jeap.governance.reporting.preparation.ReportingScore;
 import lombok.Builder;
 import lombok.Data;
@@ -17,7 +17,7 @@ public class SystemScoreReportModel {
     private List<ReportingScore> scores;
     private List<ComponentScoreReportModel> componentScores;
 
-    public String getBackgroundColor() {
-        return BackgroundUtility.getBackgroundColor(score);
+    public String getHighlightColor() {
+        return ColorUtility.getHighlightColor(score);
     }
 }

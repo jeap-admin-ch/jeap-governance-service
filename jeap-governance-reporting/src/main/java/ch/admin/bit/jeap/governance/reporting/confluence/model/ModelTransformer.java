@@ -110,47 +110,21 @@ public class ModelTransformer {
     }
 
     Trend toConfluenceTrend(TrendIndicator trendIndicator) {
-        switch (trendIndicator) {
-            case UP -> {
-                return Trend.UP;
-            }
-            case DOWN -> {
-                return Trend.DOWN;
-            }
-            case STABLE -> {
-                return Trend.EVEN;
-            }
-            case UNKNOWN -> {
-                return Trend.UNKNOWN;
-            }
-            case NO_DATA -> {
-                return Trend.NO_DATA;
-            }
-            default -> {
-                log.warn("Unknown scoring trend: {}, defaulting to UNKNOWN", trendIndicator);
-                return Trend.UNKNOWN;
-            }
-        }
+        return switch (trendIndicator) {
+            case UP -> Trend.UP;
+            case DOWN -> Trend.DOWN;
+            case STABLE -> Trend.EVEN;
+            case UNKNOWN -> Trend.UNKNOWN;
+            case NO_DATA -> Trend.NO_DATA;
+        };
     }
 
     State toConfluenceState(ch.admin.bit.jeap.governance.domain.rule.State state) {
-        switch (state) {
-            case OK -> {
-                return State.OK;
-            }
-            case PAUSED -> {
-                return State.PAUSED;
-            }
-            case FAIL -> {
-                return State.FAIL;
-            }
-            case DISABLED -> {
-                return State.DISABLED;
-            }
-            default -> {
-                log.warn("Unknown rule state: {}, defaulting to UNKNOWN", state);
-                return State.UNKNOWN;
-            }
-        }
+        return switch (state) {
+            case OK -> State.OK;
+            case PAUSED -> State.PAUSED;
+            case FAIL -> State.FAIL;
+            case DISABLED -> State.DISABLED;
+        };
     }
 }
