@@ -63,7 +63,11 @@ public class ComponentDependenciesVersionsRule implements Rule {
                 ruleResults.add(RuleResult.failed(dependencyName + " has an invalid version: " + e.getMessage()));
             }
         }
-        return summarize(ruleResults);
+
+        if (ruleResults.isEmpty()) {
+            return RuleResult.ok("No dependency version information available");
+        }
+        return RuleResult.summarize(ruleResults);
     }
 
     private Map<String, String> getVersionsToCheck(RuleParameters ruleParameters) {
@@ -78,15 +82,6 @@ public class ComponentDependenciesVersionsRule implements Rule {
                                 ? split[1]
                                 : split[2]
                 ));
-    }
-
-    private RuleResult summarize(List<RuleResult> results) {
-        if (results.isEmpty()) {
-            return RuleResult.ok("No dependency version information available");
-        }
-        boolean hasFailure = results.stream().anyMatch(result -> result.state().equals(State.FAIL));
-        String stateComment = results.stream().map(RuleResult::stateComment).filter(Objects::nonNull).collect(Collectors.joining("; "));
-        return hasFailure ? RuleResult.failed(stateComment) : RuleResult.ok(stateComment);
     }
 
     private Optional<SemanticVersion> getUsedVersion(Map<String, String> dependencies, String dependency) {

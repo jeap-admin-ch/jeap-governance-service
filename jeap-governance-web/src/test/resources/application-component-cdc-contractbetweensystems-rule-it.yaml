@@ -1,0 +1,18 @@
+jeap:
+  governance:
+    rules:
+      active:
+        - id: component-cdc-contractbetweensystems
+          weight: 3
+          parameters:
+            services-to-ignore:
+              - "testar-orchestrator"
+              - "test-agent"
+              - "testagent"
+              - "error-handling"
+              - "errorhandling"
+              - "errorhandler"
+              - "error-service"
+            relations-to-ignore:
+              - "POST /api/dbschemas"
+              - "POST /api/openapi/{systemComponentName}"
