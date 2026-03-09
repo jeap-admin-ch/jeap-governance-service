@@ -1,6 +1,6 @@
 package ch.admin.bit.jeap.governance.reactionobserver.deletion;
 
-import ch.admin.bit.jeap.governance.domain.plugin.datasource.ComponentDeletionListener;
+import ch.admin.bit.jeap.governance.domain.plugin.deletion.ComponentDeletionListener;
 import ch.admin.bit.jeap.governance.reactionobserver.domain.ReactionObserverComponentLastObservationDate;
 import ch.admin.bit.jeap.governance.reactionobserver.domain.ReactionObserverComponentLastObservationDateRepository;
 import lombok.RequiredArgsConstructor;

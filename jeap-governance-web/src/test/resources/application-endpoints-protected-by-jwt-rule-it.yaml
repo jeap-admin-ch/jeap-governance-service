@@ -24,3 +24,11 @@ jeap:
             - endpoints-protected-by-jwt
           reason: "Temporarily exempted for JWT rule IT"
           until: "2099-12-31"
+        - id: jwt-rule-it-exempted-parameterized
+          component-name: jwtexemptedcompparam-app-service
+          reason: "API without subscription, used by external provider"
+          parameters:
+            exempt-paths:
+              - "/api/safeplay/notify/*"
+          rule-id:
+            - endpoints-protected-by-jwt

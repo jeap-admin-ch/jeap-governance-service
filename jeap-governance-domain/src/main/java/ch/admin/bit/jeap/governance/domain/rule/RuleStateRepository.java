@@ -14,4 +14,6 @@ public interface RuleStateRepository {
     List<RuleState> findAll();
 
     List<NonCompliantComponentEntry> findNonCompliantSince();
+
+    void deleteAllBySystemComponentId(long systemComponentId);
 }

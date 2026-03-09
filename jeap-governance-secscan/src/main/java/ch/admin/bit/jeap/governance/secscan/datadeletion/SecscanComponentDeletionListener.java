@@ -1,6 +1,6 @@
 package ch.admin.bit.jeap.governance.secscan.datadeletion;
 
-import ch.admin.bit.jeap.governance.domain.plugin.datasource.ComponentDeletionListener;
+import ch.admin.bit.jeap.governance.domain.plugin.deletion.ComponentDeletionListener;
 import ch.admin.bit.jeap.governance.secscan.domain.SecscanFlaggedEndpointRepository;
 import ch.admin.bit.jeap.governance.secscan.domain.SecscanStateRepository;
 import lombok.RequiredArgsConstructor;

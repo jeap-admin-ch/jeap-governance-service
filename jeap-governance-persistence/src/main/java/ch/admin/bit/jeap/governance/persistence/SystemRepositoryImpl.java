@@ -28,7 +28,7 @@ public class SystemRepositoryImpl implements SystemRepository {
 
     @Override
     public Optional<System> findByName(String systemName) {
-        return jpaSystemRepository.findByName(systemName);
+        return jpaSystemRepository.findByNameIgnoreCase(systemName);
     }
 
     @Override

@@ -4,6 +4,9 @@ import ch.admin.bit.jeap.governance.domain.SystemRepository;
 import ch.admin.bit.jeap.governance.domain.rule.RuleConformanceRateService;
 import ch.admin.bit.jeap.governance.domain.rule.RuleEvaluationResult;
 import ch.admin.bit.jeap.governance.domain.score.ScoringService;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.core.LockAssert;
@@ -11,7 +14,9 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,6 +30,9 @@ public class ScoringScheduler {
     private final ScoringService scoringService;
     private final SystemRepository systemRepository;
     private final RuleConformanceRateService ruleConformanceRateService;
+    private final MeterRegistry meterRegistry;
+
+    private LocalDateTime lastRunDateTime = LocalDateTime.MIN;
 
     @Scheduled(cron = "${jeap.governance.scoring.cron-expression}")
     @SchedulerLock(name = "scoring", lockAtLeastFor = "${jeap.governance.scoring.lock-at-least}", lockAtMostFor = "${jeap.governance.scoring.lock-at-most}")
@@ -43,6 +51,7 @@ public class ScoringScheduler {
 
         ruleConformanceRateService.updateConformanceRates(allResults, day);
         ruleConformanceRateService.updateSystemConformanceRates(resultsBySystem, day);
+        lastRunDateTime = LocalDateTime.now();
     }
 
     private List<RuleEvaluationResult> updateSystemScore(long systemId, LocalDate day) {
@@ -52,5 +61,16 @@ public class ScoringScheduler {
             log.error("Failed to update score for system with id '{}'", systemId, e);
             return List.of();
         }
+    }
+
+    @PostConstruct
+    public void createLastRunFromMetric() {
+        Gauge.builder("jeap_governance_service_scoring_last_run_from", () -> calculateMinutesFromLastRunToNow(lastRunDateTime))
+                .baseUnit("minutes")
+                .register(meterRegistry);
+    }
+
+    private long calculateMinutesFromLastRunToNow(LocalDateTime lastRun) {
+        return Duration.between(lastRun, LocalDateTime.now()).toMinutes();
     }
 }

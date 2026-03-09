@@ -23,6 +23,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -179,6 +180,68 @@ class RuleStateRepositoryImplTest extends PostgresTestContainerBase {
             assertEquals("RULE-002", entry.getRuleId());
             assertEquals(timestamp2.truncatedTo(ChronoUnit.MILLIS).toInstant(), entry.getNonCompliantSince().truncatedTo(ChronoUnit.MILLIS).toInstant());
         }
+    }
+
+    @Test
+    void deleteAllBySystemComponentId() {
+        SystemComponent component1 = createAndPersistSystemWithComponent("System 1", "Component 1");
+
+        // Persist an existing (managed) entity
+        entityManager.persist(RuleState.builder()
+                .ruleId(RuleId.of("RULE-001")).systemComponent(component1)
+                .state(State.OK).build());
+        entityManager.persist(RuleState.builder()
+                .ruleId(RuleId.of("RULE-002")).systemComponent(component1)
+                .state(State.OK).build());
+        entityManager.flush();
+        entityManager.clear();
+
+        List<RuleState> results = entityManager.getEntityManager()
+                .createQuery("SELECT rs FROM RuleState rs", RuleState.class)
+                .getResultList();
+        assertEquals(2, results.size());
+
+        repository.deleteAllBySystemComponentId(component1.getId());
+        entityManager.flush();
+        entityManager.clear();
+
+        results = entityManager.getEntityManager()
+                .createQuery("SELECT rs FROM RuleState rs", RuleState.class)
+                .getResultList();
+        assertTrue(results.isEmpty());
+    }
+
+    @Test
+    void deleteAllBySystemComponentId_shouldNotAffectOtherComponentRuleStates() {
+        SystemComponent component1 = createAndPersistSystemWithComponent("System 1", "Component 1");
+        SystemComponent component2 = createAndPersistSystemWithComponent("System 2", "Component 2");
+
+        // Persist an existing (managed) entity
+        entityManager.persist(RuleState.builder()
+                .ruleId(RuleId.of("RULE-001")).systemComponent(component1)
+                .state(State.OK).build());
+        entityManager.persist(RuleState.builder()
+                .ruleId(RuleId.of("RULE-002")).systemComponent(component1)
+                .state(State.OK).build());
+        entityManager.persist(RuleState.builder()
+                .ruleId(RuleId.of("RULE-001")).systemComponent(component2)
+                .state(State.OK).build());
+        entityManager.flush();
+        entityManager.clear();
+
+        List<RuleState> results = entityManager.getEntityManager()
+                .createQuery("SELECT rs FROM RuleState rs", RuleState.class)
+                .getResultList();
+        assertEquals(3, results.size());
+
+        repository.deleteAllBySystemComponentId(component1.getId());
+        entityManager.flush();
+        entityManager.clear();
+
+        results = entityManager.getEntityManager()
+                .createQuery("SELECT rs FROM RuleState rs", RuleState.class)
+                .getResultList();
+        assertEquals(1, results.size());
     }
 
     private SystemComponent createAndPersistSystemWithComponent() {

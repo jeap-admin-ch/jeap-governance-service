@@ -20,7 +20,7 @@ public class DeploymentLogComponentVersionRepositoryImpl implements DeploymentLo
 
     @Override
     public Optional<DeploymentLogComponentVersion> findByComponentName(String componentName) {
-        return jpaRepository.findBySystemComponentName(componentName);
+        return jpaRepository.findBySystemComponentNameIgnoreCase(componentName);
     }
 
     @Override

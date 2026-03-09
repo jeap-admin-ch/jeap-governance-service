@@ -1,10 +1,8 @@
-package ch.admin.bit.jeap.governance.domain.plugin.datasource;
+package ch.admin.bit.jeap.governance.domain.plugin.deletion;
 
 /**
- * Interface for data source connectors used in the governance service.
- * <p>
- * This listener is invoked before the component deletion is finalized, allowing connectors
- * to remove associated data, close connections, or perform other cleanup tasks.
+ * This listener is invoked before the component deletion is finalized, allowing modules
+ * to remove associated data or perform other cleanup tasks.
  */
 public interface ComponentDeletionListener {
 

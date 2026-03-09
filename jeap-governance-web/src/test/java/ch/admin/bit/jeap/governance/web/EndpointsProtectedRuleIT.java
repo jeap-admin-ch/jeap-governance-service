@@ -469,4 +469,46 @@ class EndpointsProtectedRuleIT extends GovernanceIntegrationTestBase {
         assertThat(ruleState).isPresent();
         assertThat(ruleState.get().getState()).isEqualTo(State.PAUSED);
     }
+
+    @Test
+    void endpointIgnoredByComponentExemptPaths_resultsInOk() {
+        var system = systemRepository.add(System.builder()
+                .name("secscanexemptedcompparamsys")
+                .aliases(Set.of())
+                .systemComponents(List.of(
+                        SystemComponent.builder().name("secscanexemptedcompparam-app-service").type(ComponentType.BACKEND_SERVICE).build()
+                ))
+                .build());
+
+        var component = system.getSystemComponents().getFirst();
+
+        secscanStateRepository.save(SecscanState.builder()
+                .systemComponentId(component.getId())
+                .scanMessage("Scan flagged 2 endpoints")
+                .scanTimestamp(ZonedDateTime.now())
+                .build());
+
+        secscanFlaggedEndpointRepository.saveAll(List.of(
+                SecscanFlaggedEndpoint.builder()
+                        .systemComponentId(component.getId())
+                        .path("/api/safeplay/notify/gugu")
+                        .method("GET")
+                        .scanMessage("HTTP 200 returned")
+                        .scanTimestamp(ZonedDateTime.now())
+                        .build(),
+                SecscanFlaggedEndpoint.builder()
+                        .systemComponentId(component.getId())
+                        .path("/api/safeplay/notify/juhu")
+                        .method("GET")
+                        .scanMessage("HTTP 200 returned")
+                        .scanTimestamp(ZonedDateTime.now())
+                        .build()
+        ));
+
+        ruleEvaluationService.updateRuleStatesForComponent(component);
+
+        var ruleState = ruleStateRepository.findBySystemComponentAndRuleId(component, RULE_ID);
+        assertThat(ruleState).isPresent();
+        assertThat(ruleState.get().getState()).isEqualTo(State.DISABLED);
+    }
 }

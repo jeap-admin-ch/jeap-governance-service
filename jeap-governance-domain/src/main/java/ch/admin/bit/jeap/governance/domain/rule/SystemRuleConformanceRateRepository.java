@@ -12,4 +12,6 @@ public interface SystemRuleConformanceRateRepository {
     List<SystemRuleConformanceRate> findBySystemIdAndDay(long systemId, LocalDate day);
 
     List<SystemRuleConformanceRate> findLatestPerRuleIdAndSystemId();
+
+    void deleteAllBySystemId(long systemId);
 }

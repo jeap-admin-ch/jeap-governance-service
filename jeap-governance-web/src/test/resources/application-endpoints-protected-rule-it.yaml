@@ -30,3 +30,11 @@ jeap:
             - endpoints-protected
           reason: "Temporarily exempted for rule IT"
           until: "2099-12-31"
+        - id: rule-it-exempted-parameterized
+          component-name: secscanexemptedcompparam-app-service
+          reason: "API without subscription, used by external provider"
+          parameters:
+            exempt-paths:
+              - "/api/safeplay/notify/*"
+          rule-id:
+            - endpoints-protected

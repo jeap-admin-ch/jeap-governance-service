@@ -49,6 +49,10 @@ public class ApiDocVersionSystemSynchronizer {
     }
 
     private void addToSystemComponent(ApiDocVersionDto apiDocVersionDto, SystemComponent systemComponent) {
+        if(apiDocVersionDto.getVersion() == null || apiDocVersionDto.getVersion().isBlank()) {
+            log.warn("API doc version is null or blank for system component {}. Skipping API doc version synchronization for this component.", systemComponent.getName());
+            return;
+        }
         log.info("Creating new API doc version {} for system component {} with version: {}", apiDocVersionDto.getVersion(), systemComponent.getName(), apiDocVersionDto.getVersion());
         ApiDocVersion newVersion = ApiDocVersion.builder()
                 .id(UUID.randomUUID())

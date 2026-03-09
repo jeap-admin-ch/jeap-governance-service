@@ -44,4 +44,9 @@ public class ComponentScoreRepositoryImpl implements ComponentScoreRepository {
     public List<ComponentScore> findAllByDayBetweenInclusive(LocalDate fromDay, LocalDate toDay) {
         return jpaComponentScoreRepository.findAllByDayBetweenInclusive(fromDay, toDay);
     }
+
+    @Override
+    public void deleteAllBySystemComponentId(long componentId) {
+        jpaComponentScoreRepository.deleteAllBySystemComponentId(componentId);
+    }
 }

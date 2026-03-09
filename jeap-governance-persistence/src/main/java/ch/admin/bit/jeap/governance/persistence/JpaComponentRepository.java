@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 interface JpaComponentRepository extends JpaRepository<SystemComponent, Long> {
 
-    Optional<SystemComponent> findByName(String componentName);
+    Optional<SystemComponent> findByNameIgnoreCase(String componentName);
 
     @Query("SELECT sc.id AS id, sc.name AS name FROM SystemComponent sc")
     List<SystemComponentReference> findAllSystemComponentReferences();

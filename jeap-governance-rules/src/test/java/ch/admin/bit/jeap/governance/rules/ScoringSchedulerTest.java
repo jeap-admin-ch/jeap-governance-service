@@ -6,6 +6,8 @@ import ch.admin.bit.jeap.governance.domain.rule.RuleEvaluationResult;
 import ch.admin.bit.jeap.governance.domain.rule.RuleId;
 import ch.admin.bit.jeap.governance.domain.rule.State;
 import ch.admin.bit.jeap.governance.domain.score.ScoringService;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import net.javacrumbs.shedlock.core.LockAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,16 +18,23 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class ScoringSchedulerTest {
 
     private final ScoringService scoringService = mock(ScoringService.class);
     private final SystemRepository systemRepository = mock(SystemRepository.class);
     private final RuleConformanceRateService ruleConformanceRateService = mock(RuleConformanceRateService.class);
-    private final ScoringScheduler scheduler = new ScoringScheduler(scoringService, systemRepository, ruleConformanceRateService);
+    private final MeterRegistry meterRegistry = new SimpleMeterRegistry();
+    private final ScoringScheduler scheduler = new ScoringScheduler(scoringService, systemRepository, ruleConformanceRateService, meterRegistry);
 
     @BeforeEach
     void setUp() {
@@ -76,5 +85,14 @@ class ScoringSchedulerTest {
         var captor = ArgumentCaptor.forClass(Long.class);
         verify(scoringService, times(3)).updateSystemScore(captor.capture(), any(LocalDate.class));
         assertThat(captor.getAllValues()).containsExactly(1L, 2L, 3L);
+    }
+
+    @Test
+    void createLastRunFromMetric() {
+        scheduler.createLastRunFromMetric();
+
+        var gauge = meterRegistry.find("jeap_governance_service_scoring_last_run_from").gauge();
+        assertNotNull(gauge);
+        assertTrue(gauge.value() >= 0);
     }
 }

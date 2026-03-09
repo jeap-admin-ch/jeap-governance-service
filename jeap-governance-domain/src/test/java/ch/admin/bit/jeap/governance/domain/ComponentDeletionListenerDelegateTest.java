@@ -1,6 +1,6 @@
 package ch.admin.bit.jeap.governance.domain;
 
-import ch.admin.bit.jeap.governance.domain.plugin.datasource.ComponentDeletionListener;
+import ch.admin.bit.jeap.governance.domain.plugin.deletion.ComponentDeletionListener;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

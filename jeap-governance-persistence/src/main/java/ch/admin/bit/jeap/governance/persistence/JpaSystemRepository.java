@@ -14,7 +14,7 @@ import java.util.Optional;
 interface JpaSystemRepository extends JpaRepository<System, Long> {
 
     @EntityGraph(attributePaths = {"systemComponents"})
-    Optional<System> findByName(String systemName);
+    Optional<System> findByNameIgnoreCase(String systemName);
 
     @Override
     @EntityGraph(attributePaths = {"systemComponents"})

@@ -16,7 +16,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -163,6 +165,62 @@ class ComponentScoreRepositoryImplTest extends PostgresTestContainerBase {
 
         assertEquals(99, repository.findBySystemComponentAndDay(componentA, day).get().getScore());
         assertEquals(60, repository.findBySystemComponentAndDay(componentB, day).get().getScore());
+    }
+
+    @Test
+    void deleteAllBySystemComponentId() {
+        System systemA = createAndPersistSystem("System A", "Component A");
+        SystemComponent componentA = systemA.getSystemComponents().getFirst();
+        LocalDate day = LocalDate.of(2026, 1, 15);
+
+        entityManager.persist(ComponentScore.builder().systemComponent(componentA).score(50).day(day).build());
+        entityManager.persist(ComponentScore.builder().systemComponent(componentA).score(60).day(day.minusDays(1)).build());
+        entityManager.persist(ComponentScore.builder().systemComponent(componentA).score(70).day(day.minusDays(2)).build());
+        entityManager.flush();
+        entityManager.clear();
+
+        List<ComponentScore> results = entityManager.getEntityManager()
+                .createQuery("SELECT cs FROM ComponentScore cs", ComponentScore.class)
+                .getResultList();
+        assertEquals(3, results.size());
+
+        repository.deleteAllBySystemComponentId(componentA.getId());
+        entityManager.flush();
+        entityManager.clear();
+
+        results = entityManager.getEntityManager()
+                .createQuery("SELECT cs FROM ComponentScore cs", ComponentScore.class)
+                .getResultList();
+        assertTrue(results.isEmpty());
+    }
+
+    @Test
+    void deleteAllBySystemComponentId_shouldNotAffectOtherComponentScores() {
+        System systemA = createAndPersistSystem("System A", "Component A");
+        System systemB = createAndPersistSystem("System B", "Component B");
+        SystemComponent componentA = systemA.getSystemComponents().getFirst();
+        SystemComponent componentB = systemB.getSystemComponents().getFirst();
+        LocalDate day = LocalDate.of(2026, 1, 15);
+
+        entityManager.persist(ComponentScore.builder().systemComponent(componentA).score(50).day(day).build());
+        entityManager.persist(ComponentScore.builder().systemComponent(componentA).score(60).day(day.minusDays(1)).build());
+        entityManager.persist(ComponentScore.builder().systemComponent(componentB).score(60).day(day).build());
+        entityManager.flush();
+        entityManager.clear();
+
+        List<ComponentScore> results = entityManager.getEntityManager()
+                .createQuery("SELECT cs FROM ComponentScore cs", ComponentScore.class)
+                .getResultList();
+        assertEquals(3, results.size());
+
+        repository.deleteAllBySystemComponentId(componentA.getId());
+        entityManager.flush();
+        entityManager.clear();
+
+        results = entityManager.getEntityManager()
+                .createQuery("SELECT cs FROM ComponentScore cs", ComponentScore.class)
+                .getResultList();
+        assertEquals(1, results.size());
     }
 
     private SystemComponent createAndPersistSystemWithComponent() {

@@ -58,6 +58,29 @@ class SystemRepositoryImplTest extends PostgresTestContainerBase {
     }
 
     @Test
+    void findByName_shouldReturnSystem_whenExistsAndOtherCase() {
+        System system = System.builder()
+                .name("My system")
+                .systemComponents(List.of())
+                .aliases(Set.of("my-system"))
+                .build();
+
+        repository.add(system);
+
+        entityManager.flush();
+
+        Optional<System> result = repository.findByName("My system".toLowerCase());
+
+        assertNotNull(result);
+        assertTrue(result.isPresent());
+        System systemResult = result.get();
+        assertEquals("My system", systemResult.getName());
+        assertEquals(Set.of("my-system"), systemResult.getAliases());
+        assertEquals(List.of(), systemResult.getSystemComponents());
+        assertNotNull(systemResult.getCreatedAt());
+    }
+
+    @Test
     void findByName_shouldReturnSystem_whenExists_withSystemComponents() {
         System system = System.builder()
                 .name("My system")

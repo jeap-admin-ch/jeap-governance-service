@@ -32,7 +32,7 @@ public class DataImportScheduler {
     }
 
     @PostConstruct
-    private void createLastRunFromMetric() {
+    public void createLastRunFromMetric() {
         Gauge.builder("jeap_governance_service_data_import_last_run_from", () -> calculateMinutesFromLastRunToNow(lastRunDateTime))
                 .baseUnit("minutes")
                 .register(meterRegistry);

@@ -62,12 +62,11 @@ public class RestApiRelationSystemComponentSynchronizer {
     }
 
     private void validateInput(ComponentTechnicalIdentifier providerKey, SystemComponent providerSystemComponent) {
-        if (!providerSystemComponent.getSystem().getName().equals(providerKey.systemName())) {
+        if (!providerSystemComponent.getSystem().getName().equalsIgnoreCase(providerKey.systemName())) {
             throw new ArchRepoSynchronizeException("Provider system name mismatch: expected " + providerKey.systemName() + " but found " + providerSystemComponent.getSystem().getName());
         }
-        if (!providerSystemComponent.getName().equals(providerKey.componentName())) {
+        if (!providerSystemComponent.getName().equalsIgnoreCase(providerKey.componentName())) {
             throw new ArchRepoSynchronizeException("Provider system component name mismatch: expected " + providerKey.componentName() + " but found " + providerSystemComponent.getName());
         }
     }
-
 }

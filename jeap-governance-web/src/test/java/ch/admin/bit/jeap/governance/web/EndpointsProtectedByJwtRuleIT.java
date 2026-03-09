@@ -281,4 +281,43 @@ class EndpointsProtectedByJwtRuleIT extends GovernanceIntegrationTestBase {
         assertThat(ruleState).isPresent();
         assertThat(ruleState.get().getState()).isEqualTo(State.OK);
     }
+
+    @Test
+    void endpointIgnoredByComponentExemptPaths_resultsInOk() {
+        var system = systemRepository.add(System.builder()
+                .name("jwtexemptedcompparam-app-service")
+                .aliases(Set.of())
+                .systemComponents(List.of(
+                        SystemComponent.builder().name("jwtexemptedcompparam-app-service").type(ComponentType.BACKEND_SERVICE).build()
+                ))
+                .build());
+
+        var component = system.getSystemComponents().getFirst();
+
+        promTimeSeriesRepository.saveAll(List.of(
+                PromTimeSeries.builder()
+                        .prometheusQueryType(PromQueryType.JEAP_REST_ENDPOINT_WITHOUT_JWT)
+                        .queryTimestamp(ZonedDateTime.now())
+                        .systemComponentId(component.getId())
+                        .sample(new PromTimeSeriesSample(
+                                Map.of("datapoint", "/api/safeplay/notify/gugu", "method", "GET", "stage", "ref"),
+                                List.of("1")))
+                        .build(),
+                PromTimeSeries.builder()
+                        .prometheusQueryType(PromQueryType.JEAP_REST_ENDPOINT_WITHOUT_JWT)
+                        .queryTimestamp(ZonedDateTime.now())
+                        .systemComponentId(component.getId())
+                        .sample(new PromTimeSeriesSample(
+                                Map.of("datapoint", "/api/safeplay/notify/juhu", "method", "GET", "stage", "ref"),
+                                List.of("1")))
+                        .build()
+        ));
+
+
+        ruleEvaluationService.updateRuleStatesForComponent(component);
+
+        var ruleState = ruleStateRepository.findBySystemComponentAndRuleId(component, RULE_ID);
+        assertThat(ruleState).isPresent();
+        assertThat(ruleState.get().getState()).isEqualTo(State.DISABLED);
+    }
 }

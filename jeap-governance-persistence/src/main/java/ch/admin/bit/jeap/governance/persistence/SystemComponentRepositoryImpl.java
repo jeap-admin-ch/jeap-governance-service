@@ -34,7 +34,7 @@ public class SystemComponentRepositoryImpl implements SystemComponentRepository 
 
     @Override
     public Optional<SystemComponent> findByName(String componentName) {
-        return jpaComponentRepository.findByName(componentName);
+        return jpaComponentRepository.findByNameIgnoreCase(componentName);
     }
 
     @Override

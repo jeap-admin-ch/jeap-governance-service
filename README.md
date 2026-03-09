@@ -1,6 +1,18 @@
 # jeap-governance-service
 
-Service which provides a quick overview of system and service compliance with defined policies.
+Service template to provide a quick overview of system and service compliance with defined policies. A service instance 
+can be created by depending on this template,then adding specific configuration and extending it with plugin 
+implementations.
+
+## Key Features
+      
+- **Developer Feedback:** Teams receive clear information on whether their services comply with 
+        organizational policies
+- **Flexible Rule Management:** Administrators can temporarily deactivate individual rules for 
+     specific systems or services when exceptions are needed
+- **Extensible Rules Engine:** New compliance rules can be easily added through a plugin mechanism, 
+     allowing teams to provide their own custom rules
+
 
 ## Installing / Getting started
 
@@ -668,16 +680,16 @@ All list parameters support YAML list syntax. Wildcard matching is supported usi
 `/api/*` matches all paths starting with `/api/`) and suffix matching (e.g., `*-service` matches all names ending
 with `-service`).
 
-| Parameter                      | Description                                                                                                           | Applied during          |
-|--------------------------------|-----------------------------------------------------------------------------------------------------------------------|-------------------------|
-| `exempt-component-names`       | List of component names to exclude entirely (wildcards supported).                                                    | Scanning & Evaluation   |
-| `exempt-environments`          | List of environment names to exclude (e.g., `ABN`). Case-insensitive.                                                | Scanning                |
-| `exempt-api-url-not-containing`| List of strings — exempt an API if its URL does **not** contain **any** of them.                                      | Scanning                |
-| `exempt-api-url-containing`    | List of strings — exempt an API if its URL **does** contain any of them.                                              | Scanning                |
-| `exempt-methods`               | List of HTTP methods to exclude (e.g., `OPTIONS`). Case-insensitive.                                                  | Scanning & Evaluation   |
-| `exempt-paths`                 | List of URL paths to exclude (wildcards supported).                                                                    | Scanning & Evaluation   |
-| `exempt-endpoints`             | List of `METHOD:PATH` pairs to exclude (e.g., `GET:/api/public/*`).                                                  | Scanning & Evaluation   |
-| `disable-default-exemptions`   | Set to `true` to disable all default exemptions listed above.                                                         | Scanning & Evaluation   |
+| Parameter                      | Description                                                                           | Applied during          |
+|--------------------------------|---------------------------------------------------------------------------------------|-------------------------|
+| `exempt-component-names`       | List of component names to exclude entirely (wildcards supported).                    | Scanning & Evaluation   |
+| `exempt-environments`          | List of environment names to exclude (e.g., `ABN`). Case-insensitive.                 | Scanning                |
+| `exempt-api-url-not-containing`| List of strings — exempt an API if its URL does **not** contain **any** of them.      | Scanning                |
+| `exempt-api-url-containing`    | List of strings — exempt an API if its URL **does** contain any of them.              | Scanning                |
+| `exempt-methods`               | List of HTTP methods to exclude (e.g., `OPTIONS`). Case-insensitive.                  | Scanning & Evaluation   |
+| `exempt-paths`                 | List of URL paths to exclude (wildcards supported).                                   | Scanning & Evaluation   |
+| `exempt-endpoints`             | List of `METHOD:PATH` pairs to exclude (e.g., `GET:/api/public/*`).                   | Scanning & Evaluation   |
+| `disable-default-exemptions`   | Set to `true` to disable all default exemptions listed above.                         | Scanning & Evaluation   |
 
 Configuration Example:
 
@@ -707,6 +719,30 @@ jeap:
             exempt-environments:
               - prod
               - abn
+```
+
+on a dedicated component:
+
+```yaml
+jeap:
+  governance:
+    secscan:
+      enabled: true
+      dataimport:
+        target-environment: REF
+    rules:
+      active:
+        - id: endpoints-protected
+          weight: 5
+      component-exemptions:
+        - id: my-service-paths-exemption
+          component-name: my-service
+          reason: "API EOL"
+          parameters:
+            exempt-paths:
+              - "/api/myresource"
+          rule-id:
+            - endpoints-protected
 ```
 
 To use this rule, the following module must be enabled:
@@ -782,7 +818,7 @@ Root Page
     └── <Rule Name>                                   ← Rule metadata, conformance rate per system and list of non-compliant components
 ```
 
-To find out the ancestr of a page, you can use the Confluence REST API, the following example retrieves the ancestors of a page with the title "BAZG-Governance" in the space "ARCDOCDEV":
+To find out the ancestor of a page, you can use the Confluence REST API, the following example retrieves the ancestors of a page with the title "BAZG-Governance" in the space "ARCDOCDEV":
 
 ```
 confluence.yourcompany/rest/api/content?spaceKey=ARCDOCDEV&title=BAZG-Governance&expand=ancestors
@@ -804,6 +840,7 @@ The governance service provides the following Prometheus-compatible metrics for 
 | `jeap_governance_service_scoring_seconds_count`                       | **Counter** The number of scoring runs executed                                                                                                                                                                                                   | see @Timed annotation                                                                                                                                                                                                                         | `jeap_governance_service_scoring_seconds_count 97395.00`                                                                            | 
 | `jeap_governance_service_scoring_seconds_sum`                         | **Summary** The cumulative duration in seconds of scoring runs executed                                                                                                                                                                           | see @Timed annotation                                                                                                                                                                                                                         | `jeap_governance_service_scoring_seconds_sum 32431.0`                                                                               |
 | `jeap_governance_service_scoring_seconds_max`                         | **Gauge** The maximum observed duration in seconds of a scoring run                                                                                                                                                                               | see @Timed annotation                                                                                                                                                                                                                         | `jeap_governance_service_scoring_seconds_count_max 7.3`                                                                             |
+| `jeap_governance_service_scoring_last_run_from_minutes`               | **Gauge** indicating how many minutes have elapsed since the last successful scoring execution. Use this for alerting to detect when scoring has not run for an unexpectedly long time.                                                           | None                                                                                                                                                                                                                                          | `jeap_governance_service_scoring_last_run_from_minutes 3.0`                                                                         |
 | `jeap_governance_service_reporting_systems_preparation_seconds_count` | **Counter** The number of system report preparation runs executed                                                                                                                                                                                 | see @Timed annotation                                                                                                                                                                                                                         | `jeap_governance_service_reporting_systems_preparation_seconds_count 97395.00`                                                      | 
 | `jeap_governance_service_reporting_systems_preparation_seconds_sum`   | **Summary** The cumulative duration in seconds of system report preparation runs executed                                                                                                                                                         | see @Timed annotation                                                                                                                                                                                                                         | `jeap_governance_service_reporting_systems_preparation_seconds_sum 32431.0`                                                         |
 | `jeap_governance_service_reporting_systems_preparation_seconds_max`   | **Gauge** The maximum observed duration in seconds of a of system report preparation run                                                                                                                                                          | see @Timed annotation                                                                                                                                                                                                                         | `jeap_governance_service_reporting_systems_preparation_seconds_max 7.3`                                                             |
@@ -822,6 +859,7 @@ The governance service provides the following Prometheus-compatible metrics for 
 | `jeap_governance_service_reporting_rules_overall_seconds_count`       | **Counter** The number of rule report runs executed                                                                                                                                                                                               | see @Timed annotation                                                                                                                                                                                                                         | `jeap_governance_service_reporting_rules_overall_seconds_count 97395.00`                                                            | 
 | `jeap_governance_service_reporting_rules_overall_seconds_sum`         | **Summary** The cumulative duration in seconds of rule report runs executed                                                                                                                                                                       | see @Timed annotation                                                                                                                                                                                                                         | `jeap_governance_service_reporting_rules_overall_seconds_sum 32431.0`                                                               |
 | `jeap_governance_service_reporting_rules_overall_seconds_max`         | **Gauge** The maximum observed duration in seconds of a rule report run                                                                                                                                                                           | see @Timed annotation                                                                                                                                                                                                                         | `jeap_governance_service_reporting_rules_overall_seconds_max 7.3`                                                                   |
+| `jeap_governance_service_reporting_last_run_from_minutes`             | **Gauge** indicating how many minutes have elapsed since the last successful reporting execution. Use this for alerting to detect when reporting has not run for an unexpectedly long time.                                                       | None                                                                                                                                                                                                                                          | `jeap_governance_service_reporting_last_run_from_minutes 7.0`                                                                       |
 
 
 ### Recommended Alerts

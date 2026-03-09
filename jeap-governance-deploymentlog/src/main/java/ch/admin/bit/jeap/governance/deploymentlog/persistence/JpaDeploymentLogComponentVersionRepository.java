@@ -9,7 +9,7 @@ import java.util.Optional;
 @Repository
 public interface JpaDeploymentLogComponentVersionRepository extends JpaRepository<DeploymentLogComponentVersion, Long> {
 
-    Optional<DeploymentLogComponentVersion> findBySystemComponentName(String componentName);
+    Optional<DeploymentLogComponentVersion> findBySystemComponentNameIgnoreCase(String componentName);
 
     Optional<DeploymentLogComponentVersion> findBySystemComponentId(long componentId);
 }

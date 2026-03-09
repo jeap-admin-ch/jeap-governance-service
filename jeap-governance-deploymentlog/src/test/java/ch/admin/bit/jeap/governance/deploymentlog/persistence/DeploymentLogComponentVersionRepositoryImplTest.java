@@ -93,6 +93,21 @@ class DeploymentLogComponentVersionRepositoryImplTest extends PostgresTestContai
     }
 
     @Test
+    void findByComponentNameOtherCase() {
+        SystemComponent systemComponent = PersistenceTestUtility.createAndPersistSystemWithOneSystemComponent(entityManager);
+        DeploymentLogComponentVersion componentVersion = DeploymentLogComponentVersion.builder()
+                .systemComponent(systemComponent)
+                .version(VERSION_1_0_0)
+                .build();
+        repository.add(componentVersion);
+        flushAndClear();
+
+        Optional<DeploymentLogComponentVersion> found = repository.findByComponentName(systemComponent.getName().toLowerCase());
+        assertNotNull(found);
+        assertTrue(found.isPresent());
+    }
+
+    @Test
     void findByComponentName_NotExisting() {
         SystemComponent systemComponent = PersistenceTestUtility.createAndPersistSystemWithOneSystemComponent(entityManager);
         flushAndClear();

@@ -1,6 +1,6 @@
 package ch.admin.bit.jeap.governance.domain;
 
-import ch.admin.bit.jeap.governance.domain.plugin.datasource.ComponentDeletionListener;
+import ch.admin.bit.jeap.governance.domain.plugin.deletion.ComponentDeletionListener;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

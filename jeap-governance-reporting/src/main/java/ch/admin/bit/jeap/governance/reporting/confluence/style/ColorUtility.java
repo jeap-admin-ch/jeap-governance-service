@@ -20,14 +20,14 @@ public class ColorUtility {
         if (value >= 0) {
             return RED;
         }
-        return "#f4f5f7";                    // Confluence native grey
+        return null;
     }
 
     public static String getHighlightColor(State state) {
         return switch (state) {
             case OK -> GREEN;
             case FAIL -> RED;
-            default -> "#f4f5f7";
+            default -> null;
         };
     }
 }

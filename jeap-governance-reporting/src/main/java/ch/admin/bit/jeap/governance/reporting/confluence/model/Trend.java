@@ -2,6 +2,13 @@ package ch.admin.bit.jeap.governance.reporting.confluence.model;
 
 import lombok.Getter;
 
+/**
+ * To determine which emoticon, unicode, etc. to use, test it in Confluence.
+ *
+ * For example, if your pageId is {@code 1390357996}, you can retrieve the
+ * page content via:
+ * {@code https://yourconfluence.xy/rest/api/content/1390357996?expand=body.storage}
+ */
 @Getter
 public enum Trend {
     UP(null, "prog-besser", null, "It's getting better"),

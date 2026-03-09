@@ -3,7 +3,7 @@ package ch.admin.bit.jeap.governance.archrepo.synchronize;
 import ch.admin.bit.jeap.governance.archrepo.connector.model.ArchRepoSystemDto;
 import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemComponentService;
-import ch.admin.bit.jeap.governance.domain.SystemRepository;
+import ch.admin.bit.jeap.governance.domain.SystemService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 class ArchRepoModelSystemSynchronizerTest {
 
     @Mock
-    private SystemRepository systemRepository;
+    private SystemService systemService;
     @Mock
     private SystemComponentService systemComponentService;
     @Mock
@@ -38,7 +38,7 @@ class ArchRepoModelSystemSynchronizerTest {
     @Test
     void synchronizeSystemWithArchRepo_createNew() {
         String systemName = "System A";
-        when(systemRepository.findByName(systemName)).thenReturn(Optional.empty());
+        when(systemService.findByName(systemName)).thenReturn(Optional.empty());
 
         ArchRepoSystemDto archRepoSystem = ArchRepoSystemDto.builder()
                 .name(systemName)
@@ -49,9 +49,9 @@ class ArchRepoModelSystemSynchronizerTest {
 
         archRepoModelSystemSynchronizer.synchronizeWithArchRepo(archRepoSystem);
 
-        verify(systemRepository).findByName(systemName);
-        verify(systemRepository).add(newSystem);
-        verifyNoMoreInteractions(systemRepository);
+        verify(systemService).findByName(systemName);
+        verify(systemService).add(newSystem);
+        verifyNoMoreInteractions(systemService);
         verify(archRepoModelSystemUpdater).createNewSystem(archRepoSystem);
         verifyNoMoreInteractions(archRepoModelSystemUpdater);
     }
@@ -60,7 +60,7 @@ class ArchRepoModelSystemSynchronizerTest {
     void synchronizeSystemWithArchRepo_updateExisting() {
         System existingSystem = mock(System.class);
         String systemName = "System A";
-        when(systemRepository.findByName(systemName)).thenReturn(Optional.of(existingSystem));
+        when(systemService.findByName(systemName)).thenReturn(Optional.of(existingSystem));
 
         ArchRepoSystemDto archRepoSystem = ArchRepoSystemDto.builder()
                 .name(systemName)
@@ -71,9 +71,9 @@ class ArchRepoModelSystemSynchronizerTest {
 
         archRepoModelSystemSynchronizer.synchronizeWithArchRepo(archRepoSystem);
 
-        verify(systemRepository).findByName(systemName);
-        verify(systemRepository).update(updatedSystem);
-        verifyNoMoreInteractions(systemRepository);
+        verify(systemService).findByName(systemName);
+        verify(systemService).update(updatedSystem);
+        verifyNoMoreInteractions(systemService);
         verify(archRepoModelSystemUpdater).updateSystem(eq(existingSystem), eq(archRepoSystem), any(LongConsumer.class));
         verifyNoMoreInteractions(archRepoModelSystemUpdater);
     }
@@ -89,17 +89,17 @@ class ArchRepoModelSystemSynchronizerTest {
         System existingSystemC = createSystem(systemNameC);
         System existingSystemD = createSystem(systemNameD);
 
-        when(systemRepository.findAll()).thenReturn(List.of(existingSystemA, existingSystemB, existingSystemC, existingSystemD));
+        when(systemService.findAll()).thenReturn(List.of(existingSystemA, existingSystemB, existingSystemC, existingSystemD));
 
         archRepoModelSystemSynchronizer.deleteNoMoreExistingSystems(Set.of(
                 systemNameA,
                 systemNameD
         ));
 
-        verify(systemRepository).findAll();
-        verify(systemRepository).delete(existingSystemB);
-        verify(systemRepository).delete(existingSystemC);
-        verifyNoMoreInteractions(systemRepository);
+        verify(systemService).findAll();
+        verify(systemService).deleteSystem(existingSystemB);
+        verify(systemService).deleteSystem(existingSystemC);
+        verifyNoMoreInteractions(systemService);
     }
 
     @Test

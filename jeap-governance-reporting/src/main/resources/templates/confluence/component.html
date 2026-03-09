@@ -71,8 +71,11 @@
                 th:class="${highlight != null ? 'highlight-' + highlight : ''}"
                 th:attr="data-highlight-colour=${highlight}">
                 <span th:title="${rule.state.name()}">
-                    <ac:emoticon th:if="${rule.state.emoticon != null}"
+                    <ac:emoticon th:if="${rule.state.emoticon != null and rule.state.emojiId == null}"
                                  th:ac:name="${rule.state.emoticon}"/>
+                    <ac:emoticon th:if="${rule.state.emoticon != null and rule.state.emojiId != null}"
+                                 th:ac:name="${rule.state.emoticon}"
+                                 th:ac:emoji-id="${rule.state.emojiId}"/>
                     <ac:hipchat-emoticon th:if="${rule.state.hipchatEmoticon != null}"
                                          th:ac:shortcut="${rule.state.hipchatEmoticon}"/>
                     <span th:if="${rule.state.unicode != null}"

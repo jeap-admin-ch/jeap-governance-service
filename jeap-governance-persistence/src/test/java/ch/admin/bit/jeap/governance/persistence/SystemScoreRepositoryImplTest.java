@@ -180,6 +180,67 @@ class SystemScoreRepositoryImplTest extends PostgresTestContainerBase {
         assertTrue(result.isEmpty());
     }
 
+    @Test
+    void deleteAllBySystemId() {
+        System system1 = createAndPersistSystem("Test System 1");
+        entityManager.persist(SystemScore.builder()
+                .system(system1).score(77).day(LocalDate.of(2025, 12, 31)).build());
+        entityManager.persist(SystemScore.builder()
+                .system(system1).score(80).day(LocalDate.of(2026, 1, 1)).build());
+        entityManager.persist(SystemScore.builder()
+                .system(system1).score(90).day(LocalDate.of(2026, 1, 2)).build());
+        entityManager.persist(SystemScore.builder()
+                .system(system1).score(90).day(LocalDate.of(2026, 2, 1)).build());
+        entityManager.flush();
+
+        List<SystemScore> results = entityManager.getEntityManager().createQuery("SELECT s FROM SystemScore s", SystemScore.class)
+                .getResultList();
+
+        assertEquals(4, results.size());
+
+        repository.deleteAllBySystemId(system1.getId());
+        entityManager.flush();
+        entityManager.clear();
+
+        results = entityManager.getEntityManager().createQuery("SELECT s FROM SystemScore s", SystemScore.class)
+                .getResultList();
+
+        assertTrue(results.isEmpty());
+    }
+
+    @Test
+    void deleteAllBySystemId_shouldNotAffectOtherSystemScores() {
+        System system1 = createAndPersistSystem("Test System 1");
+        System system2 = createAndPersistSystem("Test System 2");
+        entityManager.persist(SystemScore.builder()
+                .system(system1).score(77).day(LocalDate.of(2025, 12, 31)).build());
+        entityManager.persist(SystemScore.builder()
+                .system(system1).score(80).day(LocalDate.of(2026, 1, 1)).build());
+        entityManager.persist(SystemScore.builder()
+                .system(system1).score(90).day(LocalDate.of(2026, 1, 2)).build());
+        entityManager.persist(SystemScore.builder()
+                .system(system1).score(90).day(LocalDate.of(2026, 2, 1)).build());
+        entityManager.persist(SystemScore.builder()
+                .system(system2).score(82).day(LocalDate.of(2026, 1, 1)).build());
+        entityManager.persist(SystemScore.builder()
+                .system(system2).score(82).day(LocalDate.of(2026, 2, 3)).build());
+        entityManager.flush();
+
+        List<SystemScore> results = entityManager.getEntityManager().createQuery("SELECT s FROM SystemScore s", SystemScore.class)
+                .getResultList();
+
+        assertEquals(6, results.size());
+
+        repository.deleteAllBySystemId(system1.getId());
+        entityManager.flush();
+        entityManager.clear();
+
+        results = entityManager.getEntityManager().createQuery("SELECT s FROM SystemScore s", SystemScore.class)
+                .getResultList();
+
+        assertEquals(2, results.size());
+    }
+
     private System createAndPersistSystem(String name) {
         System system = System.builder()
                 .name(name)

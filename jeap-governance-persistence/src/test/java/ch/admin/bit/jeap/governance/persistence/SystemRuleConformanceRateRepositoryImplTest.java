@@ -14,6 +14,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -122,6 +123,51 @@ class SystemRuleConformanceRateRepositoryImplTest extends PostgresTestContainerB
             assertEquals(90, rate.getConformanceRate());
             assertEquals(LocalDate.of(2026, 1, 17), rate.getDay());
         }
+    }
+
+    @Test
+    void deleteAllBySystemId() {
+        entityManager.persist(createRate(1L, "rule-1", 85, LocalDate.of(2026, 1, 15)));
+        entityManager.persist(createRate(1L, "rule-1", 85, LocalDate.of(2026, 1, 16)));
+        entityManager.flush();
+        entityManager.clear();
+
+        List<SystemRuleConformanceRate> results = entityManager.getEntityManager()
+                .createQuery("SELECT s FROM SystemRuleConformanceRate s", SystemRuleConformanceRate.class)
+                .getResultList();
+        assertEquals(2, results.size());
+
+        repository.deleteAllBySystemId(1L);
+        entityManager.flush();
+        entityManager.clear();
+
+        results = entityManager.getEntityManager()
+                .createQuery("SELECT s FROM SystemRuleConformanceRate s", SystemRuleConformanceRate.class)
+                .getResultList();
+        assertTrue(results.isEmpty());
+    }
+
+    @Test
+    void deleteAllBySystemId_shouldNotAffectOtherSystemRates() {
+        entityManager.persist(createRate(1L, "rule-1", 85, LocalDate.of(2026, 1, 15)));
+        entityManager.persist(createRate(1L, "rule-1", 85, LocalDate.of(2026, 1, 16)));
+        entityManager.persist(createRate(2L, "rule-1", 85, LocalDate.of(2026, 1, 16)));
+        entityManager.flush();
+        entityManager.clear();
+
+        List<SystemRuleConformanceRate> results = entityManager.getEntityManager()
+                .createQuery("SELECT s FROM SystemRuleConformanceRate s", SystemRuleConformanceRate.class)
+                .getResultList();
+        assertEquals(3, results.size());
+
+        repository.deleteAllBySystemId(1L);
+        entityManager.flush();
+        entityManager.clear();
+
+        results = entityManager.getEntityManager()
+                .createQuery("SELECT s FROM SystemRuleConformanceRate s", SystemRuleConformanceRate.class)
+                .getResultList();
+        assertEquals(1, results.size());
     }
 
     private SystemRuleConformanceRate createRate(long systemId, String ruleId, int conformanceRate, LocalDate day) {

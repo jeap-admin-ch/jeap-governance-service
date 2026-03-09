@@ -36,4 +36,9 @@ public class RuleStateRepositoryImpl implements RuleStateRepository {
     public List<NonCompliantComponentEntry> findNonCompliantSince() {
         return jpaRuleStateRepository.findNonCompliantSince();
     }
+
+    @Override
+    public void deleteAllBySystemComponentId(long systemComponentId) {
+        jpaRuleStateRepository.deleteAllBySystemComponentId(systemComponentId);
+    }
 }

@@ -1,5 +1,8 @@
 jeap:
   governance:
+    scoring:
+      lock-at-most: 10ms
+      lock-at-least: 1ms
     rules:
       active:
         - id: always-ok-rule

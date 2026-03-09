@@ -51,6 +51,26 @@ class SystemComponentRepositoryImplTest extends PostgresTestContainerBase {
     }
 
     @Test
+    void findByName_lowerCase() {
+        SystemComponent systemComponent = SystemComponent.builder()
+                .name("Test Component")
+                .type(ComponentType.BACKEND_SERVICE)
+                .build();
+
+        createAndPersistSystemWithSystemComponents(systemComponent);
+
+        Optional<SystemComponent> result = repository.findByName(systemComponent.getName().toLowerCase());
+
+        assertNotNull(result);
+        assertTrue(result.isPresent());
+        SystemComponent componentResult = result.get();
+        assertEquals("Test Component", componentResult.getName());
+        assertEquals(ComponentType.BACKEND_SERVICE, componentResult.getType());
+        assertNotNull(componentResult.getId());
+        assertNotNull(componentResult.getCreatedAt());
+    }
+
+    @Test
     void findByName_emptyResult() {
         Optional<SystemComponent> result = repository.findByName("missing component");
 

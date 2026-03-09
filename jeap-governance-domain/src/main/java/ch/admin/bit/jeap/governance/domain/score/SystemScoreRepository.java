@@ -15,4 +15,6 @@ public interface SystemScoreRepository {
     List<SystemScore> findBySystem(System system);
 
     List<SystemScore> findAllByDayBetweenInclusive(LocalDate fromDay, LocalDate toDay);
+
+    void deleteAllBySystemId(long systemId);
 }

@@ -3,6 +3,7 @@ package ch.admin.bit.jeap.governance.rules;
 import ch.admin.bit.jeap.governance.domain.SystemRepository;
 import ch.admin.bit.jeap.governance.domain.rule.RuleConformanceRateService;
 import ch.admin.bit.jeap.governance.domain.score.ScoringService;
+import io.micrometer.core.instrument.MeterRegistry;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.core.SimpleLock;
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
@@ -47,6 +48,9 @@ class ScoringSchedulerIT {
 
     @MockitoBean
     private RuleConformanceRateService ruleConformanceRateService;
+
+    @MockitoBean
+    private MeterRegistry meterRegistry;
 
     @Test
     void schedulerFiresAndCallsScoringService() {

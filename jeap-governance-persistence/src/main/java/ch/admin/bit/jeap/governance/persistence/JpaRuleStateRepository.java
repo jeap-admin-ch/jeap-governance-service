@@ -33,4 +33,8 @@ interface JpaRuleStateRepository extends JpaRepository<RuleState, Long> {
             WHERE rs.state = ch.admin.bit.jeap.governance.domain.rule.State.FAIL
             """)
     List<NonCompliantComponentEntry> findNonCompliantSince();
+
+    @Modifying
+    @Query("DELETE FROM RuleState rs WHERE rs.systemComponent.id = :systemComponentId")
+    void deleteAllBySystemComponentId(long systemComponentId);
 }

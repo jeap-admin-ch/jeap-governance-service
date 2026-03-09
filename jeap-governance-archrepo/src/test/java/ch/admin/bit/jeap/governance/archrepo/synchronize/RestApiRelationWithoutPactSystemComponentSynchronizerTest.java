@@ -57,6 +57,28 @@ class RestApiRelationWithoutPactSystemComponentSynchronizerTest {
     }
 
     @Test
+    void synchronizeRestApiRelationWithArchRepo_LowerCase() {
+        RestApiRelationWithoutPactDto relation = new RestApiRelationWithoutPactDto(SYSTEM_NAME_B, COMPONENT_NAME_B1.toLowerCase(), SYSTEM_NAME_A, COMPONENT_NAME_A1, "GET", "/api/resource");
+        when(systemComponentRepository.findByName(COMPONENT_NAME_A1)).thenReturn(Optional.of(SYSTEM_COMPONENT_A1));
+        when(systemComponentRepository.findByName(COMPONENT_NAME_B1.toLowerCase())).thenReturn(Optional.of(SYSTEM_COMPONENT_B1));
+
+        synchronizer.synchronizeWithArchRepo(PROVIDER_KEY_COMPONENT_A1, List.of(relation));
+
+        ArgumentCaptor<RestApiRelationWithoutPact> captor = ArgumentCaptor.forClass(RestApiRelationWithoutPact.class);
+        verify(restApiRelationWithoutPactRepository).add(captor.capture());
+
+        RestApiRelationWithoutPact addedRelation = captor.getValue();
+        assertEquals(SYSTEM_COMPONENT_A1, addedRelation.getProviderSystemComponent());
+        assertEquals(SYSTEM_COMPONENT_B1, addedRelation.getConsumerSystemComponent());
+        assertEquals("GET", addedRelation.getMethod());
+        assertEquals("/api/resource", addedRelation.getPath());
+
+        verify(restApiRelationWithoutPactRepository).add(addedRelation);
+        verify(restApiRelationWithoutPactRepository).deleteAllByProviderSystemComponentId(SYSTEM_COMPONENT_A1.getId());
+        verifyNoMoreInteractions(restApiRelationWithoutPactRepository);
+    }
+
+    @Test
     void synchronizeRestApiRelationWithArchRepo_SeveralRelations() {
         RestApiRelationWithoutPactDto relation1 = new RestApiRelationWithoutPactDto(SYSTEM_NAME_B, COMPONENT_NAME_B1, SYSTEM_NAME_A, COMPONENT_NAME_A1, "GET", "/api/resource");
         RestApiRelationWithoutPactDto relationConsumerNonExisting = new RestApiRelationWithoutPactDto(SYSTEM_NAME_A, COMPONENT_NAME_A_NON_EXISTING, SYSTEM_NAME_A, COMPONENT_NAME_A1, "GET", "/api/resource");
