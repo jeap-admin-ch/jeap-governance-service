@@ -87,7 +87,7 @@ class DeploymentLogComponentVersionOneByOneSynchronizerTest {
     }
 
     @Test
-    void synchronizeReactionGraphWithArchRepo_DoNothingWhenSystemNotFound() {
+    void synchronizeWithArchRepo_DoNothingWhenSystemNotFound() {
         DeploymentLogComponentVersionDto dto = new DeploymentLogComponentVersionDto(COMPONENT_NAME_A1, VERSION_1_0_0);
         when(systemComponentRepository.findByName(COMPONENT_NAME_A1)).thenReturn(Optional.empty());
 

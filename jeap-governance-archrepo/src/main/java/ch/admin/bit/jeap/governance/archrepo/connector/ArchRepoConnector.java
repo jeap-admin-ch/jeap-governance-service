@@ -4,7 +4,6 @@ import ch.admin.bit.jeap.governance.archrepo.ArchRepoProperties;
 import ch.admin.bit.jeap.governance.archrepo.connector.model.ApiDocVersionDto;
 import ch.admin.bit.jeap.governance.archrepo.connector.model.ArchRepoModelDto;
 import ch.admin.bit.jeap.governance.archrepo.connector.model.DatabaseSchemaVersionDto;
-import ch.admin.bit.jeap.governance.archrepo.connector.model.ReactionGraphDto;
 import ch.admin.bit.jeap.governance.archrepo.connector.model.RestApiRelationWithoutPactDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
@@ -86,17 +85,4 @@ public class ArchRepoConnector {
         }
     }
 
-    public List<ReactionGraphDto> getReactionGraphDtos() {
-        try {
-            List<ReactionGraphDto> components = restClient.get()
-                    .uri("/api/reactions/components")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .retrieve()
-                    .body(new ParameterizedTypeReference<>() {
-                    });
-            return components != null ? components : List.of();
-        } catch (Exception e) {
-            throw new ArchRepoConnectorException(e);
-        }
-    }
 }

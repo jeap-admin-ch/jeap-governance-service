@@ -2,11 +2,9 @@ package ch.admin.bit.jeap.governance.web;
 
 import ch.admin.bit.jeap.governance.archrepo.dataimport.ApiDocVersionImporter;
 import ch.admin.bit.jeap.governance.archrepo.dataimport.DatabaseSchemaVersionImporter;
-import ch.admin.bit.jeap.governance.archrepo.dataimport.ReactionGraphImporter;
 import ch.admin.bit.jeap.governance.archrepo.dataimport.RestApiRelationWithoutPactImporter;
 import ch.admin.bit.jeap.governance.archrepo.deletion.ApiDocVersionComponentDeletionListener;
 import ch.admin.bit.jeap.governance.archrepo.deletion.DatabaseSchemaVersionComponentDeletionListener;
-import ch.admin.bit.jeap.governance.archrepo.deletion.ReactionGraphComponentDeletionListener;
 import ch.admin.bit.jeap.governance.archrepo.deletion.RestApiRelationWithoutPactComponentDeletionListener;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +35,5 @@ class RestApiRelationWithoutPactImporterDisabledIT extends PostgresTestContainer
         assertThat(context.getBeansOfType(ApiDocVersionComponentDeletionListener.class)).hasSize(1);
         assertThat(context.getBeansOfType(DatabaseSchemaVersionImporter.class)).hasSize(1);
         assertThat(context.getBeansOfType(DatabaseSchemaVersionComponentDeletionListener.class)).hasSize(1);
-        assertThat(context.getBeansOfType(ReactionGraphImporter.class)).hasSize(1);
-        assertThat(context.getBeansOfType(ReactionGraphComponentDeletionListener.class)).hasSize(1);
     }
 }

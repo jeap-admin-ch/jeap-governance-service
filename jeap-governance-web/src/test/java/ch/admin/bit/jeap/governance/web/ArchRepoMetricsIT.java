@@ -43,7 +43,6 @@ class ArchRepoMetricsIT extends GovernanceIntegrationTestBase {
                 "jeap_governance_service_data_import_duration_seconds_sum{data_source_connector=\"ApiDocVersionImporter\"",
                 "jeap_governance_service_data_import_duration_seconds_sum{data_source_connector=\"ArchRepoSystemImporter\"",
                 "jeap_governance_service_data_import_duration_seconds_sum{data_source_connector=\"DatabaseSchemaVersionImporter\"",
-                "jeap_governance_service_data_import_duration_seconds_sum{data_source_connector=\"ReactionGraphImporter\"",
                 "jeap_governance_service_data_import_duration_seconds_sum{data_source_connector=\"RestApiRelationWithoutPactImporter\"",
                 "jeap_governance_service_data_import_last_run_from_minutes"
         );

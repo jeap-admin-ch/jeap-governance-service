@@ -6,14 +6,16 @@ import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleMetadata;
 import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleParameters;
 import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleResult;
 import ch.admin.bit.jeap.governance.domain.rule.RuleId;
-import ch.admin.bit.jeap.governance.domain.rule.State;
 import ch.admin.bit.jeap.governance.prometheus.domain.PromQueryType;
 import ch.admin.bit.jeap.governance.prometheus.domain.PromTimeSeriesQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component

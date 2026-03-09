@@ -16,7 +16,9 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static ch.admin.bit.jeap.governance.web.ImportModelHelper.createArchRepoModelDtoOneSystemLessOneSystemComponentEachLess;
@@ -27,10 +29,13 @@ public abstract class GovernanceIntegrationTestBase {
 
     private static final String DL_USERNAME = "myUsername";
     private static final String DL_PASSWORD = "myPassword";
+    private static final String RO_USERNAME = "myUsername";
+    private static final String RO_PASSWORD = "myPassword";
     private static final GovernanceServiceEnvironment DL_ENVIRONMENT = GovernanceServiceEnvironment.PROD;
 
     protected static WireMockServer archRepoMockServer;
     protected static WireMockServer deploymentLogMockServer;
+    protected static WireMockServer reactionObserverMockServer;
 
     private static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
             DockerImageName.parse("postgres:16-alpine").asCompatibleSubstituteFor("postgres:16-alpine")
@@ -49,6 +54,10 @@ public abstract class GovernanceIntegrationTestBase {
                 .dynamicPort());
         deploymentLogMockServer.start();
         WireMock.configureFor(deploymentLogMockServer.port());
+        reactionObserverMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig()
+                .dynamicPort());
+        reactionObserverMockServer.start();
+        WireMock.configureFor(reactionObserverMockServer.port());
 
         postgres.start();
     }
@@ -60,6 +69,9 @@ public abstract class GovernanceIntegrationTestBase {
         }
         if (deploymentLogMockServer != null) {
             deploymentLogMockServer.stop();
+        }
+        if (reactionObserverMockServer != null) {
+            reactionObserverMockServer.stop();
         }
         postgres.stop();
     }
@@ -77,6 +89,10 @@ public abstract class GovernanceIntegrationTestBase {
         registry.add("jeap.governance.deploymentlog.url", deploymentLogMockServer::baseUrl);
         registry.add("jeap.governance.deploymentlog.username", () -> DL_USERNAME);
         registry.add("jeap.governance.deploymentlog.password", () -> DL_PASSWORD);
+
+        registry.add("jeap.governance.reactionobserver.url", reactionObserverMockServer::baseUrl);
+        registry.add("jeap.governance.reactionobserver.username", () -> RO_USERNAME);
+        registry.add("jeap.governance.reactionobserver.password", () -> RO_PASSWORD);
     }
 
     @BeforeEach
@@ -118,14 +134,6 @@ public abstract class GovernanceIntegrationTestBase {
                         .withBody(objectMapper.writeValueAsString(restApiRelationsWithoutPact))));
     }
 
-    protected void stubArchRepoReactionGraphs(List<ReactionGraphDto> reactionGraphDtos) throws Exception {
-        archRepoMockServer.stubFor(get(urlEqualTo("/api/reactions/components"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(reactionGraphDtos))));
-    }
-
     protected void stubDeploymentLogDeploymentLogComponentVersions(Set<DeploymentLogComponentVersionDto> dtos) throws Exception {
         deploymentLogMockServer.stubFor(get(urlEqualTo("/api/environment/prod/components"))
                 .withBasicAuth(DL_USERNAME, DL_PASSWORD)
@@ -133,6 +141,15 @@ public abstract class GovernanceIntegrationTestBase {
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(objectMapper.writeValueAsString(dtos))));
+    }
+
+    protected void stubReactionObserverComponentLastObservationDates(Map<String, LocalDate> dates) throws Exception {
+        reactionObserverMockServer.stubFor(get(urlEqualTo("/api/statistics/last-observation-date"))
+                .withBasicAuth(DL_USERNAME, DL_PASSWORD)
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(objectMapper.writeValueAsString(dates))));
     }
 
     protected void setUpImportDefaultModel() throws Exception {

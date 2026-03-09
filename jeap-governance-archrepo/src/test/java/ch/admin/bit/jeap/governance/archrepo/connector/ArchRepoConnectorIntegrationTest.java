@@ -15,16 +15,11 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
 import java.time.Duration;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -186,53 +181,6 @@ class ArchRepoConnectorIntegrationTest {
                         .withBody("Internal Server Error")));
 
         assertThatThrownBy(() -> archRepoConnector.getDatabaseSchemaVersions())
-                .isInstanceOf(ArchRepoConnectorException.class)
-                .hasCauseInstanceOf(RestClientException.class);
-    }
-
-    @Test
-    void getReactionGraph_Dtos_shouldReturnModel() throws Exception {
-        List<ReactionGraphDto> reactionGraphDtos = Arrays.asList(
-                new ReactionGraphDto("component1", ZonedDateTime.now().minus(2, ChronoUnit.DAYS)),
-                new ReactionGraphDto("component2", ZonedDateTime.now().minus(10, ChronoUnit.HOURS))
-        );
-
-        stubFor(get(urlEqualTo("/api/reactions/components"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(reactionGraphDtos))));
-
-        List<ReactionGraphDto> result = archRepoConnector.getReactionGraphDtos();
-
-        assertNotNull(result);
-        assertEquals(2, result.size());
-    }
-
-    @Test
-    void getReactionGraph_Dtos_shouldReturnEmptyModelWhenNull() throws Exception {
-        List<ReactionGraphDto> reactionGraphDtos = null;
-
-        stubFor(get(urlEqualTo("/api/reactions/components"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(reactionGraphDtos))));
-
-        List<ReactionGraphDto> result = archRepoConnector.getReactionGraphDtos();
-
-        assertNotNull(result);
-        assertEquals(0, result.size());
-    }
-
-    @Test
-    void getReactionGraph_Dtos_shouldThrowException_when500Error() {
-        stubFor(get(urlEqualTo("/api/reactions/components"))
-                .willReturn(aResponse()
-                        .withStatus(500)
-                        .withBody("Internal Server Error")));
-
-        assertThatThrownBy(() -> archRepoConnector.getReactionGraphDtos())
                 .isInstanceOf(ArchRepoConnectorException.class)
                 .hasCauseInstanceOf(RestClientException.class);
     }

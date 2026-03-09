@@ -1,0 +1,44 @@
+{
+  "properties": [
+    {
+      "name": "jeap.governance.reactionobserver.enabled",
+      "description": "Flag to enable/disable the import of from the reaction observer server.",
+      "defaultValue": true,
+      "type": "java.lang.Boolean"
+    },
+    {
+      "name": "jeap.governance.reactionobserver.url",
+      "description": "URL of the reaction observer server to import data from.",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jeap.governance.reactionobserver.username",
+      "description": "Username for basic authentication when connecting to the reaction observer server.",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jeap.governance.reactionobserver.password",
+      "description": "Password for basic authentication when connecting to the reaction observer server.",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "jeap.governance.reactionobserver.timeout",
+      "description": "Reaction observer server connection timeout duration.",
+      "defaultValue": "PT5M",
+      "type": "java.time.Duration"
+    }
+  ],
+  "hints": [
+    {
+      "name": "jeap.governance.reactionobserver.enabled",
+      "values": [
+        {
+          "value": true
+        },
+        {
+          "value": false
+        }
+      ]
+    }
+  ]
+}

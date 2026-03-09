@@ -10,6 +10,8 @@ jeap:
       cron-expression: "-"
     deploymentlog:
       enabled: false
+    reactionobserver:
+      enabled: false
     prometheus:
       enabled: false
     secscan:

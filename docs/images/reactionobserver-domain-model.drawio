@@ -1,0 +1,47 @@
+<mxfile host="drawio-plugin" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" modified="2026-03-10T08:40:26.720Z" etag="Tam4GbtXUieheUZCay1F" version="22.1.22" type="embed">
+  <diagram id="KR_FKk2uConyi7XNn76q" name="Seite-1">
+    <mxGraphModel dx="2188" dy="998" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="66GZfU5-wHs_jh9OYR2Q-1" value="&lt;&lt;Entity&gt;&gt;&#xa;SystemComponent" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="110" y="-185" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="66GZfU5-wHs_jh9OYR2Q-2" value="&lt;font color=&quot;#ffffff&quot;&gt;From domain package&lt;br&gt;(simplified view)&lt;/font&gt;" style="text;strokeColor=none;fillColor=#000000;align=center;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;fontStyle=2" parent="66GZfU5-wHs_jh9OYR2Q-1" vertex="1">
+          <mxGeometry y="40" width="200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="66GZfU5-wHs_jh9OYR2Q-3" value="&amp;lt;&amp;gt;&lt;br&gt;ReactionObserverComponentLastObservationDate&amp;nbsp;" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="-510" y="-220" width="340" height="118" as="geometry" />
+        </mxCell>
+        <mxCell id="66GZfU5-wHs_jh9OYR2Q-4" value="- id: Long&lt;br&gt;- lastObservationDate: LocalDate&lt;br&gt;- systemComponent: SystemComponent&lt;br&gt;- createdAt: ZonedDateTime" style="text;strokeColor=none;fillColor=#fafafa;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="66GZfU5-wHs_jh9OYR2Q-3" vertex="1">
+          <mxGeometry y="40" width="340" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="66GZfU5-wHs_jh9OYR2Q-5" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="66GZfU5-wHs_jh9OYR2Q-3" vertex="1">
+          <mxGeometry y="110" width="340" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="66GZfU5-wHs_jh9OYR2Q-15" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=diamond;endFill=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" target="66GZfU5-wHs_jh9OYR2Q-1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-180" y="-145" />
+              <mxPoint x="-180" y="-145" />
+            </Array>
+            <mxPoint x="-160" y="-140" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="66GZfU5-wHs_jh9OYR2Q-16" value="*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="66GZfU5-wHs_jh9OYR2Q-15" connectable="0" vertex="1">
+          <mxGeometry x="-0.8" y="-2" relative="1" as="geometry">
+            <mxPoint x="10" y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="66GZfU5-wHs_jh9OYR2Q-17" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="66GZfU5-wHs_jh9OYR2Q-15" connectable="0" vertex="1">
+          <mxGeometry x="0.8" y="-2" relative="1" as="geometry">
+            <mxPoint x="-10" y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="66GZfU5-wHs_jh9OYR2Q-32" value="Package: ch.admin.bit.jeap.governance.reactionobserver.domain" style="text;html=1;strokeColor=#82b366;fillColor=#d5e8d4;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="-520" y="-40" width="360" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

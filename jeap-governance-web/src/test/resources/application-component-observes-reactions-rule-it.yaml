@@ -1,0 +1,10 @@
+jeap:
+  governance:
+    rules:
+      active:
+        - id: component-observes-reactions
+          weight: 3
+          parameters:
+            ignored-service-names:
+              - "ignored-service"
+              - "foobar-service"
