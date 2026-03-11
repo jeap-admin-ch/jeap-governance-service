@@ -722,10 +722,29 @@ The `jeap-governance-reactionobserver` module ships the following built-in rules
 
 **Component Observes Reactions Rule** (`component-observes-reactions`)
 
-This rule verifies that a component observes reactions.
+This rule verifies that a component has observed reactions within a defined time window.
 
-Some components can be excluded from this check using the `ignored-service-names` parameter.
-Multiple service names can be specified as list elements.
+By default, the rule checks whether reactions have been observed within the last 7 days.
+The time window can be configured using the parameter `observation-max-delay-in-days`.
+
+
+Configuration Example:
+
+```yaml
+jeap:
+  governance:
+    rules:
+      active:
+        - id: component-observes-reactions
+          weight: 3
+          parameters:
+            observation-max-delay-in-days: 4
+```
+
+In this example, the rule requires that reactions are observed within the last 4 days.
+
+Certain components can be excluded from this rule using the `ignored-service-names` parameter.
+Multiple services can be specified as a list.
 
 Configuration Example:
 
@@ -740,7 +759,6 @@ jeap:
             ignored-service-names: 
               - ignored-service
               - foobar-service
-
 ```
 
 To use this rule, the following modules must be enabled:

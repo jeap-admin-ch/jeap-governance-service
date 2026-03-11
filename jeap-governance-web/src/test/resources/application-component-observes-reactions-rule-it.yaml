@@ -5,6 +5,7 @@ jeap:
         - id: component-observes-reactions
           weight: 3
           parameters:
+            observation-max-delay-in-days: 4
             ignored-service-names:
               - "ignored-service"
               - "foobar-service"

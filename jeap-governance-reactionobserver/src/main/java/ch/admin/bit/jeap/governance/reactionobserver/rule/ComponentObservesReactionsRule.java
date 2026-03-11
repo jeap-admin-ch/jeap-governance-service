@@ -25,6 +25,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ComponentObservesReactionsRule implements Rule {
 
+    public static final String KEY_OBSERVATION_MAX_DELAY_IN_DAYS = "observation-max-delay-in-days";
+    private static final String KEY_IGNORED_SERVICE_NAMES = "ignored-service-names";
+    private static final int OBSERVATION_DELAY_DEFAULT_VALUE = 7;
     private final PromTimeSeriesQueryRepository promTimeSeriesQueryRepository;
 
     private final ReactionObserverComponentLastObservationDateRepository lastObservationDateRepository;
@@ -54,10 +57,11 @@ public class ComponentObservesReactionsRule implements Rule {
         }
 
         Optional<ReactionObserverComponentLastObservationDate> lastObservationDate = lastObservationDateRepository.findByComponentId(systemComponent.getId());
+        int observationDelay = getObservationDelay(ruleParameters);
         if (lastObservationDate.isEmpty()) {
             return RuleResult.failed("Component does not have a reaction graph and therefore does not observe reactions");
-        } else if (lastObservationDate.get().getLastObservationDate().isBefore(LocalDate.now().minusDays(7))) {
-            return RuleResult.failed("Component has not observed any reactions in the last 7 days. Last observation date: " + lastObservationDate.get().getLastObservationDate());
+        } else if (lastObservationDate.get().getLastObservationDate().isBefore(LocalDate.now().minusDays(observationDelay))) {
+            return RuleResult.failed("Component has not observed any reactions in the last " + observationDelay + " days. Last observation date: " + lastObservationDate.get().getLastObservationDate());
         } else {
             return RuleResult.ok("Component observes reactions. Last observation date: " + lastObservationDate.get().getLastObservationDate());
         }
@@ -66,13 +70,20 @@ public class ComponentObservesReactionsRule implements Rule {
 
     private boolean ignoreComponent(RuleParameters ruleParameters, String serviceName) {
         if (!ruleParameters.parameters().isEmpty()) {
-            for (String ignoredServiceName : ruleParameters.getParameterAsList("ignored-service-names")) {
+            for (String ignoredServiceName : ruleParameters.getParameterAsList(KEY_IGNORED_SERVICE_NAMES)) {
                 if (serviceName.contains(ignoredServiceName.trim())) {
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    private int getObservationDelay(RuleParameters ruleParameters) {
+        if (!ruleParameters.parameters().isEmpty() && ruleParameters.parameters().containsKey(KEY_OBSERVATION_MAX_DELAY_IN_DAYS)) {
+            return Integer.parseInt(ruleParameters.parameters().get(KEY_OBSERVATION_MAX_DELAY_IN_DAYS));
+        }
+        return OBSERVATION_DELAY_DEFAULT_VALUE;
     }
 
 }

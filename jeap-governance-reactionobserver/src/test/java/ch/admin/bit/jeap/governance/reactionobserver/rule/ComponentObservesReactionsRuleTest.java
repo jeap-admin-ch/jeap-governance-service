@@ -156,6 +156,25 @@ class ComponentObservesReactionsRuleTest {
         assertThat(result.stateComment()).isEqualTo("Component observes reactions. Last observation date: " + LocalDate.now());
     }
 
+    @Test
+    void returnsFailWhenComponentDoesNotObserveReactionsFromMaxDelayInDays() {
+        //given
+        SystemComponent systemComponent = mockComponent(1L, "my-service", ComponentType.BACKEND_SERVICE);
+        LocalDate observationDate = LocalDate.now().minusDays(3);
+        when(promTimeSeriesQueryRepository.findBy(PromQueryType.JEAP_MESSAGING_TOTAL, 1L)).thenReturn(List.of(mock(PromTimeSeries.class)));
+        ReactionObserverComponentLastObservationDate lastObservationDate = mock(ReactionObserverComponentLastObservationDate.class);
+        when(lastObservationDate.getLastObservationDate()).thenReturn(observationDate);
+        when(lastObservationDateRepository.findByComponentId(1L)).thenReturn(Optional.of(lastObservationDate));
+
+        //when
+        RuleResult result = rule.evaluate(systemComponent, RuleParameters.of(Map.of(ComponentObservesReactionsRule.KEY_OBSERVATION_MAX_DELAY_IN_DAYS, "2"), Map.of()));
+
+        //then
+        assertThat(result.state()).isEqualTo(State.FAIL);
+        assertThat(result.stateComment()).isEqualTo("Component has not observed any reactions in the last 2 days. Last observation date: " + observationDate);
+    }
+
+
     private SystemComponent mockComponent(long id, String name, ComponentType type) {
         var component = mock(SystemComponent.class);
         when(component.getId()).thenReturn(id);

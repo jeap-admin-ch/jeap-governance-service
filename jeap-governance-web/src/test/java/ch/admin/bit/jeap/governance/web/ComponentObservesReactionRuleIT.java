@@ -12,12 +12,15 @@ import ch.admin.bit.jeap.governance.prometheus.domain.PromQueryType;
 import ch.admin.bit.jeap.governance.prometheus.domain.PromTimeSeries;
 import ch.admin.bit.jeap.governance.prometheus.domain.PromTimeSeriesSample;
 import ch.admin.bit.jeap.governance.prometheus.persistence.JpaPromTimeSeriesRepository;
+import ch.admin.bit.jeap.governance.reactionobserver.domain.ReactionObserverComponentLastObservationDate;
+import ch.admin.bit.jeap.governance.reactionobserver.domain.ReactionObserverComponentLastObservationDateRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +46,9 @@ class ComponentObservesReactionRuleIT extends GovernanceIntegrationTestBase {
 
     @Autowired
     private JpaPromTimeSeriesRepository promTimeSeriesRepository;
+
+    @Autowired
+    private ReactionObserverComponentLastObservationDateRepository lastObservationDateRepository;
 
     @Test
     void componentObservesReactions_resultsInOk() {
@@ -106,5 +112,37 @@ class ComponentObservesReactionRuleIT extends GovernanceIntegrationTestBase {
         var ruleState = ruleStateRepository.findBySystemComponentAndRuleId(component, RuleId.of("component-observes-reactions"));
         assertThat(ruleState).isPresent();
         assertThat(ruleState.get().getState()).isEqualTo(State.FAIL);
+    }
+
+    @Test
+    void componentDoesntObservesReactionsSince6Days_resultsInFail() {
+        var system = systemRepository.add(System.builder()
+                .name("testsys4")
+                .aliases(Set.of())
+                .systemComponents(List.of(
+                        SystemComponent.builder().name("service-without-reactions-since-days").type(ComponentType.BACKEND_SERVICE).build()
+                ))
+                .build());
+
+        var component = system.getSystemComponents().getFirst();
+        promTimeSeriesRepository.saveAll(List.of(
+                PromTimeSeries.builder()
+                        .prometheusQueryType(PromQueryType.JEAP_MESSAGING_TOTAL)
+                        .queryTimestamp(ZonedDateTime.now())
+                        .systemComponentId(component.getId())
+                        .sample(new PromTimeSeriesSample(Map.of("service-without-reactions-since-days", "metricsys-app-service"), List.of("1")))
+                        .build()
+        ));
+        LocalDate lastObservationDate = LocalDate.now().minusDays(6);
+        lastObservationDateRepository.add(ReactionObserverComponentLastObservationDate.builder()
+                .systemComponent(system.getSystemComponents().getFirst())
+                .lastObservationDate(lastObservationDate).build());
+
+        ruleEvaluationService.updateRuleStatesForComponent(component);
+
+        var ruleState = ruleStateRepository.findBySystemComponentAndRuleId(component, RuleId.of("component-observes-reactions"));
+        assertThat(ruleState).isPresent();
+        assertThat(ruleState.get().getState()).isEqualTo(State.FAIL);
+        assertThat(ruleState.get().getStateComment()).isEqualTo("Component has not observed any reactions in the last 4 days. Last observation date: " + lastObservationDate);
     }
 }
