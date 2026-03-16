@@ -435,6 +435,28 @@ public class CustomCleanupListener implements ComponentDeletionListener {
 }
 ```
 
+If you hold data in instances of the governance service that reference Systems, you can be notified before a System is deleted. This is necessary to perform certain data cleanup operations. You implement an interface for this:
+
+```java
+public interface SystemDeletionListener {
+
+    /**
+     * This method is called before a system identified by {@code systemId} is deleted.
+     * Implementations should perform any necessary cleanup or data removal related to the system.
+     *
+     * @param systemId the unique identifier of the system to be deleted
+     */
+    void preSystemDeletion(long systemId);
+
+}
+```
+
+**Implementation:**
+1. Implement the `SystemDeletionListener` interface
+2. Optionally annotate with `@Order` to control execution sequence
+3. Add the implementation as a Spring bean
+4. It will be automatically included in the deletion process
+
 ### Rules
 
 The governance service provides an infrastructure to evaluate governance rules and score services/systems on a regular
