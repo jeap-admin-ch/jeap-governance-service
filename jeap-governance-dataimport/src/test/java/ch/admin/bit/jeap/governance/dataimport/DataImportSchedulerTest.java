@@ -1,25 +1,28 @@
 package ch.admin.bit.jeap.governance.dataimport;
 
-import io.micrometer.core.instrument.MeterRegistry;
+import ch.admin.bit.jeap.governance.domain.scheduler.SchedulerRunRepository;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import net.javacrumbs.shedlock.core.LockAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 class DataImportSchedulerTest {
 
     private final DataImporter dataImporter = mock(DataImporter.class);
-    private final MeterRegistry meterRegistry = new SimpleMeterRegistry();
-    private final DataImportScheduler scheduler = new DataImportScheduler(dataImporter, meterRegistry);
+    private final SchedulerRunRepository schedulerRunRepository = mock(SchedulerRunRepository.class);
+    private final DataImportScheduler scheduler = new DataImportScheduler(dataImporter, schedulerRunRepository, new SimpleMeterRegistry());
 
     @BeforeEach
     void setUp() {
         LockAssert.TestHelper.makeAllAssertsPass(true);
+        when(schedulerRunRepository.findLastRunDateTime("data-import")).thenReturn(Optional.empty());
     }
 
     @Test
@@ -27,15 +30,16 @@ class DataImportSchedulerTest {
         scheduler.update();
 
         verify(dataImporter).importData();
+        verify(schedulerRunRepository).saveLastRunDateTime(eq("data-import"), any(LocalDateTime.class));
     }
 
     @Test
-    void createLastRunFromMetric() {
-        scheduler.createLastRunFromMetric();
+    void init_loadsPersistedLastRunDateTime() {
+        LocalDateTime persisted = LocalDateTime.of(2025, 1, 15, 10, 30);
+        when(schedulerRunRepository.findLastRunDateTime("data-import")).thenReturn(Optional.of(persisted));
 
-        var gauge = meterRegistry.find("jeap_governance_service_data_import_last_run_from").gauge();
-        assertNotNull(gauge);
-        assertTrue(gauge.value() >= 0);
+        scheduler.init();
+
+        verify(schedulerRunRepository).findLastRunDateTime("data-import");
     }
-
 }

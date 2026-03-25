@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-03-25
+
+### Added
+
+- Persist last scheduler run date/time in a new `scheduler_run` database table for all schedulers (data-import,
+  scoring, reporting) so that the `jeap_governance_service_*_last_run_from` metrics report correctly even after
+  restarts/redeployments
+
 ## [1.1.0] - 2026-03-23
 
 ### Changed

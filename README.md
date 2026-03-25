@@ -186,6 +186,18 @@ spring:
 
 ![Scoring and Rule Schema Diagram](docs/images/scoring-db-schema.png)
 
+#### Scheduler Run Table
+
+The `scheduler_run` table persists the last successful run timestamp per scheduler job (data-import, scoring,
+reporting).
+This ensures that the `jeap_governance_service_*_last_run_from` metrics report correctly even after application restarts
+or redeployments.
+
+| Column        | Type        | Description                                       |
+|---------------|-------------|---------------------------------------------------|
+| `job_name`    | `VARCHAR`   | Primary key, identifies the scheduler job         |
+| `last_run_at` | `TIMESTAMP` | Timestamp of the last successful run for this job |
+
 #### ArchRepo Schema
 
 ![ArchRepo Schema Diagram](docs/images/archrepo-db-schema.png)

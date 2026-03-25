@@ -1,28 +1,28 @@
 package ch.admin.bit.jeap.governance.reporting;
 
-import io.micrometer.core.instrument.MeterRegistry;
+import ch.admin.bit.jeap.governance.domain.scheduler.SchedulerRunRepository;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import net.javacrumbs.shedlock.core.LockAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 class ReportingSchedulerTest {
 
-    private ReportingService reportingService = mock(ReportingService.class);
-    private final MeterRegistry meterRegistry = new SimpleMeterRegistry();
-
-    private final ReportingScheduler scheduler = new ReportingScheduler(reportingService, meterRegistry);
+    private final ReportingService reportingService = mock(ReportingService.class);
+    private final SchedulerRunRepository schedulerRunRepository = mock(SchedulerRunRepository.class);
+    private final ReportingScheduler scheduler = new ReportingScheduler(reportingService, schedulerRunRepository, new SimpleMeterRegistry());
 
     @BeforeEach
     void setUp() {
         LockAssert.TestHelper.makeAllAssertsPass(true);
+        when(schedulerRunRepository.findLastRunDateTime("reporting")).thenReturn(Optional.empty());
     }
 
     @Test
@@ -31,6 +31,7 @@ class ReportingSchedulerTest {
 
         verify(reportingService).generateSystemsReport(any(), eq(false));
         verify(reportingService).generateRulesReport(any(), eq(false));
+        verify(schedulerRunRepository).saveLastRunDateTime(eq("reporting"), any(LocalDateTime.class));
     }
 
     @Test
@@ -39,14 +40,6 @@ class ReportingSchedulerTest {
 
         verify(reportingService).generateSystemsReport(any(), eq(true));
         verify(reportingService).generateRulesReport(any(), eq(true));
-    }
-
-    @Test
-    void createLastRunFromMetric() {
-        scheduler.createLastRunFromMetric();
-
-        var gauge = meterRegistry.find("jeap_governance_service_reporting_last_run_from").gauge();
-        assertNotNull(gauge);
-        assertTrue(gauge.value() >= 0);
+        verify(schedulerRunRepository).saveLastRunDateTime(eq("reporting"), any(LocalDateTime.class));
     }
 }

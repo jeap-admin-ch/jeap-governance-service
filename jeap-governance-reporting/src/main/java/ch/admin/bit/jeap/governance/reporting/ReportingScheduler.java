@@ -1,28 +1,28 @@
 package ch.admin.bit.jeap.governance.reporting;
 
-import io.micrometer.core.instrument.Gauge;
+import ch.admin.bit.jeap.governance.domain.scheduler.SchedulerRunRepository;
+import ch.admin.bit.jeap.governance.domain.scheduler.SchedulerRunTracker;
 import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.core.LockAssert;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class ReportingScheduler {
 
     private final ReportingService reportingService;
-    private final MeterRegistry meterRegistry;
+    private final SchedulerRunTracker runTracker;
 
-    private LocalDateTime lastRunDateTime = LocalDateTime.MIN;
+    public ReportingScheduler(ReportingService reportingService, SchedulerRunRepository schedulerRunRepository, MeterRegistry meterRegistry) {
+        this.reportingService = reportingService;
+        this.runTracker = new SchedulerRunTracker("reporting", "jeap_governance_service_reporting_last_run_from", schedulerRunRepository, meterRegistry);
+    }
 
     @Scheduled(cron = "${jeap.governance.reporting.cron-expression}")
     @SchedulerLock(name = "reporting", lockAtLeastFor = "${jeap.governance.reporting.lock-at-least}", lockAtMostFor = "${jeap.governance.reporting.lock-at-most}")
@@ -42,7 +42,7 @@ public class ReportingScheduler {
 
         generateSystemPages(day, withOrphanCleanup);
         generateRulePages(day, withOrphanCleanup);
-        lastRunDateTime = LocalDateTime.now();
+        runTracker.recordRun();
     }
 
     private void generateSystemPages(LocalDate untilDay, boolean withOrphanCleanup) {
@@ -66,13 +66,7 @@ public class ReportingScheduler {
     }
 
     @PostConstruct
-    public void createLastRunFromMetric() {
-        Gauge.builder("jeap_governance_service_reporting_last_run_from", () -> calculateMinutesFromLastRunToNow(lastRunDateTime))
-                .baseUnit("minutes")
-                .register(meterRegistry);
-    }
-
-    private long calculateMinutesFromLastRunToNow(LocalDateTime lastRun) {
-        return Duration.between(lastRun, LocalDateTime.now()).toMinutes();
+    public void init() {
+        runTracker.init();
     }
 }

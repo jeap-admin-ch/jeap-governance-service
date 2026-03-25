@@ -3,36 +3,40 @@ package ch.admin.bit.jeap.governance.rules;
 import ch.admin.bit.jeap.governance.domain.SystemRepository;
 import ch.admin.bit.jeap.governance.domain.rule.RuleConformanceRateService;
 import ch.admin.bit.jeap.governance.domain.rule.RuleEvaluationResult;
+import ch.admin.bit.jeap.governance.domain.scheduler.SchedulerRunRepository;
+import ch.admin.bit.jeap.governance.domain.scheduler.SchedulerRunTracker;
 import ch.admin.bit.jeap.governance.domain.score.ScoringService;
-import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.core.LockAssert;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class ScoringScheduler {
 
     private final ScoringService scoringService;
     private final SystemRepository systemRepository;
     private final RuleConformanceRateService ruleConformanceRateService;
-    private final MeterRegistry meterRegistry;
+    private final SchedulerRunTracker runTracker;
 
-    private LocalDateTime lastRunDateTime = LocalDateTime.MIN;
+    public ScoringScheduler(ScoringService scoringService, SystemRepository systemRepository,
+                            RuleConformanceRateService ruleConformanceRateService,
+                            SchedulerRunRepository schedulerRunRepository, MeterRegistry meterRegistry) {
+        this.scoringService = scoringService;
+        this.systemRepository = systemRepository;
+        this.ruleConformanceRateService = ruleConformanceRateService;
+        this.runTracker = new SchedulerRunTracker("scoring", "jeap_governance_service_scoring_last_run_from", schedulerRunRepository, meterRegistry);
+    }
 
     @Scheduled(cron = "${jeap.governance.scoring.cron-expression}")
     @SchedulerLock(name = "scoring", lockAtLeastFor = "${jeap.governance.scoring.lock-at-least}", lockAtMostFor = "${jeap.governance.scoring.lock-at-most}")
@@ -51,7 +55,7 @@ public class ScoringScheduler {
 
         ruleConformanceRateService.updateConformanceRates(allResults, day);
         ruleConformanceRateService.updateSystemConformanceRates(resultsBySystem, day);
-        lastRunDateTime = LocalDateTime.now();
+        runTracker.recordRun();
     }
 
     private List<RuleEvaluationResult> updateSystemScore(long systemId, LocalDate day) {
@@ -64,13 +68,7 @@ public class ScoringScheduler {
     }
 
     @PostConstruct
-    public void createLastRunFromMetric() {
-        Gauge.builder("jeap_governance_service_scoring_last_run_from", () -> calculateMinutesFromLastRunToNow(lastRunDateTime))
-                .baseUnit("minutes")
-                .register(meterRegistry);
-    }
-
-    private long calculateMinutesFromLastRunToNow(LocalDateTime lastRun) {
-        return Duration.between(lastRun, LocalDateTime.now()).toMinutes();
+    public void init() {
+        runTracker.init();
     }
 }
