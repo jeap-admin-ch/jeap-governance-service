@@ -18,10 +18,7 @@ import static ch.admin.bit.jeap.governance.archrepo.TestUtility.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RestApiRelationWithoutPactSystemComponentSynchronizerTest {
@@ -52,7 +49,7 @@ class RestApiRelationWithoutPactSystemComponentSynchronizerTest {
         assertEquals("/api/resource", addedRelation.getPath());
 
         verify(restApiRelationWithoutPactRepository).add(addedRelation);
-        verify(restApiRelationWithoutPactRepository).deleteAllByProviderSystemComponentId(SYSTEM_COMPONENT_A1.getId());
+        verify(restApiRelationWithoutPactRepository, never()).deleteAll();
         verifyNoMoreInteractions(restApiRelationWithoutPactRepository);
     }
 
@@ -74,7 +71,7 @@ class RestApiRelationWithoutPactSystemComponentSynchronizerTest {
         assertEquals("/api/resource", addedRelation.getPath());
 
         verify(restApiRelationWithoutPactRepository).add(addedRelation);
-        verify(restApiRelationWithoutPactRepository).deleteAllByProviderSystemComponentId(SYSTEM_COMPONENT_A1.getId());
+        verify(restApiRelationWithoutPactRepository, never()).deleteAll();
         verifyNoMoreInteractions(restApiRelationWithoutPactRepository);
     }
 
@@ -91,7 +88,7 @@ class RestApiRelationWithoutPactSystemComponentSynchronizerTest {
         synchronizer.synchronizeWithArchRepo(PROVIDER_KEY_COMPONENT_A1, List.of(relation1, relationConsumerNonExisting, relation2));
 
         verify(restApiRelationWithoutPactRepository, times(2)).add(any());
-        verify(restApiRelationWithoutPactRepository).deleteAllByProviderSystemComponentId(SYSTEM_COMPONENT_A1.getId());
+        verify(restApiRelationWithoutPactRepository, never()).deleteAll();
         verifyNoMoreInteractions(restApiRelationWithoutPactRepository);
     }
 
@@ -120,4 +117,13 @@ class RestApiRelationWithoutPactSystemComponentSynchronizerTest {
 
         verifyNoMoreInteractions(restApiRelationWithoutPactRepository);
     }
+
+    @Test
+    void deleteAllPreviousDataBeforeFullImport() {
+        synchronizer.deleteAllPreviousDataBeforeFullImport();
+
+        verify(restApiRelationWithoutPactRepository, times(1)).deleteAll();
+        verifyNoMoreInteractions(restApiRelationWithoutPactRepository);
+    }
+
 }

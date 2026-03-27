@@ -22,7 +22,11 @@ public class RestApiRelationSystemComponentSynchronizer {
     private final SystemComponentRepository systemComponentRepository;
     private final RestApiRelationWithoutPactRepository restApiRelationWithoutPactRepository;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void deleteAllPreviousDataBeforeFullImport() {
+        log.info("Delete all previous imported data as RestApiRelationWithoutPact is a full import");
+        restApiRelationWithoutPactRepository.deleteAll();
+    }
+
     public void synchronizeWithArchRepo(ComponentTechnicalIdentifier providerKey, List<RestApiRelationWithoutPactDto> restApiRelationDtos) {
         Optional<SystemComponent> providerSystemComponentOptional = systemComponentRepository.findByName(providerKey.componentName());
         if (providerSystemComponentOptional.isEmpty()) {
@@ -32,7 +36,6 @@ public class RestApiRelationSystemComponentSynchronizer {
         SystemComponent providerSystemComponent = providerSystemComponentOptional.get();
         validateInput(providerKey, providerSystemComponent);
 
-        restApiRelationWithoutPactRepository.deleteAllByProviderSystemComponentId(providerSystemComponent.getId());
         addAllToSystemComponent(providerSystemComponent, restApiRelationDtos);
     }
 

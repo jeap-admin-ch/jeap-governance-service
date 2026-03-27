@@ -16,6 +16,6 @@ public interface JpaRestApiRelationWithoutPactRepository extends JpaRepository<R
     List<RestApiRelationWithoutPact> findByConsumerSystemComponentId(long id);
 
     @Modifying
-    @Query("DELETE FROM RestApiRelationWithoutPact a WHERE a.providerSystemComponent.id = :id")
-    void deleteAllByProviderSystemComponentId(long id);
+    @Query("DELETE FROM RestApiRelationWithoutPact")
+    void deleteAll();
 }

@@ -200,11 +200,11 @@ class RestApiRelationWithoutPactRepositoryImplTest extends PostgresTestContainer
         Iterable<RestApiRelationWithoutPact> all = jpaRepository.findAll();
         assertThat(all).hasSize(4);
 
-        repository.deleteAllByProviderSystemComponentId(systemComponent11.getId());
+        repository.deleteAll();
         flushAndClear();
 
         Iterable<RestApiRelationWithoutPact> allAfterDeletion = jpaRepository.findAll();
-        assertThat(allAfterDeletion).hasSize(2);
+        assertThat(allAfterDeletion).isEmpty();
     }
 
     private void flushAndClear() {

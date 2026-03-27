@@ -4,6 +4,8 @@ import ch.admin.bit.jeap.governance.archrepo.connector.model.RestApiRelationWith
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -16,8 +18,14 @@ public class RestApiRelationWithoutPactSynchronizer {
 
     private final RestApiRelationSystemComponentSynchronizer restApiRelationSystemComponentSynchronizer;
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void synchronizeWithArchRepo(List<RestApiRelationWithoutPactDto> restApiRelationDtos) {
         boolean hasException = false;
+
+        if (!restApiRelationDtos.isEmpty()) {
+            restApiRelationSystemComponentSynchronizer.deleteAllPreviousDataBeforeFullImport();
+        }
+
         // Group relations by provider system and component to minimize transaction size
         Map<ComponentTechnicalIdentifier, List<RestApiRelationWithoutPactDto>> relationsByProvider = groupForProviders(restApiRelationDtos);
         for (Map.Entry<ComponentTechnicalIdentifier, List<RestApiRelationWithoutPactDto>> entry : relationsByProvider.entrySet()) {

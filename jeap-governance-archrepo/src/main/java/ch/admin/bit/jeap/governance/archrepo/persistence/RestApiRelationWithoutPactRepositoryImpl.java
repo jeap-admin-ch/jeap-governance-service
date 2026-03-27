@@ -34,7 +34,7 @@ public class RestApiRelationWithoutPactRepositoryImpl implements RestApiRelation
     }
 
     @Override
-    public void deleteAllByProviderSystemComponentId(long id) {
-        jpaRepository.deleteAllByProviderSystemComponentId(id);
+    public void deleteAll() {
+        jpaRepository.deleteAll();
     }
 }

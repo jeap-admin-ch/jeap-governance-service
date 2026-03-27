@@ -31,6 +31,7 @@ class RestApiRelationWithoutPactSynchronizerTest {
         synchronizer.synchronizeWithArchRepo(restApiRelationDtos);
 
 
+        verify(restApiRelationSystemComponentSynchronizer).deleteAllPreviousDataBeforeFullImport();
         verify(restApiRelationSystemComponentSynchronizer).synchronizeWithArchRepo(new ComponentTechnicalIdentifier(SYSTEM_NAME_B, COMPONENT_NAME_B1), List.of(relationDto));
         verifyNoMoreInteractions(restApiRelationSystemComponentSynchronizer);
     }
@@ -45,7 +46,7 @@ class RestApiRelationWithoutPactSynchronizerTest {
 
         synchronizer.synchronizeWithArchRepo(restApiRelationDtos);
 
-
+        verify(restApiRelationSystemComponentSynchronizer).deleteAllPreviousDataBeforeFullImport();
         verify(restApiRelationSystemComponentSynchronizer).synchronizeWithArchRepo(new ComponentTechnicalIdentifier(SYSTEM_NAME_B, COMPONENT_NAME_B1), List.of(relationDtoA1B1, relationDtoA2B1));
         verify(restApiRelationSystemComponentSynchronizer).synchronizeWithArchRepo(new ComponentTechnicalIdentifier(SYSTEM_NAME_B, COMPONENT_NAME_B2), List.of(relationDtoA1B2, relationDtoA2B2));
         verifyNoMoreInteractions(restApiRelationSystemComponentSynchronizer);
@@ -61,6 +62,7 @@ class RestApiRelationWithoutPactSynchronizerTest {
 
         assertThatThrownBy(() -> synchronizer.synchronizeWithArchRepo(restApiRelationDtos)).isInstanceOf(ArchRepoSynchronizeException.class);
 
+        verify(restApiRelationSystemComponentSynchronizer).deleteAllPreviousDataBeforeFullImport();
         verify(restApiRelationSystemComponentSynchronizer).synchronizeWithArchRepo(new ComponentTechnicalIdentifier(SYSTEM_NAME_B, COMPONENT_NAME_B1), List.of(relationDtoA1B1));
         verify(restApiRelationSystemComponentSynchronizer).synchronizeWithArchRepo(new ComponentTechnicalIdentifier(SYSTEM_NAME_B, COMPONENT_NAME_B2), List.of(relationDtoA1B2));
         verifyNoMoreInteractions(restApiRelationSystemComponentSynchronizer);

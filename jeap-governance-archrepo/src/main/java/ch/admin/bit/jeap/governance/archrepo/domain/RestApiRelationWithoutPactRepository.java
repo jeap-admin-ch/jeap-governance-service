@@ -12,5 +12,5 @@ public interface RestApiRelationWithoutPactRepository {
 
     void delete(RestApiRelationWithoutPact restApiRelationWithoutPact);
 
-    void deleteAllByProviderSystemComponentId(long id);
+    void deleteAll();
 }
