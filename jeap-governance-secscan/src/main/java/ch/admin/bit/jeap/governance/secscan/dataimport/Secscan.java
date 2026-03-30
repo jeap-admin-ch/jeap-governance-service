@@ -11,6 +11,7 @@ import ch.admin.bit.jeap.governance.secscan.domain.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -112,11 +113,18 @@ public class Secscan implements DataSourceImporter {
                                                             ZonedDateTime scanTimestamp) {
         if ((systemComponentApi == null) || (systemComponentApi.httpApi() == null)) {
             String message = """
-                     No HTTP API found for the system component '%s' in the environment '%s' for the HTTP API security scan.
-                     Skipping security scan.""".formatted(componentRef.getName(), environment);
+                    No HTTP API found for the system component '%s' in the environment '%s' for the HTTP API security scan.
+                    Skipping security scan.""".formatted(componentRef.getName(), environment);
             log.info(message);
             return Optional.of(new SystemComponentSecscanResult(
                     NO_API, scanTimestamp, componentRef, environment, message, List.of()));
+        } else if (!StringUtils.hasText(systemComponentApi.httpApi().url()) || (!systemComponentApi.httpApi().url().startsWith("https://") && !systemComponentApi.httpApi().url().startsWith("http://"))) {
+            String message = """
+                    Invalid HTTP API serverUrl '%s' found for the system component '%s' in the environment '%s' for the HTTP API security scan.
+                    Skipping security scan.""".formatted(systemComponentApi.httpApi().url(), componentRef.getName(), environment);
+            log.info(message);
+            return Optional.of(new SystemComponentSecscanResult(
+                    API_IGNORED, scanTimestamp, componentRef, environment, message, List.of()));
         } else {
             return Optional.empty();
         }
@@ -215,7 +223,7 @@ public class Secscan implements DataSourceImporter {
         } catch (Exception e) {
             log.warn("Failed to check the security for the system component '{}' and endpoint '{}' because of '{}'.",
                     systemComponentName, endpoint, e.getMessage(), e);
-            return  new HttpEndpointSecurityChecker.Result(
+            return new HttpEndpointSecurityChecker.Result(
                     false, "Not flagging the endpoint, the check was not able to access it at all.");
         }
     }

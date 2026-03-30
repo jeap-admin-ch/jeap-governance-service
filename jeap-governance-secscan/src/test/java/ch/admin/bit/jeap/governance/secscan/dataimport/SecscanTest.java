@@ -122,7 +122,7 @@ class SecscanTest {
         mockExecuteInTransactions();
         when(systemComponentRepository.findAllSystemComponentReferences()).thenReturn(List.of(componentReference(COMPONENT_A)));
         when(apiDiscoveryClient.discover(COMPONENT_A, ENV)).thenReturn(
-                new SystemComponentHttpApi(COMPONENT_A, ENV, new HttpApi("http://example.com", "1.0", null), null));
+                new SystemComponentHttpApi(COMPONENT_A, ENV, new HttpApi("https://example.com", "1.0", null), null));
 
         secscan.importData();
 
@@ -196,7 +196,7 @@ class SecscanTest {
 
         secscan.importData();
 
-        verify(endpointSecurityChecker).check("http://example.com", endpoint);
+        verify(endpointSecurityChecker).check("https://example.com", endpoint);
         verify(secscanStateRepository).save(any());
     }
 
@@ -215,7 +215,7 @@ class SecscanTest {
 
         secscan.importData();
 
-        verify(endpointSecurityChecker).check("http://example.com", endpoint);
+        verify(endpointSecurityChecker).check("https://example.com", endpoint);
         verify(secscanStateRepository).save(any());
     }
 
@@ -232,8 +232,61 @@ class SecscanTest {
 
         secscan.importData();
 
+        verify(endpointSecurityChecker).check("https://example.com", endpoint);
+        verify(secscanStateRepository, never()).findBySystemComponentId(anyLong());
+    }
+
+    @Test
+    void importData_noLastUpdated_withHttp_alwaysScans() {
+        mockExecuteInTransactions();
+        when(systemComponentRepository.findAllSystemComponentReferences()).thenReturn(List.of(componentReference(COMPONENT_A)));
+        HttpEndpoint endpoint = new HttpEndpoint("/api/test", "GET");
+        when(apiDiscoveryClient.discover(COMPONENT_A, ENV)).thenReturn(
+                createSystemComponentHttpApi("http://example.com", COMPONENT_A, List.of(endpoint), null));
+        when(apiFilter.shouldIgnoreApi(any())).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
+        when(apiFilter.shouldIgnoreEndpoint(eq(COMPONENT_A), any(), eq(ENV.name()))).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
+        when(endpointSecurityChecker.check(any(), any())).thenReturn(new HttpEndpointSecurityChecker.Result(false, "passed"));
+
+        secscan.importData();
+
         verify(endpointSecurityChecker).check("http://example.com", endpoint);
         verify(secscanStateRepository, never()).findBySystemComponentId(anyLong());
+    }
+
+    @Test
+    void importData_nullServerUrl_neverScans() {
+        mockExecuteInTransactions();
+        when(systemComponentRepository.findAllSystemComponentReferences()).thenReturn(List.of(componentReference(COMPONENT_A)));
+        HttpEndpoint endpoint = new HttpEndpoint("/api/test", "GET");
+        when(apiDiscoveryClient.discover(COMPONENT_A, ENV)).thenReturn(
+                createSystemComponentHttpApi(null, COMPONENT_A, List.of(endpoint), null));
+
+        secscan.importData();
+
+        verify(flaggedEndpointRepository).deleteBySystemComponentId(COMPONENT_A_ID);
+        verify(flaggedEndpointRepository, never()).saveAll(any());
+        verify(secscanStateRepository).save(stateCaptor.capture());
+        assertThat(stateCaptor.getValue().getSystemComponentId()).isEqualTo(COMPONENT_A_ID);
+        assertThat(stateCaptor.getValue().getScanMessage()).contains("Invalid HTTP API serverUrl 'null' found for the system component 'testa-backend-svc' in the environment 'REF' for the HTTP API security scan.\n" +
+                "Skipping security scan.");
+    }
+
+    @Test
+    void importData_noServerUrl_neverScans() {
+        mockExecuteInTransactions();
+        when(systemComponentRepository.findAllSystemComponentReferences()).thenReturn(List.of(componentReference(COMPONENT_A)));
+        HttpEndpoint endpoint = new HttpEndpoint("/api/test", "GET");
+        when(apiDiscoveryClient.discover(COMPONENT_A, ENV)).thenReturn(
+                createSystemComponentHttpApi("null", COMPONENT_A, List.of(endpoint), null));
+
+        secscan.importData();
+
+        verify(flaggedEndpointRepository).deleteBySystemComponentId(COMPONENT_A_ID);
+        verify(flaggedEndpointRepository, never()).saveAll(any());
+        verify(secscanStateRepository).save(stateCaptor.capture());
+        assertThat(stateCaptor.getValue().getSystemComponentId()).isEqualTo(COMPONENT_A_ID);
+        assertThat(stateCaptor.getValue().getScanMessage()).contains("Invalid HTTP API serverUrl 'null' found for the system component 'testa-backend-svc' in the environment 'REF' for the HTTP API security scan.\n" +
+                "Skipping security scan.");
     }
 
     @Test
@@ -270,9 +323,9 @@ class SecscanTest {
                 createSystemComponentHttpApi(COMPONENT_A, List.of(securedEndpoint, unsecuredEndpoint), null));
         when(apiFilter.shouldIgnoreApi(any())).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
         when(apiFilter.shouldIgnoreEndpoint(eq(COMPONENT_A), any(), eq(ENV.name()))).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
-        when(endpointSecurityChecker.check("http://example.com", securedEndpoint))
+        when(endpointSecurityChecker.check("https://example.com", securedEndpoint))
                 .thenReturn(new HttpEndpointSecurityChecker.Result(false, "passed"));
-        when(endpointSecurityChecker.check("http://example.com", unsecuredEndpoint))
+        when(endpointSecurityChecker.check("https://example.com", unsecuredEndpoint))
                 .thenReturn(new HttpEndpointSecurityChecker.Result(true, "Endpoint failed check by returning status 200 OK."));
 
         secscan.importData();
@@ -304,12 +357,12 @@ class SecscanTest {
         when(apiFilter.shouldIgnoreEndpoint(COMPONENT_A, getEndpoint, ENV.name())).thenReturn(SystemComponentHttpApiIgnoreFilter.Result.notIgnored());
         when(apiFilter.shouldIgnoreEndpoint(COMPONENT_A, postEndpoint, ENV.name())).thenReturn(
                 SystemComponentHttpApiIgnoreFilter.Result.ignoredWithReason("Only GET requests"));
-        when(endpointSecurityChecker.check("http://example.com", getEndpoint))
+        when(endpointSecurityChecker.check("https://example.com", getEndpoint))
                 .thenReturn(new HttpEndpointSecurityChecker.Result(false, "passed"));
 
         secscan.importData();
 
-        verify(endpointSecurityChecker).check("http://example.com", getEndpoint);
+        verify(endpointSecurityChecker).check("https://example.com", getEndpoint);
         verify(endpointSecurityChecker, never()).check(any(), eq(postEndpoint));
     }
 
@@ -432,7 +485,12 @@ class SecscanTest {
 
     @SuppressWarnings("SameParameterValue")
     private SystemComponentHttpApi createSystemComponentHttpApi(String componentName, List<HttpEndpoint> endpoints, ZonedDateTime lastUpdated) {
-        HttpApi httpApi = new HttpApi("http://example.com", "1.0", endpoints);
+        return createSystemComponentHttpApi("https://example.com", componentName, endpoints, lastUpdated);
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private SystemComponentHttpApi createSystemComponentHttpApi(String serverUrl, String componentName, List<HttpEndpoint> endpoints, ZonedDateTime lastUpdated) {
+        HttpApi httpApi = new HttpApi(serverUrl, "1.0", endpoints);
         return new SystemComponentHttpApi(componentName, ENV, httpApi, lastUpdated);
     }
 
