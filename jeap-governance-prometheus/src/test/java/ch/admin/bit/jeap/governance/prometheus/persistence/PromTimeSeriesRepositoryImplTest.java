@@ -36,7 +36,7 @@ class PromTimeSeriesRepositoryImplTest {
     @Container
     @ServiceConnection
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
-            DockerImageName.parse("postgres:16-alpine").asCompatibleSubstituteFor("postgres:16-alpine"));
+            DockerImageName.parse("postgres:17-alpine").asCompatibleSubstituteFor("postgres:17-alpine"));
 
     @Autowired
     private TestEntityManager entityManager;
