@@ -3,7 +3,7 @@ package ch.admin.bit.jeap.governance.persistence;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.AutoConfigurationPackage;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -16,7 +16,7 @@ import javax.sql.DataSource;
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages = "ch.admin.bit.jeap.governance")
 @EnableJpaAuditing
-@EntityScan(basePackages = "ch.admin.bit.jeap.governance")
+@AutoConfigurationPackage(basePackages = "ch.admin.bit.jeap.governance")
 @ComponentScan(basePackages = "ch.admin.bit.jeap.governance.persistence")
 class PersistenceConfiguration {
     @Bean

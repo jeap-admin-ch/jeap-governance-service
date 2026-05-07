@@ -7,7 +7,8 @@ import ch.admin.bit.jeap.governance.prometheus.domain.PromQueryType;
 import ch.admin.bit.jeap.governance.prometheus.domain.PromTimeSeriesSample;
 import ch.admin.bit.jeap.governance.prometheus.domain.PromClient;
 import ch.admin.bit.jeap.governance.prometheus.domain.PromException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import io.micrometer.core.annotation.Timed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.support.RetryTemplate;
@@ -105,7 +106,7 @@ public class AmazonManagedPromClient implements PromClient {
                     "[" + DAYS_TO_IMPORT + "d]))";
 
     AmazonManagedPromClient(AmazonManagedPromClientProperties ampClientProperties) {
-        this.objectMapper = new ObjectMapper();
+        this.objectMapper = new JsonMapper();
         this.ampClientProperties = ampClientProperties;
         try {
             this.ampUri = new URI(String.format(QUERY_URL_PATTERN,

@@ -1,8 +1,8 @@
 package ch.admin.bit.jeap.governance.reactionobserver.connector;
 
 import ch.admin.bit.jeap.governance.reactionobserver.ReactionObserverProperties;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
@@ -92,7 +92,7 @@ class ReactionObserverConnectorIntegrationTest {
     void setUp() {
         wireMockServer.resetAll();
 
-        objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+        objectMapper = new JsonMapper();
 
         ReactionObserverProperties properties = new ReactionObserverProperties();
         properties.setUrl(wireMockServer.baseUrl());

@@ -3,17 +3,19 @@ package ch.admin.bit.jeap.governance.web;
 import ch.admin.bit.jeap.governance.archrepo.connector.model.*;
 import ch.admin.bit.jeap.governance.deploymentlog.connector.model.DeploymentLogComponentVersionDto;
 import ch.admin.bit.jeap.governance.domain.GovernanceServiceEnvironment;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.DockerClientFactory;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import java.time.LocalDate;
@@ -37,7 +39,7 @@ public abstract class GovernanceIntegrationTestBase {
     protected static WireMockServer deploymentLogMockServer;
     protected static WireMockServer reactionObserverMockServer;
 
-    private static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
+    private static PostgreSQLContainer postgres = new PostgreSQLContainer(
             DockerImageName.parse("postgres:17-alpine").asCompatibleSubstituteFor("postgres:17-alpine")
     );
 
@@ -46,6 +48,9 @@ public abstract class GovernanceIntegrationTestBase {
 
     @BeforeAll
     static void startInfrastructure() {
+        Assumptions.assumeTrue(DockerClientFactory.instance().isDockerAvailable(),
+                "Docker is not available, skipping integration tests requiring Testcontainers");
+
         archRepoMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig()
                 .dynamicPort());
         archRepoMockServer.start();

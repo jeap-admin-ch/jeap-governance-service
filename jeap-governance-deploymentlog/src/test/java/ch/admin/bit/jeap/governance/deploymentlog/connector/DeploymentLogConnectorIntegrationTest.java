@@ -3,8 +3,8 @@ package ch.admin.bit.jeap.governance.deploymentlog.connector;
 import ch.admin.bit.jeap.governance.deploymentlog.DeploymentLogProperties;
 import ch.admin.bit.jeap.governance.domain.GovernanceServiceEnvironment;
 import ch.admin.bit.jeap.governance.deploymentlog.connector.model.DeploymentLogComponentVersionDto;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
@@ -112,7 +112,7 @@ class DeploymentLogConnectorIntegrationTest {
     void setUp() {
         wireMockServer.resetAll();
 
-        objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+        objectMapper = new JsonMapper();
 
         DeploymentLogProperties properties = new DeploymentLogProperties();
         properties.setUrl(wireMockServer.baseUrl());

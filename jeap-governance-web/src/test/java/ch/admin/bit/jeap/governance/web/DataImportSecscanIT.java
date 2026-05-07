@@ -2,7 +2,7 @@ package ch.admin.bit.jeap.governance.web;
 
 import ch.admin.bit.jeap.governance.dataimport.DataImportScheduler;
 import ch.admin.bit.jeap.governance.secscan.domain.SystemComponentHttpApiIgnoreFilter;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import org.junit.jupiter.api.AfterAll;

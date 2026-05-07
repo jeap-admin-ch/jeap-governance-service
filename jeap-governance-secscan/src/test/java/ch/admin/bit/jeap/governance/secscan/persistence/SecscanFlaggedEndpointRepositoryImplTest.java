@@ -4,8 +4,8 @@ import ch.admin.bit.jeap.governance.domain.SystemComponent;
 import ch.admin.bit.jeap.governance.secscan.domain.SecscanFlaggedEndpoint;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.context.annotation.Import;
 
 import java.time.ZonedDateTime;

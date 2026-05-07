@@ -4,7 +4,7 @@ import ch.admin.bit.jeap.governance.domain.ComponentType;
 import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
 import lombok.experimental.UtilityClass;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 
 import java.util.List;
 import java.util.Set;
