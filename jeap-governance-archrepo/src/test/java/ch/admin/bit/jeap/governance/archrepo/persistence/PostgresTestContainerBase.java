@@ -6,7 +6,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
-@Testcontainers(disabledWithoutDocker = true)
+@Testcontainers
 public abstract class PostgresTestContainerBase {
 
     @Container

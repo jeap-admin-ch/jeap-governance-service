@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @Import(PrometheusAutoconfiguration.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers(disabledWithoutDocker = true)
+@Testcontainers
 class PrometheusComponentDeletionListenerTest {
 
     @SuppressWarnings("unused")

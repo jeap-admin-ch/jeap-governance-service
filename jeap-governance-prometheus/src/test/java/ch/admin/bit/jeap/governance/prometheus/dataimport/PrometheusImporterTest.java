@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
 @DataJpaTest
 @Import(PrometheusAutoconfiguration.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers(disabledWithoutDocker = true)
+@Testcontainers
 class PrometheusImporterTest {
 
     @SuppressWarnings("unused")

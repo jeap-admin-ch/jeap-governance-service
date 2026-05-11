@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(PromTimeSeriesRepositoryImpl.class)
-@Testcontainers(disabledWithoutDocker = true)
+@Testcontainers
 class PromTimeSeriesRepositoryImplTest {
 
     @SuppressWarnings("unused")

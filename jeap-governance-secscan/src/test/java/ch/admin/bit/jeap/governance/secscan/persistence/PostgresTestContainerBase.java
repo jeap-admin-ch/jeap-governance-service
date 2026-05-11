@@ -14,7 +14,7 @@ import org.testcontainers.utility.DockerImageName;
 import java.util.List;
 import java.util.Set;
 
-@Testcontainers(disabledWithoutDocker = true)
+@Testcontainers
 public abstract class PostgresTestContainerBase {
 
     @Container
