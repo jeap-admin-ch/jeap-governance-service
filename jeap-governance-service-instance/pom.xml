@@ -6,7 +6,7 @@
     <parent>
         <groupId>ch.admin.bit.jeap</groupId>
         <artifactId>jeap-governance-service</artifactId>
-        <version>2.0.0-alpha-springboot4-SNAPSHOT</version>
+        <version>2.1.0-alpha-springboot4-SNAPSHOT</version>
     </parent>
 
     <artifactId>jeap-governance-service-instance</artifactId>
