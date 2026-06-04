@@ -12,6 +12,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - Update parent from 35.0.0 to 35.3.0
+- update asciidoc-confluence-publisher-client from 0.30.2 to 0.32.0
 
 ## [3.0.0] - 2026-05-28
 

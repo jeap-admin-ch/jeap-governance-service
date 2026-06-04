@@ -38,7 +38,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <asciidoc-confluence-publisher-client.version>0.30.2</asciidoc-confluence-publisher-client.version>
+        <asciidoc-confluence-publisher-client.version>0.32.0</asciidoc-confluence-publisher-client.version>
         <maven.javadoc.skip>false</maven.javadoc.skip>
         <java.version>25</java.version>
         <maven.compiler.release>25</maven.compiler.release>
