@@ -50,7 +50,6 @@ Apache License Version 2.0
  * docker-java-api - [com.github.docker-java:docker-java-api](https://github.com/docker-java/docker-java)
  * docker-java-transport - [com.github.docker-java:docker-java-transport](https://github.com/docker-java/docker-java)
  * docker-java-transport-zerodep - [com.github.docker-java:docker-java-transport-zerodep](https://github.com/docker-java/docker-java)
- * Generex - [com.github.mifmif:generex](https://github.com/mifmif/Generex/tree/master)
  * JCIP Annotations under Apache License - [com.github.stephenc.jcip:jcip-annotations](http://stephenc.github.com/jcip-annotations)
  * Google Android Annotations Library - [com.google.android:annotations](http://source.android.com/)
  * proto-google-common-protos - [com.google.api.grpc:proto-google-common-protos](https://github.com/googleapis/sdk-platform-java)
@@ -94,6 +93,7 @@ Apache License Version 2.0
  * io.grpc:grpc-util - [io.grpc:grpc-util](https://github.com/grpc/grpc-java)
  * ktor-events - [io.ktor:ktor-events](https://github.com/ktorio/ktor)
  * ktor-http - [io.ktor:ktor-http](https://github.com/ktorio/ktor)
+ * ktor-http-cio - [io.ktor:ktor-http-cio](https://github.com/ktorio/ktor)
  * ktor-http - [io.ktor:ktor-http-jvm](https://github.com/ktorio/ktor)
  * ktor-io - [io.ktor:ktor-io](https://github.com/ktorio/ktor)
  * ktor-io - [io.ktor:ktor-io-jvm](https://github.com/ktorio/ktor)
@@ -206,14 +206,14 @@ Apache License Version 2.0
  * JetBrains Java Annotations - [org.jetbrains:annotations](https://github.com/JetBrains/java-annotations)
  * Kotlin Reflect - [org.jetbrains.kotlin:kotlin-reflect](https://kotlinlang.org/)
  * Kotlin Stdlib - [org.jetbrains.kotlin:kotlin-stdlib](https://kotlinlang.org/)
- * Kotlin Stdlib Common - [org.jetbrains.kotlin:kotlin-stdlib-common](https://kotlinlang.org/)
- * Kotlin Stdlib Jdk7 - [org.jetbrains.kotlin:kotlin-stdlib-jdk7](https://kotlinlang.org/)
- * Kotlin Stdlib Jdk8 - [org.jetbrains.kotlin:kotlin-stdlib-jdk8](https://kotlinlang.org/)
- * atomicfu - [org.jetbrains.kotlinx:atomicfu](https://github.com/Kotlin/kotlinx.atomicfu)
- * atomicfu - [org.jetbrains.kotlinx:atomicfu-jvm](https://github.com/Kotlin/kotlinx.atomicfu)
  * kotlinx-coroutines-core - [org.jetbrains.kotlinx:kotlinx-coroutines-core](https://github.com/Kotlin/kotlinx.coroutines)
  * kotlinx-coroutines-core - [org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm](https://github.com/Kotlin/kotlinx.coroutines)
- * kotlinx-coroutines-jdk8 - [org.jetbrains.kotlinx:kotlinx-coroutines-jdk8](https://github.com/Kotlin/kotlinx.coroutines)
+ * kotlinx-io-bytestring - [org.jetbrains.kotlinx:kotlinx-io-bytestring](https://github.com/Kotlin/kotlinx-io)
+ * kotlinx-io-bytestring - [org.jetbrains.kotlinx:kotlinx-io-bytestring-jvm](https://github.com/Kotlin/kotlinx-io)
+ * kotlinx-io-core - [org.jetbrains.kotlinx:kotlinx-io-core](https://github.com/Kotlin/kotlinx-io)
+ * kotlinx-io-core - [org.jetbrains.kotlinx:kotlinx-io-core-jvm](https://github.com/Kotlin/kotlinx-io)
+ * kotlinx-serialization-core - [org.jetbrains.kotlinx:kotlinx-serialization-core](https://github.com/Kotlin/kotlinx.serialization)
+ * kotlinx-serialization-core - [org.jetbrains.kotlinx:kotlinx-serialization-core-jvm](https://github.com/Kotlin/kotlinx.serialization)
  * JSpecify annotations - [org.jspecify:jspecify](http://jspecify.org/)
  * Objenesis - [org.objenesis:objenesis](http://objenesis.org/objenesis)
  * org.opentest4j:opentest4j - [org.opentest4j:opentest4j](https://github.com/ota4j-team/opentest4j)
@@ -319,6 +319,7 @@ Apache License Version 2.0
  * org.xmlunit:xmlunit-core - [org.xmlunit:xmlunit-core](https://www.xmlunit.org/)
  * SnakeYAML - [org.yaml:snakeyaml](https://bitbucket.org/snakeyaml/snakeyaml)
  * AWS Java SDK :: Annotations - [software.amazon.awssdk:annotations](https://aws.amazon.com/sdkforjava/core/annotations)
+ * AWS Java SDK :: HTTP Clients :: Apache5 - [software.amazon.awssdk:apache5-client](https://aws.amazon.com/sdkforjava/http-clients/apache5-client)
  * AWS Java SDK :: Auth - [software.amazon.awssdk:auth](https://aws.amazon.com/sdkforjava)
  * AWS Java SDK :: AWS Core - [software.amazon.awssdk:aws-core](https://aws.amazon.com/sdkforjava)
  * AWS Java SDK :: Core :: Protocols :: AWS Query Protocol - [software.amazon.awssdk:aws-query-protocol](https://aws.amazon.com/sdkforjava)
@@ -349,11 +350,6 @@ Apache License Version 2.0
  * AWS Advanced JDBC Wrapper - [software.amazon.jdbc:aws-advanced-jdbc-wrapper](https://github.com/aws/aws-advanced-jdbc-wrapper)
  * Jackson-core - [tools.jackson.core:jackson-core](https://github.com/FasterXML/jackson-core)
  * jackson-databind - [tools.jackson.core:jackson-databind](https://github.com/FasterXML/jackson)
-
-BSD
--------------------------------
-
- * Automaton - [dk.brics.automaton:automaton](http://www.brics.dk/automaton/)
 
 BSD 2-Clause License
 -------------------------------
