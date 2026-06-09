@@ -48,14 +48,14 @@ class ComponentUsesWebConfigStarterRuleTest {
         SystemComponent component = scsComponent();
         when(promTimeSeriesQueryRepository.findBy(PromQueryType.JEAP_DEPENDENCY_VERSION, 1L)).thenReturn(List.of(
                 createSample(component, "ch.admin.bit.jeap:jeap-messaging", "9.3.1"),
-                createSample(component, "ch.admin.bit.jeap:jeap-web-config-starter", "2.1.0")));
+                createSample(component, "ch.admin.bit.jeap:jeap-spring-boot-web-config-starter", "2.1.0")));
 
         //when
         RuleResult result = rule.evaluate(component, NO_PARAMS);
 
         //then
         assertThat(result.state()).isEqualTo(State.OK);
-        assertThat(result.stateComment()).isEqualTo("jeap-web-config-starter is used");
+        assertThat(result.stateComment()).isEqualTo("jeap-spring-boot-web-config-starter is used");
     }
 
     @Test
@@ -63,14 +63,14 @@ class ComponentUsesWebConfigStarterRuleTest {
         //given
         SystemComponent component = scsComponent();
         when(promTimeSeriesQueryRepository.findBy(PromQueryType.JEAP_DEPENDENCY_VERSION, 1L)).thenReturn(List.of(
-                createSample(component, "jeap-web-config-starter", "2.1.0")));
+                createSample(component, "jeap-spring-boot-web-config-starter", "2.1.0")));
 
         //when
         RuleResult result = rule.evaluate(component, NO_PARAMS);
 
         //then
         assertThat(result.state()).isEqualTo(State.OK);
-        assertThat(result.stateComment()).isEqualTo("jeap-web-config-starter is used");
+        assertThat(result.stateComment()).isEqualTo("jeap-spring-boot-web-config-starter is used");
     }
 
     @Test
@@ -86,7 +86,7 @@ class ComponentUsesWebConfigStarterRuleTest {
 
         //then
         assertThat(result.state()).isEqualTo(State.FAIL);
-        assertThat(result.stateComment()).isEqualTo("Self-contained system does not use jeap-web-config-starter");
+        assertThat(result.stateComment()).isEqualTo("Self-contained system does not use jeap-spring-boot-web-config-starter");
     }
 
     @Test
@@ -100,7 +100,7 @@ class ComponentUsesWebConfigStarterRuleTest {
 
         //then
         assertThat(result.state()).isEqualTo(State.FAIL);
-        assertThat(result.stateComment()).isEqualTo("Self-contained system does not use jeap-web-config-starter");
+        assertThat(result.stateComment()).isEqualTo("Self-contained system does not use jeap-spring-boot-web-config-starter");
     }
 
     @Test

@@ -20,7 +20,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ComponentUsesWebConfigStarterRule implements Rule {
 
-    private static final String WEB_CONFIG_STARTER_ARTIFACT_ID = "jeap-web-config-starter";
+    private static final String WEB_CONFIG_STARTER_ARTIFACT_ID = "jeap-spring-boot-web-config-starter";
 
     private final PromTimeSeriesQueryRepository promTimeSeriesQueryRepository;
 

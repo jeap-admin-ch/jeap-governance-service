@@ -637,7 +637,7 @@ The `jeap-governance-rules-dependency` module provides the following built-in ru
 | Rule ID                             | Description                                                                                   |
 |-------------------------------------|-----------------------------------------------------------------------------------------------|
 | `component-dependencies-versions`   | Ensures that a component uses defined minimum dependency versions.                            |
-| `component-uses-web-config-starter` | Ensures that a self-contained system uses the `jeap-web-config-starter` dependency.           |
+| `component-uses-web-config-starter` | Ensures that a self-contained system uses the `jeap-spring-boot-web-config-starter` dependency. |
 
 **Component Dependencies Versions** (`component-dependencies-versions`)
 
@@ -680,10 +680,10 @@ To use this rule, the following modules must be enabled:
 
 **Component Uses Web Config Starter** (`component-uses-web-config-starter`)
 
-This rule validates that a self-contained system uses the `jeap-web-config-starter` dependency.
+This rule validates that a self-contained system uses the `jeap-spring-boot-web-config-starter` dependency.
 
 The rule only applies to components of type `SELF_CONTAINED_SYSTEM`; all other component types are considered not
-applicable and pass automatically. A self-contained system that does not declare the `jeap-web-config-starter`
+applicable and pass automatically. A self-contained system that does not declare the `jeap-spring-boot-web-config-starter`
 dependency violates the rule.
 
 The rule takes no parameters.
