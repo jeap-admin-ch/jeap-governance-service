@@ -634,9 +634,10 @@ To use this rule, the following modules must be enabled:
 
 The `jeap-governance-rules-dependency` module provides the following built-in rules:
 
-| Rule ID                             | Description                                                        |
-|-------------------------------------|--------------------------------------------------------------------|
-| `component-dependencies-versions`   | Ensures that a component uses defined minimum dependency versions. |
+| Rule ID                             | Description                                                                                   |
+|-------------------------------------|-----------------------------------------------------------------------------------------------|
+| `component-dependencies-versions`   | Ensures that a component uses defined minimum dependency versions.                            |
+| `component-uses-web-config-starter` | Ensures that a self-contained system uses the `jeap-web-config-starter` dependency.           |
 
 **Component Dependencies Versions** (`component-dependencies-versions`)
 
@@ -672,6 +673,30 @@ jeap:
               - "ch.admin.bit.jeap:jeap-process-context-scs:13.25.0"
               - "ch.admin.bit.jeap:jeap-process-archive-service:9.5.0"
               - "spring.boot:3.5.6"
+```
+
+To use this rule, the following modules must be enabled:
+- Prometheus module (`jeap.governance.prometheus.enabled=true`)
+
+**Component Uses Web Config Starter** (`component-uses-web-config-starter`)
+
+This rule validates that a self-contained system uses the `jeap-web-config-starter` dependency.
+
+The rule only applies to components of type `SELF_CONTAINED_SYSTEM`; all other component types are considered not
+applicable and pass automatically. A self-contained system that does not declare the `jeap-web-config-starter`
+dependency violates the rule.
+
+The rule takes no parameters.
+
+Configuration Example:
+
+```yaml
+jeap:
+  governance:
+    rules:
+      active:
+        - id: component-uses-web-config-starter
+          weight: 3
 ```
 
 To use this rule, the following modules must be enabled:

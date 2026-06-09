@@ -7,6 +7,13 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > - Spring Boot 3 maintenance (bug fixes, patches, and regular updates) continues on branch `release/springboot3`.
 
+## [3.2.0] - 2026-06-09
+
+### Added
+
+- New built-in dependency rule `component-uses-web-config-starter`: ensures that a self-contained system uses the
+  `jeap-web-config-starter` dependency.
+
 ## [3.1.0] - 2026-06-04
 
 ### Changed
