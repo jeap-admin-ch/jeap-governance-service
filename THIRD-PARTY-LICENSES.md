@@ -329,6 +329,12 @@ Common Development and Distribution License (CDDL) v1.0
 
  * JavaBeans Activation Framework (JAF) - [javax.activation:activation](http://java.sun.com/products/javabeans/jaf/index.jsp)
 
+EPL-2.0
+-------------------------------
+
+ * Logback Classic Module - [ch.qos.logback:logback-classic](http://logback.qos.ch/logback-classic)
+ * Logback Core Module - [ch.qos.logback:logback-core](http://logback.qos.ch/logback-core)
+
 Eclipse Distribution License - v 1.0
 -------------------------------
 
@@ -344,8 +350,6 @@ Eclipse Distribution License - v 1.0
 Eclipse Public License v2.0
 -------------------------------
 
- * Logback Classic Module - [ch.qos.logback:logback-classic](http://logback.qos.ch/logback-classic)
- * Logback Core Module - [ch.qos.logback:logback-core](http://logback.qos.ch/logback-core)
  * Jakarta Annotations API - [jakarta.annotation:jakarta.annotation-api](https://projects.eclipse.org/projects/ee4j.ca)
  * Jakarta Persistence API - [jakarta.persistence:jakarta.persistence-api](https://github.com/eclipse-ee4j/jpa-api)
  * jakarta.transaction API - [jakarta.transaction:jakarta.transaction-api](https://projects.eclipse.org/projects/ee4j.jta)
@@ -369,12 +373,6 @@ GNU General Public License, version 2 (GPL2), with the classpath exception
  * Jakarta Annotations API - [jakarta.annotation:jakarta.annotation-api](https://projects.eclipse.org/projects/ee4j.ca)
  * jakarta.transaction API - [jakarta.transaction:jakarta.transaction-api](https://projects.eclipse.org/projects/ee4j.jta)
 
-GNU Lesser General Public License
--------------------------------
-
- * Logback Classic Module - [ch.qos.logback:logback-classic](http://logback.qos.ch/logback-classic)
- * Logback Core Module - [ch.qos.logback:logback-core](http://logback.qos.ch/logback-core)
-
 GNU Library General Public License v2.1 or later
 -------------------------------
 
@@ -384,6 +382,12 @@ GPLv2+CE
 -------------------------------
 
  * JavaMail API (compat) - [javax.mail:mail](http://kenai.com/projects/javamail/mail)
+
+LGPL-2.1-only
+-------------------------------
+
+ * Logback Classic Module - [ch.qos.logback:logback-classic](http://logback.qos.ch/logback-classic)
+ * Logback Core Module - [ch.qos.logback:logback-core](http://logback.qos.ch/logback-core)
 
 LGPL-2.1-or-later
 -------------------------------
