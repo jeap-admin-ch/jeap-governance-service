@@ -86,7 +86,7 @@ This repository is Open Source Software licensed under the [Apache License 2.0](
 
 The core model consists of Systems and their associated System Components.
 
-![Core Model Diagram](docs/images/governance-domain-model.png)
+![Core Model Diagram](doc/images/governance-domain-model.png)
 
 #### Scoring and Rule Models
 
@@ -113,25 +113,25 @@ score = 100 * (sum(ruleWeight)[ruleState == OK] / sum(ruleWeight)[ruleState != D
 
 The system score is calculated as the average of the component scores of all components belonging to the system.
 
-![Scoring Model Diagram](docs/images/scoring-model.png)
+![Scoring Model Diagram](doc/images/scoring-model.png)
 
 #### ArchRepo Model
 
 The ArchRepo model consists of ApiDocVersion, DatabaseSchemaVersion, and RestApiRelationWithoutPact.
 
-![ArchRepo Model Diagram](docs/images/archrepo-domain-model.png)
+![ArchRepo Model Diagram](doc/images/archrepo-domain-model.png)
 
 #### DeploymentLog Model
 
 The DeploymentLog model consists of DeploymentLogComponentVersion.
 
-![DeploymentLog Model Diagram](docs/images/deploymentlog-domain-model.png)
+![DeploymentLog Model Diagram](doc/images/deploymentlog-domain-model.png)
 
 #### ReactionObserver Model
 
 The ReactionObserver model consists of ReactionObserverComponentLastObservationDate.
 
-![ReactionObserver Model Diagram](docs/images/reactionobserver-domain-model.png)
+![ReactionObserver Model Diagram](doc/images/reactionobserver-domain-model.png)
 
 #### Prometheus Time Series Model
 
@@ -140,7 +140,7 @@ designed to capture the current state of a component aspect (not to retrieve ext
 of time series samples is expected. Consequently, the model intentionally remains denormalized to keep the domain and
 implementation straightforward.
 
-![Prometheus Model Diagram](docs/images/prometheus-domain-model.png)
+![Prometheus Model Diagram](doc/images/prometheus-domain-model.png)
 
 #### Security Scan Model
 
@@ -152,7 +152,7 @@ result details for flagged endpoints are persisted to SecscanFlaggedEndpoint ent
 message is persisted per system component in a SecscanState entity. A configurable endpoint filter allows to filter out
 certain APIs and endpoints from the scan, e.g. to exclude APIs or endpoints that are expected to be unprotected.
 
-![Security Scan Model Diagram](docs/images/secscan-domain-model.png)
+![Security Scan Model Diagram](doc/images/secscan-domain-model.png)
 
 ### Database
 
@@ -180,11 +180,11 @@ spring:
 
 #### Core Schema
 
-![Core Schema Diagram](docs/images/governance-db-schema.png)
+![Core Schema Diagram](doc/images/governance-db-schema.png)
 
 #### Scoring Schema
 
-![Scoring and Rule Schema Diagram](docs/images/scoring-db-schema.png)
+![Scoring and Rule Schema Diagram](doc/images/scoring-db-schema.png)
 
 #### Scheduler Run Table
 
@@ -200,15 +200,15 @@ or redeployments.
 
 #### ArchRepo Schema
 
-![ArchRepo Schema Diagram](docs/images/archrepo-db-schema.png)
+![ArchRepo Schema Diagram](doc/images/archrepo-db-schema.png)
 
 #### DeploymentLog Schema
 
-![DeploymentLog Schema Diagram](docs/images/deploymentlog-db-schema.png)
+![DeploymentLog Schema Diagram](doc/images/deploymentlog-db-schema.png)
 
 #### ReactionObserver Schema
 
-![ReactionObserver Schema Diagram](docs/images/reactionobserver-db-schema.png)
+![ReactionObserver Schema Diagram](doc/images/reactionobserver-db-schema.png)
 
 #### Prometheus Time Series Schema
 
@@ -217,11 +217,11 @@ component aspect rather than extended time series. As a result, only a limited n
 stored. Consequently, the schema intentionally remains denormalized (avoiding additional normalization of sample
 storage) to keep both the data model and the implementation straightforward.
 
-![Prometheus Time Series Schema Diagram](docs/images/prometheus-db-schema.png)
+![Prometheus Time Series Schema Diagram](doc/images/prometheus-db-schema.png)
 
 #### Security Scan Schema
 
-![Security Scan Schema Diagram](docs/images/secscan-db-schema.png)
+![Security Scan Schema Diagram](doc/images/secscan-db-schema.png)
 
 ### Configuration
 
