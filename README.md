@@ -611,7 +611,17 @@ The `jeap-governance-rules-messaging` module ships the following built-in rules:
 
 **Component Defines Messaging Contracts Rule** (`component-defines-messagingcontracts`)
 
-This rule verifies that a component defines messaging contracts.
+This rule verifies that a component defines messaging contracts. It evaluates the `jeap_messaging_contract` metric
+reported by the component and fails if any of the following contract validation switches is enabled:
+
+| Switch                       | Failure reason                                        |
+|------------------------------|-------------------------------------------------------|
+| `noMasterContracts`          | Contracts are loaded from a branch other than master. |
+| `consumeWithoutContract`     | Consuming messages without a contract is allowed.     |
+| `publishWithoutContract`     | Publishing messages without a contract is allowed.    |
+| `silentIgnoreWithoutContract`| Messages without a contract are silently ignored.     |
+
+If the metric is not present (no messaging library detected), the rule passes.
 
 To use this rule, the following modules must be enabled:
 - Prometheus module (`jeap.governance.prometheus.enabled=true`)
