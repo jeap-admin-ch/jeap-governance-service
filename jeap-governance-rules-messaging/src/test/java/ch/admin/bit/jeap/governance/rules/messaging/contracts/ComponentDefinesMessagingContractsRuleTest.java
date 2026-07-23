@@ -113,11 +113,31 @@ class ComponentDefinesMessagingContractsRuleTest {
         assertThat(result.stateComment()).isEqualTo("Publish without contracts enabled");
     }
 
+    @Test
+    void silentIgnoreWithoutContract() {
+        //given
+        SystemComponent component = mockComponent(4L);
+        when(promTimeSeriesQueryRepository.findBy(PromQueryType.JEAP_MESSAGING_CONTRACT, 4L))
+                .thenReturn(mockPrometheusResponse("0", "0", "0", "1"));
+
+        //when
+        RuleResult result = rule.evaluate(component, emptyParams);
+
+        //then
+        assertThat(result.state()).isEqualTo(State.FAIL);
+        assertThat(result.stateComment()).isEqualTo("Silently ignoring messages without contract enabled");
+    }
+
     private List<PromTimeSeries> mockPrometheusResponse(String noMasterContractsValue, String consumeWithoutContractValue, String publishWithoutContractValue) {
+        return mockPrometheusResponse(noMasterContractsValue, consumeWithoutContractValue, publishWithoutContractValue, "0");
+    }
+
+    private List<PromTimeSeries> mockPrometheusResponse(String noMasterContractsValue, String consumeWithoutContractValue, String publishWithoutContractValue, String silentIgnoreWithoutContractValue) {
         return List.of(
                 mockPromTimeSeries("noMasterContracts", noMasterContractsValue),
                 mockPromTimeSeries("consumeWithoutContract", consumeWithoutContractValue),
-                mockPromTimeSeries("publishWithoutContract", publishWithoutContractValue));
+                mockPromTimeSeries("publishWithoutContract", publishWithoutContractValue),
+                mockPromTimeSeries("silentIgnoreWithoutContract", silentIgnoreWithoutContractValue));
     }
 
     private PromTimeSeries mockPromTimeSeries(String key, String value) {

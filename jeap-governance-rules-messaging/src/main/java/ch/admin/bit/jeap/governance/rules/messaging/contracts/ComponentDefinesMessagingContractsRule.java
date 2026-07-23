@@ -24,6 +24,7 @@ public class ComponentDefinesMessagingContractsRule implements Rule {
     private static final String NO_MASTER_SWITCH_NAME = "noMasterContracts";
     private static final String CONSUME_WITHOUT_SWITCH_NAME = "consumeWithoutContract";
     private static final String PUBLISH_WITHOUT_SWITCH_NAME = "publishWithoutContract";
+    private static final String SILENT_IGNORE_WITHOUT_SWITCH_NAME = "silentIgnoreWithoutContract";
 
     private final PromTimeSeriesQueryRepository promTimeSeriesQueryRepository;
 
@@ -51,6 +52,9 @@ public class ComponentDefinesMessagingContractsRule implements Rule {
         }
         if (getSwitchValue(prometheusQueryResponses, PUBLISH_WITHOUT_SWITCH_NAME)) {
             return RuleResult.failed("Publish without contracts enabled");
+        }
+        if (getSwitchValue(prometheusQueryResponses, SILENT_IGNORE_WITHOUT_SWITCH_NAME)) {
+            return RuleResult.failed("Silently ignoring messages without contract enabled");
         }
         return RuleResult.ok("Contracts enabled");
     }

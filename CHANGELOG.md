@@ -7,6 +7,12 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > - Spring Boot 3 maintenance (bug fixes, patches, and regular updates) continues on branch `release/springboot3`.
 
+## [5.3.0] - 2026-07-23
+
+### Changed
+- The messaging contracts rule now fails for components that silently ignore messages without a contract
+  (`jeap.messaging.contract` metric switch `silentIgnoreWithoutContract`).
+
 ## [5.2.0] - 2026-07-22
 
 ### Dependencies

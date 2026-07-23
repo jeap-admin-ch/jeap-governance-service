@@ -87,4 +87,31 @@ class ComponentDefinesMessagingContractsRuleIT extends GovernanceIntegrationTest
         assertThat(ruleState).isPresent();
         assertThat(ruleState.get().getState()).isEqualTo(State.FAIL);
     }
+
+    @Test
+    void componentSilentlyIgnoresMessagesWithoutContract_resultsInFail() {
+        var system = systemRepository.add(System.builder()
+                .name("testsys3")
+                .aliases(Set.of())
+                .systemComponents(List.of(
+                        SystemComponent.builder().name("service3").type(ComponentType.BACKEND_SERVICE).build()
+                ))
+                .build());
+
+        var component = system.getSystemComponents().getFirst();
+        promTimeSeriesRepository.saveAll(List.of(
+                PromTimeSeries.builder()
+                        .prometheusQueryType(PromQueryType.JEAP_MESSAGING_CONTRACT)
+                        .queryTimestamp(ZonedDateTime.now())
+                        .systemComponentId(component.getId())
+                        .sample(new PromTimeSeriesSample(Map.of("switch", "silentIgnoreWithoutContract"), List.of("1")))
+                        .build()
+        ));
+
+        ruleEvaluationService.updateRuleStatesForComponent(component);
+
+        var ruleState = ruleStateRepository.findBySystemComponentAndRuleId(component, RuleId.of("component-defines-messagingcontracts"));
+        assertThat(ruleState).isPresent();
+        assertThat(ruleState.get().getState()).isEqualTo(State.FAIL);
+    }
 }
