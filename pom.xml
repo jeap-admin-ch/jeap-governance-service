@@ -28,13 +28,13 @@
     <parent>
         <groupId>ch.admin.bit.jeap</groupId>
         <artifactId>jeap-spring-boot-parent</artifactId>
-        <version>38.0.0</version>
+        <version>38.0.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <artifactId>jeap-governance-service</artifactId>
     <name>${project.groupId}:${project.artifactId}</name>
-    <version>6.0.0-SNAPSHOT</version>
+    <version>6.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -71,82 +71,82 @@
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-dataimport</artifactId>
-                <version>6.0.0-SNAPSHOT</version>
+                <version>6.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-domain</artifactId>
-                <version>6.0.0-SNAPSHOT</version>
+                <version>6.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-persistence</artifactId>
-                <version>6.0.0-SNAPSHOT</version>
+                <version>6.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-rules</artifactId>
-                <version>6.0.0-SNAPSHOT</version>
+                <version>6.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-rules-core</artifactId>
-                <version>6.0.0-SNAPSHOT</version>
+                <version>6.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-archrepo</artifactId>
-                <version>6.0.0-SNAPSHOT</version>
+                <version>6.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-deploymentlog</artifactId>
-                <version>6.0.0-SNAPSHOT</version>
+                <version>6.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-reactionobserver</artifactId>
-                <version>6.0.0-SNAPSHOT</version>
+                <version>6.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-web</artifactId>
-                <version>6.0.0-SNAPSHOT</version>
+                <version>6.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-reporting</artifactId>
-                <version>6.0.0-SNAPSHOT</version>
+                <version>6.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-prometheus</artifactId>
-                <version>6.0.0-SNAPSHOT</version>
+                <version>6.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-secscan</artifactId>
-                <version>6.0.0-SNAPSHOT</version>
+                <version>6.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-rules-messaging</artifactId>
-                <version>6.0.0-SNAPSHOT</version>
+                <version>6.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-rules-dependency</artifactId>
-                <version>6.0.0-SNAPSHOT</version>
+                <version>6.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-rules-pact</artifactId>
-                <version>6.0.0-SNAPSHOT</version>
+                <version>6.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-service-instance</artifactId>
-                <version>6.0.0-SNAPSHOT</version>
+                <version>6.0.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
