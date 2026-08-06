@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -39,7 +40,7 @@ class ScoringServiceTest {
             systemScoreCalculator, systemScoreRepository,
             ruleEvaluationService, systemRepository);
 
-    private static final LocalDate DAY = LocalDate.of(2025, 6, 15);
+    private static final LocalDate DAY = LocalDate.of(2025, Month.JUNE, 15);
 
     @BeforeEach
     void setUp() {
@@ -94,7 +95,7 @@ class ScoringServiceTest {
 
         scoringService.updateSystemScore(SYSTEM_ID, DAY);
 
-        verify(componentScoreRepository).saveOrReplaceAllForSystemAndDay(eq(system), eq(List.of()), eq(DAY));
+        verify(componentScoreRepository).saveOrReplaceAllForSystemAndDay(system, List.of(), DAY);
         verify(systemScoreRepository).save(argThat(score -> score.getScore() == 100));
     }
 
@@ -133,6 +134,24 @@ class ScoringServiceTest {
         assertThat(allResults)
                 .hasSize(2)
                 .containsExactlyElementsOf(results);
+    }
+
+    @Test
+    void updateSystemScore_ignoresGatewayComponents() {
+        List<SystemComponent> components = List.of(
+                SystemComponent.builder().name("service-a").type(ComponentType.BACKEND_SERVICE).build(),
+                SystemComponent.builder().name("GATEWAY-api-gw").type(ComponentType.GATEWAY).build()
+        );
+        System system = System.builder().name("test-system").aliases(Set.of()).systemComponents(components).build();
+        when(systemRepository.findById(SYSTEM_ID)).thenReturn(Optional.of(system));
+        when(ruleEvaluationService.updateRuleStatesForComponent(any())).thenReturn(List.of());
+
+        scoringService.updateSystemScore(SYSTEM_ID, DAY);
+
+        // Only the BACKEND_SERVICE component should be evaluated, not the GATEWAY one
+        verify(ruleEvaluationService, times(1)).updateRuleStatesForComponent(any());
+        verify(componentScoreRepository).saveOrReplaceAllForSystemAndDay(eq(system),
+                argThat(scores -> scores.size() == 1), eq(DAY));
     }
 
     private System systemWithComponents(String... componentNames) {

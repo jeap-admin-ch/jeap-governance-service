@@ -7,6 +7,7 @@ public enum ArchRepoSystemComponentType {
     FRONTEND,
     MOBILE_APP,
     SELF_CONTAINED_SYSTEM,
+    GATEWAY,
     @JsonEnumDefaultValue
     UNKNOWN
 }

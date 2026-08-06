@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static ch.admin.bit.jeap.governance.domain.ComponentType.isIgnoredForGovernance;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -49,6 +51,9 @@ public class ReportingSystemsPreparation {
         Map<Long, Map<Long, ReportingComponentScore>> componentScoresPerSystem = new HashMap<>();
         for (ComponentScore componentScore : componentScores) {
             SystemComponent systemComponent = componentScore.getSystemComponent();
+            if (isIgnoredForGovernance(systemComponent.getType())) {
+                continue;
+            }
             System system = systemComponent.getSystem();
             Long systemId = system.getId();
             componentScoresPerSystem
@@ -69,20 +74,28 @@ public class ReportingSystemsPreparation {
         Map<Long, List<ReportingRuleState>> ruleStatesPerComponentId = new HashMap<>();
         Map<String, RuleInfo> ruleInfoByRuleId = activeRules.stream().collect(Collectors.toMap(ruleInfo -> ruleInfo.ruleId().id(), rm -> rm));
         for (RuleState ruleState : ruleStates) {
-
-            RuleInfo ruleInfo = ruleInfoByRuleId.get(ruleState.getRuleId());
-            if (ruleInfo == null) {
-                log.warn("Could not find any rule metadata for rule id: {}, rule state: {}", ruleState.getRuleId(), ruleState);
-                continue;
+            if (!isIgnoredForGovernance(ruleState.getSystemComponent().getType())) {
+                addRuleState(ruleStatesPerComponentId, ruleInfoByRuleId, ruleState);
             }
-            Long componentId = ruleState.getSystemComponent().getId();
-            ReportingRuleState reportingRuleState = new ReportingRuleState(ruleState.getRuleId(), ruleInfo.label(), ruleInfo.documentationLink(),
-                    ruleState.getState(), ruleState.getStateComment(), ruleState.getModifiedAt());
-            ruleStatesPerComponentId
-                    .computeIfAbsent(componentId, _ -> new ArrayList<>())
-                    .add(reportingRuleState);
         }
         return ruleStatesPerComponentId;
+    }
+
+    private static void addRuleState(Map<Long, List<ReportingRuleState>> ruleStatesPerComponentId,
+                                     Map<String, RuleInfo> ruleInfoByRuleId,
+                                     RuleState ruleState) {
+        RuleInfo ruleInfo = ruleInfoByRuleId.get(ruleState.getRuleId());
+        if (ruleInfo == null) {
+            log.warn("Could not find any rule metadata for rule id: {}, rule state: {}", ruleState.getRuleId(), ruleState);
+            return;
+        }
+
+        Long componentId = ruleState.getSystemComponent().getId();
+        ReportingRuleState reportingRuleState = new ReportingRuleState(ruleState.getRuleId(), ruleInfo.label(), ruleInfo.documentationLink(),
+                ruleState.getState(), ruleState.getStateComment(), ruleState.getModifiedAt());
+        ruleStatesPerComponentId
+                .computeIfAbsent(componentId, _ -> new ArrayList<>())
+                .add(reportingRuleState);
     }
 
     private static Map<Long, ReportingSystemScore> prepareSystemScores(List<SystemScore> systemScores, Map<Long, Map<Long, ReportingComponentScore>> componentScoresPerSystem) {

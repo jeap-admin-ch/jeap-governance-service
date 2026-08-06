@@ -17,6 +17,7 @@ import org.mockito.quality.Strictness;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -56,9 +57,9 @@ class ReportingRulesPreparationTest {
         List<SystemReference> systems = List.of(systemRef(SYSTEM_ID, SYSTEM_NAME));
         List<SystemComponentReference> components = List.of(componentRef(COMPONENT_ID, COMPONENT_NAME));
 
-        List<ReportingRule> result = preparation.prepareAllRules(
+        List<ReportingRule> result = preparation.prepareRules(
                 conformanceRates, systemConformanceRates, activeRules,
-                nonCompliant, systems, components
+                nonCompliant, systems, components, Set.of()
         );
 
         assertThat(result).hasSize(1);
@@ -79,9 +80,9 @@ class ReportingRulesPreparationTest {
         List<SystemReference> systems = List.of();
         List<SystemComponentReference> components = List.of();
 
-        List<ReportingRule> result = preparation.prepareAllRules(
+        List<ReportingRule> result = preparation.prepareRules(
                 conformanceRates, systemConformanceRates, activeRules,
-                nonCompliant, systems, components
+                nonCompliant, systems, components, Set.of()
         );
 
         assertThat(result).isEmpty();
@@ -89,8 +90,8 @@ class ReportingRulesPreparationTest {
 
     @Test
     void prepareAllRules_noActiveRules_returnsEmptyList() {
-        List<ReportingRule> result = preparation.prepareAllRules(
-                List.of(), List.of(), List.of(), List.of(), List.of(), List.of()
+        List<ReportingRule> result = preparation.prepareRules(
+                List.of(), List.of(), List.of(), List.of(), List.of(), List.of(), Set.of()
         );
 
         assertThat(result).isEmpty();
@@ -102,10 +103,10 @@ class ReportingRulesPreparationTest {
                 conformanceRate(RULE_ID, TIMESTAMP, 90)
         );
 
-        List<ReportingRule> result = preparation.prepareAllRules(
+        List<ReportingRule> result = preparation.prepareRules(
                 conformanceRates, List.of(),
                 List.of(ruleInfo(RULE_ID, RULE_LABEL)),
-                List.of(), List.of(systemRef(SYSTEM_ID, SYSTEM_NAME)), List.of()
+                List.of(), List.of(systemRef(SYSTEM_ID, SYSTEM_NAME)), List.of(), Set.of()
         );
 
         assertThat(result).hasSize(1);
@@ -118,10 +119,10 @@ class ReportingRulesPreparationTest {
                 conformanceRate(RULE_ID, TIMESTAMP, 100)
         );
 
-        List<ReportingRule> result = preparation.prepareAllRules(
+        List<ReportingRule> result = preparation.prepareRules(
                 conformanceRates, List.of(),
                 List.of(ruleInfo(RULE_ID, RULE_LABEL)),
-                List.of(), List.of(), List.of()
+                List.of(), List.of(), List.of(), Set.of()
         );
 
         assertThat(result).hasSize(1);
@@ -135,12 +136,13 @@ class ReportingRulesPreparationTest {
         );
         NonCompliantComponentEntry entryWithUnknownSystem = nonCompliantEntry(RULE_ID, 999L, COMPONENT_ID, TIMESTAMP);
 
-        List<ReportingRule> result = preparation.prepareAllRules(
+        List<ReportingRule> result = preparation.prepareRules(
                 conformanceRates, List.of(),
                 List.of(ruleInfo(RULE_ID, RULE_LABEL)),
                 List.of(entryWithUnknownSystem),
                 List.of(systemRef(SYSTEM_ID, SYSTEM_NAME)), // system 999 not present
-                List.of(componentRef(COMPONENT_ID, COMPONENT_NAME))
+                List.of(componentRef(COMPONENT_ID, COMPONENT_NAME)),
+                Set.of()
         );
 
         assertThat(result).hasSize(1);
@@ -154,12 +156,13 @@ class ReportingRulesPreparationTest {
         );
         NonCompliantComponentEntry entryWithUnknownComponent = nonCompliantEntry(RULE_ID, SYSTEM_ID, 999L, TIMESTAMP);
 
-        List<ReportingRule> result = preparation.prepareAllRules(
+        List<ReportingRule> result = preparation.prepareRules(
                 conformanceRates, List.of(),
                 List.of(ruleInfo(RULE_ID, RULE_LABEL)),
                 List.of(entryWithUnknownComponent),
                 List.of(systemRef(SYSTEM_ID, SYSTEM_NAME)),
-                List.of(componentRef(COMPONENT_ID, COMPONENT_NAME)) // component 999 not present
+                List.of(componentRef(COMPONENT_ID, COMPONENT_NAME)), // component 999 not present
+                Set.of()
         );
 
         assertThat(result).hasSize(1);
@@ -178,14 +181,43 @@ class ReportingRulesPreparationTest {
                 ruleInfo(ruleId2, "Rule Two")
         );
 
-        List<ReportingRule> result = preparation.prepareAllRules(
+        List<ReportingRule> result = preparation.prepareRules(
                 conformanceRates, List.of(), activeRules,
-                List.of(), List.of(), List.of()
+                List.of(), List.of(), List.of(), Set.of()
         );
 
         assertThat(result).hasSize(2);
         assertThat(result).extracting(ReportingRule::getRuleId)
                 .containsExactlyInAnyOrder(RULE_ID, ruleId2);
+    }
+
+    @Test
+    void prepareAllRules_ignoredComponentNonComplianceIsExcluded() {
+        long gatewayComponentId = 21L;
+        List<RuleConformanceRate> conformanceRates = List.of(
+                conformanceRate(RULE_ID, TIMESTAMP, 50)
+        );
+        List<NonCompliantComponentEntry> nonCompliant = List.of(
+                nonCompliantEntry(RULE_ID, SYSTEM_ID, COMPONENT_ID, TIMESTAMP.minusDays(2)),
+                nonCompliantEntry(RULE_ID, SYSTEM_ID, gatewayComponentId, TIMESTAMP.minusDays(3))
+        );
+        List<SystemComponentReference> components = List.of(
+                componentRef(COMPONENT_ID, COMPONENT_NAME),
+                componentRef(gatewayComponentId, "Gateway X")
+        );
+
+        List<ReportingRule> result = preparation.prepareRules(
+                conformanceRates, List.of(), List.of(ruleInfo(RULE_ID, RULE_LABEL)),
+                nonCompliant, List.of(systemRef(SYSTEM_ID, SYSTEM_NAME)), components, Set.of(gatewayComponentId)
+        );
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().getNonCompliantComponents())
+                .singleElement()
+                .satisfies(component -> {
+                    assertThat(component.getComponentId()).isEqualTo(COMPONENT_ID);
+                    assertThat(component.getComponentName()).isEqualTo(COMPONENT_NAME);
+                });
     }
 
 

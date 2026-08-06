@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 @ExtendWith(MockitoExtension.class)
 class ReportingSystemsPreparationTest {
@@ -29,6 +30,7 @@ class ReportingSystemsPreparationTest {
     private static final System SYSTEM_A = System.builder().name("System A").systemComponents(List.of()).build();
     private static final SystemComponent COMPONENT_A_1 = SystemComponent.builder().name("Component A1").type(ComponentType.BACKEND_SERVICE).build();
     private static final SystemComponent COMPONENT_A_2 = SystemComponent.builder().name("Component A2").type(ComponentType.BACKEND_SERVICE).build();
+    private static final SystemComponent GATEWAY_A = SystemComponent.builder().name("Gateway A").type(ComponentType.GATEWAY).build();
     private static final RuleInfo RULE_INFO_1 = new RuleInfo(new RuleId("Rule_1"), "Rule 1 label", "Rule 1 link");
     private static final RuleInfo RULE_INFO_2 = new RuleInfo(new RuleId("Rule_2"), "Rule 2 label", "Rule 2 link");
 
@@ -39,6 +41,10 @@ class ReportingSystemsPreparationTest {
     static {
         SYSTEM_A.addSystemComponent(COMPONENT_A_1);
         SYSTEM_A.addSystemComponent(COMPONENT_A_2);
+        SYSTEM_A.addSystemComponent(GATEWAY_A);
+        setField(COMPONENT_A_1, "id", 1L);
+        setField(COMPONENT_A_2, "id", 2L);
+        setField(GATEWAY_A, "id", 3L);
     }
 
     @Mock
@@ -127,6 +133,34 @@ class ReportingSystemsPreparationTest {
     }
 
     @Test
+    void prepareAllSystemsScores_ignoredComponentHistoricalScoresAndRuleStatesAreExcluded() {
+        List<SystemScore> systemScores = List.of(createSystemScore(SYSTEM_A, DAY3, 95));
+        List<ComponentScore> componentScores = List.of(
+                createComponentScore(COMPONENT_A_1, DAY3, 60),
+                createComponentScore(GATEWAY_A, DAY3, 10)
+        );
+        List<RuleInfo> activeRules = List.of(RULE_INFO_1);
+        List<RuleState> ruleStates = List.of(
+                createRuleState(COMPONENT_A_1, RULE_INFO_1, State.OK),
+                createRuleState(GATEWAY_A, RULE_INFO_1, State.FAIL)
+        );
+        when(dataAccess.findAllSystemScoresByDayBetweenInclusive(DAY1, DAY3)).thenReturn(systemScores);
+        when(dataAccess.findAllComponentScoreByDayBetweenInclusive(DAY1, DAY3)).thenReturn(componentScores);
+        when(dataAccess.findAllActiveRuleInfos()).thenReturn(activeRules);
+        when(dataAccess.findAllRuleStates()).thenReturn(ruleStates);
+
+        List<ReportingSystemScore> result = preparation.prepareAllSystemsScores(DAY1, DAY3);
+
+        assertEquals(1, result.size());
+        assertEquals(1, result.getFirst().getComponentScores().size());
+        ReportingComponentScore componentScore = result.getFirst().getComponentScores().getFirst();
+        assertEquals(COMPONENT_A_1.getId(), componentScore.getComponentId());
+        assertEquals(1, componentScore.getScores().size());
+        assertEquals(1, componentScore.getRuleStates().size());
+        assertEquals(RULE_INFO_1.ruleId().id(), componentScore.getRuleStates().getFirst().ruleId());
+    }
+
+    @Test
     void testPrepareSystemsScoreReportModel_returnEmptyOutput_ifInputEmpty() {
         List<SystemScore> systemScores = List.of();
         List<ComponentScore> componentScores = List.of();
@@ -160,9 +194,13 @@ class ReportingSystemsPreparationTest {
     }
 
     private RuleState createRuleState(SystemComponent systemComponent, RuleInfo ruleMetadata) {
+        return createRuleState(systemComponent, ruleMetadata, State.OK);
+    }
+
+    private RuleState createRuleState(SystemComponent systemComponent, RuleInfo ruleMetadata, State state) {
         return RuleState.builder()
                 .ruleId(ruleMetadata.ruleId())
-                .state(State.OK)
+                .state(state)
                 .ruleStateComment("No comment" + ruleMetadata.label())
                 .systemComponent(systemComponent)
                 .build();

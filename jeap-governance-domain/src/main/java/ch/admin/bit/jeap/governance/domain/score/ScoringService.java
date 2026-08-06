@@ -15,6 +15,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static ch.admin.bit.jeap.governance.domain.ComponentType.isIgnoredForGovernance;
+
 /**
  * Orchestrates rule evaluation and score calculation for all components of a system.
  */
@@ -38,6 +40,7 @@ public class ScoringService {
         List<RuleEvaluationResult> allResults = new ArrayList<>();
 
         List<ComponentScore> componentScores = system.getSystemComponents().stream()
+                .filter(systemComponent -> !isIgnoredForGovernance(systemComponent.getType()))
                 .map(systemComponent -> evaluateComponentScore(systemComponent, day, allResults))
                 .toList();
         componentScoreRepository.saveOrReplaceAllForSystemAndDay(system, componentScores, day);

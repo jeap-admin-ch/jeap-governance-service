@@ -1,9 +1,6 @@
 package ch.admin.bit.jeap.governance.reporting.preparation;
 
-import ch.admin.bit.jeap.governance.domain.SystemComponentReference;
-import ch.admin.bit.jeap.governance.domain.SystemComponentRepository;
-import ch.admin.bit.jeap.governance.domain.SystemReference;
-import ch.admin.bit.jeap.governance.domain.SystemRepository;
+import ch.admin.bit.jeap.governance.domain.*;
 import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleInfo;
 import ch.admin.bit.jeap.governance.domain.rule.*;
 import ch.admin.bit.jeap.governance.domain.score.ComponentScore;
@@ -16,6 +13,11 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
+import static ch.admin.bit.jeap.governance.domain.ComponentType.isIgnoredForGovernance;
+import static java.util.stream.Collectors.toUnmodifiableSet;
 
 @Component
 @RequiredArgsConstructor
@@ -65,6 +67,15 @@ public class ReportingDataAccess {
 
     public List<SystemComponentReference> findAllComponentReferences() {
         return systemComponentRepository.findAllSystemComponentReferences();
+    }
+
+    Set<Long> findIgnoredComponentIds() {
+        return systemRepository.findAll().stream()
+                .flatMap(system -> system.getSystemComponents().stream())
+                .filter(component -> isIgnoredForGovernance(component.getType()))
+                .map(SystemComponent::getId)
+                .filter(Objects::nonNull)
+                .collect(toUnmodifiableSet());
     }
 
 }

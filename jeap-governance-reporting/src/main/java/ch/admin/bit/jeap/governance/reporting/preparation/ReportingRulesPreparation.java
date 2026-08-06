@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -34,12 +35,15 @@ public class ReportingRulesPreparation {
         List<NonCompliantComponentEntry> nonCompliantComponentEntries = dataAccess.findNonCompliantSince();
         List<SystemReference> allSystemReferences = dataAccess.findAllSystemReferences();
         List<SystemComponentReference> allComponentReferences = dataAccess.findAllComponentReferences();
+        Set<Long> ignoredComponentIds = dataAccess.findIgnoredComponentIds();
 
-        return prepareAllRules(latestRuleConformanceRatesPerRuleId, latestPerRuleIdAndSystemId, activeRuleInfos, nonCompliantComponentEntries, allSystemReferences, allComponentReferences);
+        return prepareRules(latestRuleConformanceRatesPerRuleId, latestPerRuleIdAndSystemId, activeRuleInfos,
+                nonCompliantComponentEntries, allSystemReferences, allComponentReferences, ignoredComponentIds);
     }
 
-    List<ReportingRule> prepareAllRules(List<RuleConformanceRate> latestRuleConformanceRatesPerRuleId, List<SystemRuleConformanceRate> latestPerRuleIdAndSystemId, List<RuleInfo> activeRuleInfos,
-                                        List<NonCompliantComponentEntry> nonCompliantComponentEntries, List<SystemReference> allSystemReferences, List<SystemComponentReference> allComponentReferences) {
+    List<ReportingRule> prepareRules(List<RuleConformanceRate> latestRuleConformanceRatesPerRuleId, List<SystemRuleConformanceRate> latestPerRuleIdAndSystemId, List<RuleInfo> activeRuleInfos,
+                                    List<NonCompliantComponentEntry> nonCompliantComponentEntries, List<SystemReference> allSystemReferences,
+                                    List<SystemComponentReference> allComponentReferences, Set<Long> ignoredComponentIds) {
         Map<Long, SystemReference> systemReferenceById = allSystemReferences.stream()
                 .collect(Collectors.toMap(SystemReference::getId, systemReference -> systemReference));
         Map<Long, SystemComponentReference> componentReferenceById = allComponentReferences.stream()
@@ -51,10 +55,16 @@ public class ReportingRulesPreparation {
         Map<String, List<NonCompliantComponentEntry>> nonCompliantComponentEntryByRuleId = nonCompliantComponentEntries.stream()
                 .collect(Collectors.groupingBy(NonCompliantComponentEntry::getRuleId));
 
-        return prepareAllRules(activeRuleInfos, ruleConformanceRateByRuleId, systemRuleConformanceRateByRuleIdAndSystemId, systemReferenceById, nonCompliantComponentEntryByRuleId, componentReferenceById);
+        return buildRules(activeRuleInfos, ruleConformanceRateByRuleId, systemRuleConformanceRateByRuleIdAndSystemId,
+                systemReferenceById, nonCompliantComponentEntryByRuleId, componentReferenceById, ignoredComponentIds);
     }
 
-    private List<ReportingRule> prepareAllRules(List<RuleInfo> activeRuleInfos, Map<String, List<RuleConformanceRate>> ruleConformanceRateByRuleId, Map<String, List<SystemRuleConformanceRate>> systemRuleConformanceRateByRuleIdAndSystemId, Map<Long, SystemReference> systemReferenceById, Map<String, List<NonCompliantComponentEntry>> nonCompliantComponentEntryByRuleId, Map<Long, SystemComponentReference> componentReferenceById) {
+    private List<ReportingRule> buildRules(List<RuleInfo> activeRuleInfos, Map<String, List<RuleConformanceRate>> ruleConformanceRateByRuleId,
+                                           Map<String, List<SystemRuleConformanceRate>> systemRuleConformanceRateByRuleIdAndSystemId,
+                                           Map<Long, SystemReference> systemReferenceById,
+                                           Map<String, List<NonCompliantComponentEntry>> nonCompliantComponentEntryByRuleId,
+                                           Map<Long, SystemComponentReference> componentReferenceById,
+                                           Set<Long> ignoredComponentIds) {
         List<ReportingRule> result = new ArrayList<>();
         for (RuleInfo ruleInfo : activeRuleInfos) {
             String ruleId = ruleInfo.ruleId().id();
@@ -70,7 +80,8 @@ public class ReportingRulesPreparation {
             );
             ruleConformanceRates.forEach(reportingRule::addConformanceRate);
             addSystemRuleConformanceRates(reportingRule, systemRuleConformanceRateByRuleIdAndSystemId, systemReferenceById);
-            addNonCompliantComponents(reportingRule, nonCompliantComponentEntryByRuleId, systemReferenceById, componentReferenceById);
+            addNonCompliantComponents(reportingRule, nonCompliantComponentEntryByRuleId, systemReferenceById,
+                    componentReferenceById, ignoredComponentIds);
 
             result.add(reportingRule);
         }
@@ -94,18 +105,30 @@ public class ReportingRulesPreparation {
         }
     }
 
-    private static void addNonCompliantComponents(ReportingRule reportingRule, Map<String, List<NonCompliantComponentEntry>> nonCompliantComponentEntryByRuleId, Map<Long, SystemReference> systemReferenceById, Map<Long, SystemComponentReference> componentReferenceById) {
+    private static void addNonCompliantComponents(ReportingRule reportingRule,
+                                                  Map<String, List<NonCompliantComponentEntry>> nonCompliantComponentEntryByRuleId,
+                                                  Map<Long, SystemReference> systemReferenceById,
+                                                  Map<Long, SystemComponentReference> componentReferenceById,
+                                                  Set<Long> ignoredComponentIds) {
         List<NonCompliantComponentEntry> nonCompliantComponentEntriesForRule = nonCompliantComponentEntryByRuleId.get(reportingRule.getRuleId());
         if (nonCompliantComponentEntriesForRule == null || nonCompliantComponentEntriesForRule.isEmpty()) {
             log.info("No non compliant component entries found for rule id {}, rule label {}", reportingRule.getRuleId(), reportingRule.getRuleName());
         } else {
             for (NonCompliantComponentEntry nonCompliantComponentEntry : nonCompliantComponentEntriesForRule) {
-                addNonCompliantComponentEntry(nonCompliantComponentEntry, reportingRule, systemReferenceById, componentReferenceById);
+                addNonCompliantComponentEntry(nonCompliantComponentEntry, reportingRule, systemReferenceById,
+                        componentReferenceById, ignoredComponentIds);
             }
         }
     }
 
-    private static void addNonCompliantComponentEntry(NonCompliantComponentEntry nonCompliantComponentEntry, ReportingRule reportingRule, Map<Long, SystemReference> systemReferenceById, Map<Long, SystemComponentReference> componentReferenceById) {
+    private static void addNonCompliantComponentEntry(NonCompliantComponentEntry nonCompliantComponentEntry,
+                                                      ReportingRule reportingRule,
+                                                      Map<Long, SystemReference> systemReferenceById,
+                                                      Map<Long, SystemComponentReference> componentReferenceById,
+                                                      Set<Long> ignoredComponentIds) {
+        if (ignoredComponentIds.contains(nonCompliantComponentEntry.getSystemComponentId())) {
+            return;
+        }
         SystemReference systemReference = systemReferenceById.get(nonCompliantComponentEntry.getSystemId());
         if (systemReference == null) {
             log.warn(
