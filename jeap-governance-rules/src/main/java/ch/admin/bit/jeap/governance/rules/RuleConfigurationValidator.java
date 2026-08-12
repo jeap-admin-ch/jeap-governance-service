@@ -50,6 +50,7 @@ class RuleConfigurationValidator {
     void validateConfiguration(boolean failOnError) {
         validateUnknownRuleIds(failOnError);
         validateRuleWeights(failOnError);
+        validateViolationDelays(failOnError);
         validateRuleParameters(failOnError);
     }
 
@@ -84,6 +85,19 @@ class RuleConfigurationValidator {
             log.error("Active rule(s) have invalid weight (must be >= 1): {}", rulesWithInvalidWeight);
             if (failOnError) {
                 throw new IllegalStateException("Active rule(s) have invalid weight (must be >= 1)");
+            }
+        }
+    }
+
+    private void validateViolationDelays(boolean failOnError) {
+        List<RuleId> rulesWithInvalidDelay = properties.getActive().stream()
+                .filter(activeRule -> activeRule.getViolationDelay() == null || activeRule.getViolationDelay().isNegative())
+                .map(ActiveRule::getId)
+                .toList();
+        if (!rulesWithInvalidDelay.isEmpty()) {
+            log.error("Active rule(s) have invalid violation delay (must be >= 0): {}", rulesWithInvalidDelay);
+            if (failOnError) {
+                throw new IllegalStateException("Active rule(s) have invalid violation delay (must be >= 0)");
             }
         }
     }

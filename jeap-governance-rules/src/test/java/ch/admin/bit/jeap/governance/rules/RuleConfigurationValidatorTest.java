@@ -12,6 +12,7 @@ import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 
 import java.util.List;
+import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -155,6 +156,23 @@ class RuleConfigurationValidatorTest {
         validator.validateConfiguration(false);
 
         assertThat(output).contains("Active rule 'validating-rule' has invalid parameters");
+    }
+
+    @Test
+    void negativeViolationDelayThrows(CapturedOutput output) {
+        var properties = new RuleConfigurationProperties();
+        var activeRule = new RuleConfigurationProperties.ActiveRule();
+        activeRule.setId("enforce-oauth2");
+        activeRule.setWeight(5);
+        activeRule.setViolationDelay(Duration.ofDays(-1));
+        properties.setActive(List.of(activeRule));
+
+        var validator = new RuleConfigurationValidator(List.of(testRule("enforce-oauth2")), properties);
+
+        assertThatThrownBy(() -> validator.validateConfiguration(true))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("invalid violation delay");
+        assertThat(output).contains("invalid violation delay");
     }
 
     private static Rule testRule(String id) {

@@ -3,10 +3,17 @@ package ch.admin.bit.jeap.governance.domain.rule;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
 import org.springframework.util.StringUtils;
 
+import java.time.Duration;
+import java.time.ZonedDateTime;
+
 /**
  * The outcome of evaluating a rule against a component, carrying the resulting state and an optional comment for failed rules.
  */
-public record RuleEvaluationResult(RuleId ruleId, State state, String stateComment) {
+public record RuleEvaluationResult(RuleId ruleId, State state, String stateComment, Duration violationDelay) {
+
+    public RuleEvaluationResult(RuleId ruleId, State state, String stateComment) {
+        this(ruleId, state, stateComment, Duration.ZERO);
+    }
 
     public static RuleEvaluationResult ok(RuleId ruleId) {
         return new RuleEvaluationResult(ruleId, State.OK, null);
@@ -30,6 +37,12 @@ public record RuleEvaluationResult(RuleId ruleId, State state, String stateComme
 
     public boolean isOk() {
         return state == State.OK;
+    }
+
+    RuleEvaluationResult delayedUntil(ZonedDateTime deadline) {
+        String comment = StringUtils.hasText(stateComment) ? stateComment + ". " : "";
+        return new RuleEvaluationResult(ruleId, State.OK,
+                comment + "Violation grace period ends at " + deadline, violationDelay);
     }
 
     RuleState toRuleState(SystemComponent systemComponent) {

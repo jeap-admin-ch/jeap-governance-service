@@ -33,11 +33,14 @@ public abstract class GovernanceIntegrationTestBase {
     private static final String DL_PASSWORD = "myPassword";
     private static final String RO_USERNAME = "myUsername";
     private static final String RO_PASSWORD = "myPassword";
+    protected static final String MC_USERNAME = "messageContractReader";
+    protected static final String MC_PASSWORD = "messageContractPassword";
     private static final GovernanceServiceEnvironment DL_ENVIRONMENT = GovernanceServiceEnvironment.PROD;
 
     protected static WireMockServer archRepoMockServer;
     protected static WireMockServer deploymentLogMockServer;
     protected static WireMockServer reactionObserverMockServer;
+    protected static WireMockServer messageContractMockServer;
 
     private static PostgreSQLContainer postgres = new PostgreSQLContainer(
             DockerImageName.parse("postgres:17-alpine").asCompatibleSubstituteFor("postgres:17-alpine")
@@ -63,6 +66,10 @@ public abstract class GovernanceIntegrationTestBase {
                 .dynamicPort());
         reactionObserverMockServer.start();
         WireMock.configureFor(reactionObserverMockServer.port());
+        messageContractMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig()
+                .dynamicPort());
+        messageContractMockServer.start();
+        WireMock.configureFor(messageContractMockServer.port());
 
         postgres.start();
     }
@@ -77,6 +84,9 @@ public abstract class GovernanceIntegrationTestBase {
         }
         if (reactionObserverMockServer != null) {
             reactionObserverMockServer.stop();
+        }
+        if (messageContractMockServer != null) {
+            messageContractMockServer.stop();
         }
         postgres.stop();
     }
@@ -98,11 +108,17 @@ public abstract class GovernanceIntegrationTestBase {
         registry.add("jeap.governance.reactionobserver.url", reactionObserverMockServer::baseUrl);
         registry.add("jeap.governance.reactionobserver.username", () -> RO_USERNAME);
         registry.add("jeap.governance.reactionobserver.password", () -> RO_PASSWORD);
+
+        registry.add("jeap.governance.message-contract.url",
+                () -> messageContractMockServer.baseUrl() + "/api/contracts/version-status?env={environment}");
+        registry.add("jeap.governance.message-contract.username", () -> MC_USERNAME);
+        registry.add("jeap.governance.message-contract.password", () -> MC_PASSWORD);
     }
 
     @BeforeEach
     void resetWireMock() {
         archRepoMockServer.resetAll();
+        messageContractMockServer.resetAll();
     }
 
     // Helper methods for stubbing

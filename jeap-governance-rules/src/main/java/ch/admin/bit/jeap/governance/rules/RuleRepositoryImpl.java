@@ -94,7 +94,7 @@ class RuleRepositoryImpl implements RuleRepository {
         var optionalExemption = findExemption(rule.metadata().ruleId(), component);
         var activationState = determineActivationState(optionalExemption);
         var parameters = getRuleParameters(activeRule, optionalExemption);
-        return new RuleEvaluation(rule, parameters, activationState);
+        return new RuleEvaluation(rule, parameters, activationState, activeRule.getViolationDelay());
     }
 
     private static RuleParameters getRuleParameters(ActiveRule activeRule, Optional<ComponentExemption> optionalExemption) {

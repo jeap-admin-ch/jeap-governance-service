@@ -7,6 +7,11 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > - Spring Boot 3 maintenance (bug fixes, patches, and regular updates) continues on branch `release/springboot3`.
 
+## [7.1.0] - 2026-08-17
+
+### Changed
+- Added delayed rule violations and a messaging rule that detects deployed contracts using outdated message versions.
+
 ## [7.0.0] - 2026-08-16
 
 ### Dependencies

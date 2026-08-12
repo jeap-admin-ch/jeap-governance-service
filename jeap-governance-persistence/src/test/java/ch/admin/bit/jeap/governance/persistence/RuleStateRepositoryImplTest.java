@@ -52,6 +52,24 @@ class RuleStateRepositoryImplTest extends PostgresTestContainerBase {
     }
 
     @Test
+    void violationDetectionTime_survivesPersistenceRoundTrip() {
+        SystemComponent component = createAndPersistSystemWithComponent();
+        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime detectedAt = now.minusDays(3);
+        entityManager.persist(RuleState.createWithTimestamps(
+                RuleId.of("RULE-001"), component, State.OK, now, now, detectedAt));
+        entityManager.flush();
+        entityManager.clear();
+
+        Optional<RuleState> result = repository.findBySystemComponentAndRuleId(component, RuleId.of("RULE-001"));
+
+        assertThat(result).isPresent()
+                .hasValueSatisfying(ruleState -> assertThat(ruleState.getViolationDetectedAt()
+                        .truncatedTo(ChronoUnit.MILLIS).toInstant())
+                        .isEqualTo(detectedAt.truncatedTo(ChronoUnit.MILLIS).toInstant()));
+    }
+
+    @Test
     void findBySystemComponentAndRuleId_shouldReturnEmpty_whenNotExists() {
         SystemComponent component = createAndPersistSystemWithComponent();
         entityManager.persist(RuleState.builder()

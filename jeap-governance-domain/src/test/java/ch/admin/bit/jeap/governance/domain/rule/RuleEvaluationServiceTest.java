@@ -8,6 +8,11 @@ import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleParameters;
 import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleResult;
 import org.junit.jupiter.api.Test;
 
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -100,6 +105,80 @@ class RuleEvaluationServiceTest {
                     saved.getState() == State.OK &&
                     saved.getSystemComponent() == component;
         }));
+    }
+
+    @Test
+    void delayedViolationRemainsCompliantUntilDelayElapsed() {
+        Clock clock = Clock.fixed(Instant.parse("2026-08-11T10:00:00Z"), ZoneOffset.UTC);
+        RuleEvaluationService delayedService = new RuleEvaluationService(ruleEvaluator, ruleStateRepository, clock);
+        Rule rule = failingRule("delayed-rule");
+        var evaluation = new RuleEvaluation(rule, new RuleParameters(Map.of()), RuleActivationState.ACTIVE,
+                Duration.ofDays(7));
+        when(ruleRepository.getRulesToEvaluateForComponent(component)).thenReturn(List.of(evaluation));
+        when(ruleStateRepository.findBySystemComponentAndRuleId(component, rule.metadata().ruleId()))
+                .thenReturn(Optional.empty());
+
+        List<RuleEvaluationResult> results = delayedService.updateRuleStatesForComponent(component);
+
+        assertThat(results.getFirst().state()).isEqualTo(State.OK);
+        assertThat(results.getFirst().stateComment()).contains("Violation grace period ends at");
+        verify(ruleStateRepository).saveAll(argThat(states ->
+                states.getFirst().getViolationDetectedAt().equals(ZonedDateTime.now(clock))));
+    }
+
+    @Test
+    void delayedViolationFailsAfterDelayElapsed() {
+        Clock clock = Clock.fixed(Instant.parse("2026-08-11T10:00:00Z"), ZoneOffset.UTC);
+        RuleEvaluationService delayedService = new RuleEvaluationService(ruleEvaluator, ruleStateRepository, clock);
+        Rule rule = failingRule("delayed-rule");
+        var evaluation = new RuleEvaluation(rule, new RuleParameters(Map.of()), RuleActivationState.ACTIVE,
+                Duration.ofDays(7));
+        RuleState existingState = existingRuleState(rule.metadata().ruleId());
+        existingState.startViolation(ZonedDateTime.now(clock).minusDays(8));
+        when(ruleRepository.getRulesToEvaluateForComponent(component)).thenReturn(List.of(evaluation));
+        when(ruleStateRepository.findBySystemComponentAndRuleId(component, rule.metadata().ruleId()))
+                .thenReturn(Optional.of(existingState));
+
+        List<RuleEvaluationResult> results = delayedService.updateRuleStatesForComponent(component);
+
+        assertThat(results.getFirst().state()).isEqualTo(State.FAIL);
+        assertThat(existingState.getState()).isEqualTo(State.FAIL);
+    }
+
+    @Test
+    void ongoingDelayedViolationRefreshesHousekeepingTimestamp() {
+        Clock clock = Clock.fixed(Instant.parse("2026-08-11T10:00:00Z"), ZoneOffset.UTC);
+        RuleEvaluationService delayedService = new RuleEvaluationService(ruleEvaluator, ruleStateRepository, clock);
+        Rule rule = failingRule("delayed-rule");
+        var evaluation = new RuleEvaluation(rule, new RuleParameters(Map.of()), RuleActivationState.ACTIVE,
+                Duration.ofDays(7));
+        RuleState existingState = existingRuleState(rule.metadata().ruleId());
+        existingState.startViolation(ZonedDateTime.now(clock).minusDays(2));
+        when(ruleRepository.getRulesToEvaluateForComponent(component)).thenReturn(List.of(evaluation));
+        when(ruleStateRepository.findBySystemComponentAndRuleId(component, rule.metadata().ruleId()))
+                .thenReturn(Optional.of(existingState));
+
+        delayedService.updateRuleStatesForComponent(component);
+
+        assertThat(existingState.getModifiedAt()).isEqualTo(ZonedDateTime.now(clock));
+    }
+
+    @Test
+    void successfulEvaluationClearsViolationDetectionTime() {
+        Clock clock = Clock.fixed(Instant.parse("2026-08-11T10:00:00Z"), ZoneOffset.UTC);
+        RuleEvaluationService delayedService = new RuleEvaluationService(ruleEvaluator, ruleStateRepository, clock);
+        Rule rule = okRule("delayed-rule");
+        var evaluation = new RuleEvaluation(rule, new RuleParameters(Map.of()), RuleActivationState.ACTIVE,
+                Duration.ofDays(7));
+        RuleState existingState = existingRuleState(rule.metadata().ruleId());
+        existingState.startViolation(ZonedDateTime.now(clock).minusDays(2));
+        when(ruleRepository.getRulesToEvaluateForComponent(component)).thenReturn(List.of(evaluation));
+        when(ruleStateRepository.findBySystemComponentAndRuleId(component, rule.metadata().ruleId()))
+                .thenReturn(Optional.of(existingState));
+
+        delayedService.updateRuleStatesForComponent(component);
+
+        assertThat(existingState.getViolationDetectedAt()).isNull();
     }
 
     private RuleState existingRuleState(RuleId ruleId) {

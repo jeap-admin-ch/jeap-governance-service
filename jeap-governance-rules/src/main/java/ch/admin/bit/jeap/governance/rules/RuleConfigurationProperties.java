@@ -7,6 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 
 import java.time.LocalDate;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,6 +81,11 @@ public class RuleConfigurationProperties {
          * Rule weight for this rule, see scoring documentation for details. Must be provided, positive integer.
          */
         private Integer weight;
+
+        /**
+         * Optional delay before a continuous violation affects governance scoring.
+         */
+        private Duration violationDelay = Duration.ZERO;
 
         /**
          * Optional link to the documentation for this rule. Used when generating governance reports

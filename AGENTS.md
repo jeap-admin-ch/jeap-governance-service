@@ -80,6 +80,8 @@ Built on Java 25 and the `jeap-spring-boot-parent` (Spring Boot 4).
   a `ComponentDeletionListener`. Own Flyway migration (`V1300_0_0`).
 - `jeap-governance-reactionobserver/` - Reaction Observer adapter. Imports each component's last observed reaction date
   via `ReactionObserverConnector` and provides `ComponentObservesReactionsRule`. Own Flyway migration (`V1400_0_0`).
+- `jeap-governance-messagecontract/` - Message Contract adapter. Imports deployed/latest message versions into a shared
+  database snapshot and provides `ComponentUsesLatestMessageVersionsRule`. Own Flyway migration (`V1500_0_0`).
 - `jeap-governance-reporting/` - Generates governance rule/score reports with trend indicators to Confluence (
   `ReportingScheduler` -> `ReportingService` -> `ConfluenceAdapter`). Replaces the former `docgen` placeholder.
 - `jeap-governance-web/` - Spring Boot application entry point (`GovernanceApplication`), REST controllers (
@@ -158,6 +160,7 @@ Each module registers via `META-INF/spring/org.springframework.boot.autoconfigur
     - `V1200_*` - Prometheus schema (prometheus module)
     - `V1300_*` - Security scan schema (secscan module)
     - `V1400_*` - Reaction Observer schema (reactionobserver module)
+    - `V1500_*` - Message Contract schema (messagecontract module, prefix: `mc_`)
     - `V2000_*` and higher - Reserved for downstream service instances
 - Migration naming: `V{range}_{sequence}__{description-with-hyphens}.sql`
 - ShedLock table in core schema for distributed lock management

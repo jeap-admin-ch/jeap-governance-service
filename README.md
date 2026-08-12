@@ -608,6 +608,7 @@ The `jeap-governance-rules-messaging` module ships the following built-in rules:
 | `component-defines-messagingcontracts` | Validates that component defines messaging contracts. |
 | `component-consumes-signedmessages`    | Validates that component consumes signed messages.    |
 | `component-produces-signedmessages`    | Validates that component produces signed messages.    |
+| `component-uses-latest-message-versions` | Validates that deployed contracts use the latest message versions. |
 
 **Component Defines Messaging Contracts Rule** (`component-defines-messagingcontracts`)
 
@@ -625,6 +626,36 @@ If the metric is not present (no messaging library detected), the rule passes.
 
 To use this rule, the following modules must be enabled:
 - Prometheus module (`jeap.governance.prometheus.enabled=true`)
+
+**Component Uses Latest Message Versions** (`component-uses-latest-message-versions`)
+
+This rule compares the versions in the currently deployed message contracts with the latest semantic versions in the
+message type registry. Contract version data is imported from the Message Contract Service before rule evaluation.
+Configure the endpoint URL as a URI template containing the `{environment}` placeholder. A violation delay can be used
+to give teams a grace period before an outdated contract affects their governance score.
+
+```yaml
+jeap:
+  governance:
+    message-contract:
+      enabled: true
+      url: https://message-contract-service/api/contracts/version-status?env={environment}
+      environment: PROD
+      username: governance-reader
+      password: ${MESSAGE_CONTRACT_PASSWORD}
+      timeout: 10s
+    rules:
+      active:
+        - id: component-uses-latest-message-versions
+          weight: 5
+          violation-delay: 70d
+```
+
+During `violation-delay`, a continuous violation is reported in the rule comment but remains compliant for scoring.
+Once the delay expires it becomes a regular rule failure. A successful evaluation resets the delay.
+Imported version status is persisted as a shared database snapshot so import and scoring can run on different service
+replicas. If no version status data is available, the rule is compliant. A failed import retains the previous snapshot.
+The configured user requires the `messagecontract-read` role.
 
 **Component Consumes Signed Messages** (`component-consumes-signedmessages`)
 
@@ -949,4 +980,3 @@ Based on these metrics, consider setting up the following alerts:
 ```promql
    jeap_governance_service_data_import_duration_seconds_max > 300
 ```
-

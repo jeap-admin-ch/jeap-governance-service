@@ -33,6 +33,7 @@ class RuleEvaluator {
     private RuleEvaluationResult evaluateRule(RuleEvaluation ruleEvaluation, SystemComponent systemComponent) {
         var rule = ruleEvaluation.rule();
         var result = rule.evaluate(systemComponent, ruleEvaluation.ruleParameters());
-        return new RuleEvaluationResult(rule.metadata().ruleId(), result.state(), result.stateComment());
+        return new RuleEvaluationResult(rule.metadata().ruleId(), result.state(), result.stateComment(),
+                ruleEvaluation.violationDelay());
     }
 }

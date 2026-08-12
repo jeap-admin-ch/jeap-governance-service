@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {"name": "jeap.governance.message-contract.enabled", "type": "java.lang.Boolean", "defaultValue": false, "description": "Enable Message Contract version status import and rule."},
+    {"name": "jeap.governance.message-contract.url", "type": "java.lang.String", "description": "Version status endpoint URI template containing {environment}."},
+    {"name": "jeap.governance.message-contract.environment", "type": "java.lang.String", "defaultValue": "PROD"},
+    {"name": "jeap.governance.message-contract.username", "type": "java.lang.String", "description": "Basic authentication username."},
+    {"name": "jeap.governance.message-contract.password", "type": "java.lang.String", "description": "Basic authentication password."},
+    {"name": "jeap.governance.message-contract.timeout", "type": "java.time.Duration", "defaultValue": "PT10S"}
+  ]
+}
