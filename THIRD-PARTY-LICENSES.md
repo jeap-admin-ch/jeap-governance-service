@@ -39,6 +39,8 @@ Apache License Version 2.0
  * ch.admin.bit.jeap:jeap-spring-boot-swagger - [ch.admin.bit.jeap:jeap-spring-boot-swagger](https://github.com/jeap-admin-ch/jeap-spring-boot-starters/tree/main/jeap-spring-boot-swagger)
  * ch.admin.bit.jeap:jeap-spring-boot-swagger-starter - [ch.admin.bit.jeap:jeap-spring-boot-swagger-starter](https://github.com/jeap-admin-ch/jeap-spring-boot-starters/tree/main/jeap-spring-boot-swagger-starter)
  * ch.admin.bit.jeap:jeap-spring-boot-tx - [ch.admin.bit.jeap:jeap-spring-boot-tx](https://github.com/jeap-admin-ch/jeap-spring-boot-starters/tree/main/jeap-spring-boot-tx)
+ * libGDX jnigen library - [com.badlogicgames.jnigen:jnigen-commons](https://github.com/libgdx/gdx-jnigen)
+ * libGDX jnigen library - [com.badlogicgames.jnigen:jnigen-loader](https://github.com/libgdx/gdx-jnigen)
  * ClassMate - [com.fasterxml:classmate](https://github.com/FasterXML/java-classmate)
  * Jackson-annotations - [com.fasterxml.jackson.core:jackson-annotations](https://github.com/FasterXML/jackson)
  * Jackson-core - [com.fasterxml.jackson.core:jackson-core](https://github.com/FasterXML/jackson-core)
@@ -76,7 +78,6 @@ Apache License Version 2.0
  * Apache Commons BeanUtils - [commons-beanutils:commons-beanutils](https://commons.apache.org/proper/commons-beanutils)
  * Apache Commons Codec - [commons-codec:commons-codec](https://commons.apache.org/proper/commons-codec/)
  * Apache Commons Collections - [commons-collections:commons-collections](http://commons.apache.org/collections/)
- * Apache Commons IO - [commons-io:commons-io](https://commons.apache.org/proper/commons-io/)
  * Apache Commons IO - [commons-io:commons-io](https://commons.apache.org/proper/commons-io/)
  * Apache Commons Logging - [commons-logging:commons-logging](https://commons.apache.org/proper/commons-logging/)
  * compress4j - [io.github.compress4j:compress4j](https://github.com/compress4j/compress4j)
@@ -181,8 +182,8 @@ Apache License Version 2.0
  * Apache HttpClient Mime - [org.apache.httpcomponents:httpmime](http://hc.apache.org/httpcomponents-client-ga)
  * Apache HttpClient - [org.apache.httpcomponents.client5:httpclient5](https://hc.apache.org/httpcomponents-client-5.5.x/5.6.1/httpclient5/)
  * Apache HttpClient Fluent - [org.apache.httpcomponents.client5:httpclient5-fluent](https://hc.apache.org/httpcomponents-client-5.5.x/5.6.1/httpclient5-fluent/)
- * Apache HttpComponents Core HTTP/1.1 - [org.apache.httpcomponents.core5:httpcore5](https://hc.apache.org/httpcomponents-core-5.4.x/5.4.2/httpcore5/)
- * Apache HttpComponents Core HTTP/2 - [org.apache.httpcomponents.core5:httpcore5-h2](https://hc.apache.org/httpcomponents-core-5.4.x/5.4.2/httpcore5-h2/)
+ * Apache HttpComponents Core HTTP/1.1 - [org.apache.httpcomponents.core5:httpcore5](https://hc.apache.org/httpcomponents-core-5.4.x/5.4.3/httpcore5/)
+ * Apache HttpComponents Core HTTP/2 - [org.apache.httpcomponents.core5:httpcore5-h2](https://hc.apache.org/httpcomponents-core-5.4.x/5.4.3/httpcore5-h2/)
  * Apache Log4j API - [org.apache.logging.log4j:log4j-api](https://logging.apache.org/log4j/2.x/)
  * Log4j API to SLF4J Adapter - [org.apache.logging.log4j:log4j-to-slf4j](https://logging.apache.org/log4j/2.x/)
  * Apache Tika core - [org.apache.tika:tika-core](https://tika.apache.org/)
@@ -365,6 +366,13 @@ BSD License 3
  * Hamcrest - [org.hamcrest:hamcrest](http://hamcrest.org/JavaHamcrest/)
  * asm - [org.ow2.asm:asm](http://asm.ow2.io/)
 
+Bouncy Castle Licence
+-------------------------------
+
+ * Bouncy Castle PKIX, CMS, EAC, TSP, PKCS, OCSP, CMP, and CRMF APIs - [org.bouncycastle:bcpkix-jdk18on](https://www.bouncycastle.org/download/bouncy-castle-java/)
+ * Bouncy Castle Provider - [org.bouncycastle:bcprov-jdk18on](https://www.bouncycastle.org/download/bouncy-castle-java/)
+ * Bouncy Castle ASN.1 Extension and Utility APIs - [org.bouncycastle:bcutil-jdk18on](https://www.bouncycastle.org/download/bouncy-castle-java/)
+
 CDDL
 -------------------------------
 
@@ -456,6 +464,9 @@ MIT License
  * Testcontainers :: JUnit Jupiter Extension - [org.testcontainers:testcontainers-junit-jupiter](https://java.testcontainers.org)
  * Testcontainers :: JDBC :: PostgreSQL - [org.testcontainers:testcontainers-postgresql](https://java.testcontainers.org)
  * webjars-locator-lite - [org.webjars:webjars-locator-lite](https://webjars.org)
+ * Lua 5.4 - [party.iroiro.luajava:lua54](https://github.com/gudzpoz/luajava)
+ * Lua 5.4 - [party.iroiro.luajava:lua54-platform](https://github.com/gudzpoz/luajava)
+ * LuaJava - [party.iroiro.luajava:luajava](https://github.com/gudzpoz/luajava)
 
 Mozilla Public License, Version 2.0
 -------------------------------
