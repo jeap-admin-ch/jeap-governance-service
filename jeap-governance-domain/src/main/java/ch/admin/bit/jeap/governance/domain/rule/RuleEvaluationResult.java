@@ -40,9 +40,13 @@ public record RuleEvaluationResult(RuleId ruleId, State state, String stateComme
     }
 
     RuleEvaluationResult delayedUntil(ZonedDateTime deadline) {
-        String comment = StringUtils.hasText(stateComment) ? stateComment + ". " : "";
-        return new RuleEvaluationResult(ruleId, State.OK,
-                comment + "Violation grace period ends at " + deadline, violationDelay);
+        String comment = StringUtils.hasText(stateComment) ? stateComment : "";
+        String gracePeriod = "Violation grace period ends at " + deadline;
+        String[] commentParts = comment.split("\\R", 2);
+        String delayedComment = commentParts.length == 1
+                ? (comment.isEmpty() ? "" : comment + ". ") + gracePeriod
+                : commentParts[0].stripTrailing() + " " + gracePeriod + "\n" + commentParts[1];
+        return new RuleEvaluationResult(ruleId, State.OK, delayedComment, violationDelay);
     }
 
     RuleState toRuleState(SystemComponent systemComponent) {

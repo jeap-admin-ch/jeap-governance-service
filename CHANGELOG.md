@@ -7,6 +7,11 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > - Spring Boot 3 maintenance (bug fixes, patches, and regular updates) continues on branch `release/springboot3`.
 
+## [7.2.1] - 2026-08-18
+
+### Changed
+- Rendered multiline rule comments as readable bullet lists in Confluence reports.
+
 ## [7.2.0] - 2026-08-18
 
 ### Changed

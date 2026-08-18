@@ -82,7 +82,15 @@
                           th:text="${rule.state.unicode}"></span>
                 </span>
             </td>
-            <td colspan="1" th:text="${rule.stateComment}">-</td>
+            <td colspan="1">
+                <span th:unless="${rule.hasStateCommentDetails()}" th:text="${rule.stateComment}">-</span>
+                <th:block th:if="${rule.hasStateCommentDetails()}">
+                    <div th:text="${rule.stateCommentHeading}">-</div>
+                    <ul>
+                        <li th:each="detail : ${rule.stateCommentDetails}" th:text="${detail}">-</li>
+                    </ul>
+                </th:block>
+            </td>
             <td colspan="1"
                 th:text="${rule.modifiedAt != null ? #temporals.format(rule.modifiedAt, 'dd.MM.yyyy HH:mm') : '-'}">-</td>
         </tr>

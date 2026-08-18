@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Builder
 @Data
@@ -18,5 +19,19 @@ public class RuleStateReportModel {
 
     public String getHighlightColor() {
         return ColorUtility.getHighlightColor(state);
+    }
+
+    public String getStateCommentHeading() {
+        return stateComment == null ? null : stateComment.lines().findFirst().orElse("");
+    }
+
+    public List<String> getStateCommentDetails() {
+        return stateComment == null ? List.of() : stateComment.lines().skip(1)
+                .filter(line -> !line.isBlank())
+                .toList();
+    }
+
+    public boolean hasStateCommentDetails() {
+        return !getStateCommentDetails().isEmpty();
     }
 }

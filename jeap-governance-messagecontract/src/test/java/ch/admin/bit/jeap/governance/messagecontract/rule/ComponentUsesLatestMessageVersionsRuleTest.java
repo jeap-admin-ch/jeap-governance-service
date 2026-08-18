@@ -37,8 +37,10 @@ class ComponentUsesLatestMessageVersionsRuleTest {
         var result = evaluate(component);
 
         assertThat(result.state()).isEqualTo(State.FAIL);
-        assertThat(result.stateComment()).contains("AEvent", "ZEvent", "1.1.0", "2.0.0")
-                .containsSubsequence("AEvent", "ZEvent");
+        assertThat(result.stateComment()).isEqualTo("""
+                Outdated message contracts:
+                AEvent (CONSUMER on topic) uses 1.1.0, latest is 1.2.0
+                ZEvent (CONSUMER on topic) uses 1.0.0, latest is 2.0.0""");
     }
 
     @Test

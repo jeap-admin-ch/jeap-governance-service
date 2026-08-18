@@ -4,6 +4,9 @@ import ch.admin.bit.jeap.governance.domain.ComponentType;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.ZonedDateTime;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class RuleEvaluationResultTest {
@@ -121,5 +124,34 @@ class RuleEvaluationResultTest {
         var ruleState = result.toRuleState(component);
 
         assertThat(ruleState.getStateComment()).isNull();
+    }
+
+    @Test
+    void delayedUntil_placesGracePeriodBeforeMultilineDetails() {
+        var deadline = ZonedDateTime.parse("2026-10-27T10:00:00Z");
+        var result = new RuleEvaluationResult(RULE_ID, State.FAIL, """
+                Outdated message contracts:
+                FirstEvent uses 1.0.0, latest is 2.0.0
+                SecondEvent uses 1.0.0, latest is 2.0.0""", Duration.ofDays(70));
+
+        var delayed = result.delayedUntil(deadline);
+
+        assertThat(delayed.stateComment()).isEqualTo("""
+                Outdated message contracts: Violation grace period ends at 2026-10-27T10:00Z
+                FirstEvent uses 1.0.0, latest is 2.0.0
+                SecondEvent uses 1.0.0, latest is 2.0.0""");
+    }
+
+    @Test
+    void delayedUntil_handlesCarriageReturnLineBreaks() {
+        var deadline = ZonedDateTime.parse("2026-10-27T10:00:00Z");
+        var result = new RuleEvaluationResult(RULE_ID, State.FAIL,
+                "Outdated message contracts:\rFirstEvent uses 1.0.0, latest is 2.0.0", Duration.ofDays(70));
+
+        var delayed = result.delayedUntil(deadline);
+
+        assertThat(delayed.stateComment()).isEqualTo("""
+                Outdated message contracts: Violation grace period ends at 2026-10-27T10:00Z
+                FirstEvent uses 1.0.0, latest is 2.0.0""");
     }
 }

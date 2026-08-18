@@ -43,7 +43,7 @@ public class ComponentUsesLatestMessageVersionsRule implements Rule {
                         .thenComparing(MessageContractVersionStatus::getTopic))
                 .map(status -> "%s (%s on %s) uses %s, latest is %s".formatted(status.getMessageType(),
                         status.getRole(), status.getTopic(), status.getUsedVersion(), status.getLatestVersion()))
-                .collect(Collectors.joining("; "));
-        return RuleResult.failed("Outdated message contracts: " + details);
+                .collect(Collectors.joining("\n"));
+        return RuleResult.failed("Outdated message contracts:\n" + details);
     }
 }
