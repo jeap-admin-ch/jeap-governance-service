@@ -32,11 +32,19 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 
 /**
  * This Prometheus client can execute predefined queries on an Amazon Managed Prometheus.
+ * <p>
+ * All queries return the most recent sample a service exported within the configured lookback window
+ * ({@code jeap.governance.prometheus.amp.query-lookback}). The window only tolerates a service not being
+ * scraped for a while, e.g. during a deployment - it is not a memory: once a service stops exporting a
+ * time series, that series drops out of the query results after the window has elapsed. Keeping the window
+ * short therefore lets rules reflect a changed service configuration quickly, while keeping it longer than
+ * a deployment prevents rules from failing for a service that is temporarily unavailable.
  * <p>
  * For the Prometheus Query API <a href="https://prometheus.io/docs/prometheus/latest/querying/api/#querying-metadata">...</a>
  */
@@ -44,8 +52,6 @@ import java.util.Objects;
 @Slf4j
 @Component
 public class AmazonManagedPromClient implements PromClient {
-
-    private static final int DAYS_TO_IMPORT = 2;
 
     private static final String QUERY_URL_PATTERN = "%s/workspaces/%s/api/v1/query";
 
@@ -57,6 +63,8 @@ public class AmazonManagedPromClient implements PromClient {
 
     private final RetryTemplate retryTemplate;
 
+    private final String queryRange;
+
     public static final String STAGE_TAG = "stage";
     private static final String SERVICE_TAG = "service";
     private static final String STATUS_TAG = "status";
@@ -65,45 +73,46 @@ public class AmazonManagedPromClient implements PromClient {
     private static final String TASK_REVISION_TAG = "task_revision";
 
     private static final String JEAP_MESSAGING_CONTRACT_QUERY_PATTERN = "last_over_time(jeap_messaging_contract{" +
-            STAGE_TAG + "=\"%s\"," +
-            SERVICE_TAG + "=\"%s\"}" +
-            "[" + DAYS_TO_IMPORT + "d])";
+            STAGE_TAG + "=\"%1$s\"," +
+            SERVICE_TAG + "=\"%2$s\"}" +
+            "[%3$s])";
 
     private static final String JEAP_JAVA_VERSION_QUERY_PATTERN = "last_over_time(jeap_java_version{" +
-            STAGE_TAG + "=\"%s\"," +
-            SERVICE_TAG + "=\"%s\"}" +
-            "[" + DAYS_TO_IMPORT + "d])";
+            STAGE_TAG + "=\"%1$s\"," +
+            SERVICE_TAG + "=\"%2$s\"}" +
+            "[%3$s])";
 
     private static final String JEAP_DEPENDENCY_VERSION_QUERY_PATTERN = "last_over_time(jeap_dependency_version{" +
-            STAGE_TAG + "=\"%s\"," +
-            SERVICE_TAG + "=\"%s\"}" +
-            "[" + DAYS_TO_IMPORT + "d])";
+            STAGE_TAG + "=\"%1$s\"," +
+            SERVICE_TAG + "=\"%2$s\"}" +
+            "[%3$s])";
 
     private static final String JEAP_REST_ENDPOINT_WITHOUT_JWT_PATTERN = "group by (" + SERVICE_TAG + ", " + DATAPOINT_TAG + ", " + STAGE_TAG + ", " + METHOD_TAG + ")(last_over_time(jeap_rest_endpoint_without_jwt_total{" +
-            STAGE_TAG + "=\"%s\"," +
-            SERVICE_TAG + "=\"%s\"," +
+            STAGE_TAG + "=\"%1$s\"," +
+            SERVICE_TAG + "=\"%2$s\"," +
             STATUS_TAG + "!=\"404\"}" +
-            "[" + DAYS_TO_IMPORT + "d]))";
+            "[%3$s]))";
 
     private static final String JEAP_MESSAGING_TOTAL_QUERY_PATTERN = "last_over_time(jeap_messaging_total{" +
-            STAGE_TAG + "=\"%s\"," +
-            SERVICE_TAG + "=\"%s\"}" +
-            "[" + DAYS_TO_IMPORT + "d])";
+            STAGE_TAG + "=\"%1$s\"," +
+            SERVICE_TAG + "=\"%2$s\"}" +
+            "[%3$s])";
 
     private static final String JDBC_CONNECTIONS_ACTIVE_QUERY_PATTERN = "last_over_time(jdbc_connections_active{" +
-            STAGE_TAG + "=\"%s\"," +
-            SERVICE_TAG + "=\"%s\"}" +
-            "[" + DAYS_TO_IMPORT + "d])";
+            STAGE_TAG + "=\"%1$s\"," +
+            SERVICE_TAG + "=\"%2$s\"}" +
+            "[%3$s])";
 
     // Get latest value of jeap_messaging_signature_required_state for a service in a stage
     // When activating the signature required flag, the query will mark the service as compliant as early as possible.
-    // When deactivating the flag, the query will mark the service as non-compliant after DAYS_TO_IMPORT.
+    // When deactivating the flag, the query will mark the service as non-compliant after the lookback window has elapsed,
+    // as the max aggregation keeps reporting the value from before the change while both values are within the window.
     private static final String JEAP_MESSAGING_SIGNATURE_REQUIRED_QUERY_PATTERN =
             "max by (" + STAGE_TAG + ", " + SERVICE_TAG + ") (" +
                     "last_over_time(jeap_messaging_signature_required_state{" +
-                    STAGE_TAG + "=\"%s\"," +
-                    SERVICE_TAG + "=\"%s\"}" +
-                    "[" + DAYS_TO_IMPORT + "d]))";
+                    STAGE_TAG + "=\"%1$s\"," +
+                    SERVICE_TAG + "=\"%2$s\"}" +
+                    "[%3$s]))";
 
     AmazonManagedPromClient(AmazonManagedPromClientProperties ampClientProperties) {
         this.objectMapper = new JsonMapper();
@@ -116,11 +125,24 @@ public class AmazonManagedPromClient implements PromClient {
             throw PromException.uriProblem(e);
         }
 
+        this.queryRange = toRangeSelector(ampClientProperties.getQueryLookback());
+
         this.retryTemplate = RetryTemplate.builder()
                 .maxAttempts(5)
                 .retryOn(Exception.class)
                 .fixedBackoff(600)
                 .build();
+    }
+
+    /**
+     * Renders a duration as a PromQL range selector. Note that {@link Duration#toString()} produces the ISO-8601
+     * format, which PromQL does not accept - seconds are used instead as they are unambiguous for any duration.
+     */
+    private static String toRangeSelector(Duration queryLookback) {
+        if (queryLookback == null || queryLookback.isZero() || queryLookback.isNegative()) {
+            throw PromException.invalidQueryLookback(queryLookback);
+        }
+        return queryLookback.toSeconds() + "s";
     }
 
     @Timed("jeap.governance.service.prometheus.queries")
@@ -265,16 +287,16 @@ public class AmazonManagedPromClient implements PromClient {
         return prometheusQueryResponse;
     }
 
-    private String getQueryString(PromQueryType queryType, GovernanceServiceEnvironment environment, String... args) {
+    String getQueryString(PromQueryType queryType, GovernanceServiceEnvironment environment, String... args) {
         final String ampEnv = toAmpEnvironment(environment);
         return switch (queryType) {
-            case JEAP_MESSAGING_CONTRACT -> JEAP_MESSAGING_CONTRACT_QUERY_PATTERN.formatted(ampEnv, args[0]);
-            case JEAP_JAVA_VERSION -> JEAP_JAVA_VERSION_QUERY_PATTERN.formatted(ampEnv, args[0]);
-            case JEAP_DEPENDENCY_VERSION -> JEAP_DEPENDENCY_VERSION_QUERY_PATTERN.formatted(ampEnv, args[0]);
-            case JEAP_REST_ENDPOINT_WITHOUT_JWT -> JEAP_REST_ENDPOINT_WITHOUT_JWT_PATTERN.formatted(ampEnv, args[0]);
-            case JEAP_MESSAGING_TOTAL -> JEAP_MESSAGING_TOTAL_QUERY_PATTERN.formatted(ampEnv, args[0]);
-            case JDBC_CONNECTIONS_ACTIVE -> JDBC_CONNECTIONS_ACTIVE_QUERY_PATTERN.formatted(ampEnv, args[0]);
-            case JEAP_MESSAGING_SIGNATURE_REQUIRED -> JEAP_MESSAGING_SIGNATURE_REQUIRED_QUERY_PATTERN.formatted(ampEnv, args[0]);
+            case JEAP_MESSAGING_CONTRACT -> JEAP_MESSAGING_CONTRACT_QUERY_PATTERN.formatted(ampEnv, args[0], queryRange);
+            case JEAP_JAVA_VERSION -> JEAP_JAVA_VERSION_QUERY_PATTERN.formatted(ampEnv, args[0], queryRange);
+            case JEAP_DEPENDENCY_VERSION -> JEAP_DEPENDENCY_VERSION_QUERY_PATTERN.formatted(ampEnv, args[0], queryRange);
+            case JEAP_REST_ENDPOINT_WITHOUT_JWT -> JEAP_REST_ENDPOINT_WITHOUT_JWT_PATTERN.formatted(ampEnv, args[0], queryRange);
+            case JEAP_MESSAGING_TOTAL -> JEAP_MESSAGING_TOTAL_QUERY_PATTERN.formatted(ampEnv, args[0], queryRange);
+            case JDBC_CONNECTIONS_ACTIVE -> JDBC_CONNECTIONS_ACTIVE_QUERY_PATTERN.formatted(ampEnv, args[0], queryRange);
+            case JEAP_MESSAGING_SIGNATURE_REQUIRED -> JEAP_MESSAGING_SIGNATURE_REQUIRED_QUERY_PATTERN.formatted(ampEnv, args[0], queryRange);
         };
     }
 

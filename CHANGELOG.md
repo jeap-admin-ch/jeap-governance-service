@@ -7,6 +7,19 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > - Spring Boot 3 maintenance (bug fixes, patches, and regular updates) continues on branch `release/springboot3`.
 
+## [7.2.0] - 2026-08-18
+
+### Changed
+- The Prometheus queries now look back six hours instead of two days for the most recent sample of a service. The
+  lookback window is configurable with `jeap.governance.prometheus.amp.query-lookback`.
+- Note that the window is not a memory: once a service stops exporting a time series, that series drops out of the
+  query results after the window has elapsed. Shortening the window therefore lets the rules based on Prometheus data
+  reflect a changed service configuration within one data import instead of after two days - for example the
+  `endpoints-protected-by-jwt` rule, which kept reporting an endpoint as unprotected long after the exposure had been
+  removed and the service redeployed. In turn, a service that is not scraped for longer than the window now fails
+  these rules. Raise the lookback for components that are not running continuously, or configure a `violation-delay`
+  for the affected rules.
+
 ## [7.1.1] - 2026-08-18
 
 ### Changed

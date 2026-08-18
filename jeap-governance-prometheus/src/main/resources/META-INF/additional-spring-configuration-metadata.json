@@ -5,6 +5,12 @@
       "description": "Enable or disable the Prometheus integration",
       "defaultValue": true,
       "type": "java.lang.Boolean"
+    },
+    {
+      "name": "jeap.governance.prometheus.amp.query-lookback",
+      "description": "How far back the Prometheus queries look for the most recent sample of a service. Must be a positive duration. Keep it longer than a deployment takes, so that rules do not fail for a service that is temporarily not scraped, and short enough for the rules to reflect a changed service configuration quickly.",
+      "defaultValue": "6h",
+      "type": "java.time.Duration"
     }
   ]
 }

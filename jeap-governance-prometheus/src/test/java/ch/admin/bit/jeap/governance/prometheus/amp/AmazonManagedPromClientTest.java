@@ -20,6 +20,7 @@ import software.amazon.awssdk.services.sts.model.Credentials;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -54,12 +55,54 @@ class AmazonManagedPromClientTest {
 
     @BeforeEach
     void setUp() {
+        client = new AmazonManagedPromClient(properties(null));
+    }
+
+    private static AmazonManagedPromClientProperties properties(Duration queryLookback) {
         AmazonManagedPromClientProperties properties = new AmazonManagedPromClientProperties();
         properties.setHost("https://aps-workspaces.eu-central-1.amazonaws.com");
         properties.setWorkspace("test-workspace");
         properties.setRoleArn("arn:aws:iam::123456789:role/test-role");
         properties.setRoleSessionName("testSession");
-        client = new AmazonManagedPromClient(properties);
+        if (queryLookback != null) {
+            properties.setQueryLookback(queryLookback);
+        }
+        return properties;
+    }
+
+    @Test
+    void getQueryString_defaultLookback_usesSixHourRangeSelector() {
+        String query = client.getQueryString(PromQueryType.JEAP_JAVA_VERSION, PROD, "test-service");
+
+        assertEquals("last_over_time(jeap_java_version{stage=\"prod\",service=\"test-service\"}[21600s])", query);
+    }
+
+    @Test
+    void getQueryString_restEndpointWithoutJwt_groupsByEndpointAndExcludesNotFound() {
+        String query = client.getQueryString(PromQueryType.JEAP_REST_ENDPOINT_WITHOUT_JWT, REF, "test-service");
+
+        assertEquals("group by (service, datapoint, stage, method)(last_over_time(jeap_rest_endpoint_without_jwt_total{" +
+                "stage=\"ref\",service=\"test-service\",status!=\"404\"}[21600s]))", query);
+    }
+
+    @Test
+    void getQueryString_allQueryTypes_useConfiguredLookback() {
+        AmazonManagedPromClient clientWithShortLookback = new AmazonManagedPromClient(properties(Duration.ofMinutes(15)));
+
+        for (PromQueryType queryType : PromQueryType.values()) {
+            String query = clientWithShortLookback.getQueryString(queryType, PROD, "test-service");
+
+            // A duration must be rendered in seconds, as PromQL does not accept the ISO-8601 format of Duration.toString()
+            assertTrue(query.contains("[900s]"), "Unexpected range selector in query for " + queryType + ": " + query);
+            assertTrue(query.contains("stage=\"prod\""), "Missing stage in query for " + queryType + ": " + query);
+            assertTrue(query.contains("service=\"test-service\""), "Missing service in query for " + queryType + ": " + query);
+        }
+    }
+
+    @Test
+    void constructor_nonPositiveLookback_throwsException() {
+        assertThrows(PromException.class, () -> new AmazonManagedPromClient(properties(Duration.ZERO)));
+        assertThrows(PromException.class, () -> new AmazonManagedPromClient(properties(Duration.ofHours(-1))));
     }
 
     @Test

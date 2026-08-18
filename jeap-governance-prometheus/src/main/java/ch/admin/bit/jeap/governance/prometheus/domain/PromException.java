@@ -2,6 +2,8 @@ package ch.admin.bit.jeap.governance.prometheus.domain;
 
 import ch.admin.bit.jeap.governance.domain.GovernanceServiceEnvironment;
 
+import java.time.Duration;
+
 public class PromException extends RuntimeException {
     
     private PromException(String message, Throwable cause) {
@@ -27,6 +29,11 @@ public class PromException extends RuntimeException {
     public static PromException allQueryTypesFailedForSystemComponent(String systemComponentName, GovernanceServiceEnvironment environment) {
         return new PromException("All queries to Prometheus failed for the environment '%s' and the system component '%s'."
                 .formatted(environment, systemComponentName));
+    }
+
+    public static PromException invalidQueryLookback(Duration queryLookback) {
+        return new PromException("The configured Prometheus query lookback must be a positive duration, but was '%s'."
+                .formatted(queryLookback));
     }
 
     public static PromException uriProblem(Exception e) {

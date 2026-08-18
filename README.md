@@ -50,6 +50,7 @@ This repository is Open Source Software licensed under the [Apache License 2.0](
   - [Prometheus Schema](#prometheus-time-series-schema)
   - [Security Scan Schema](#security-scan-schema)
 - [Configuration](#configuration)
+  - [Prometheus Query Lookback](#prometheus-query-lookback)
   - [Example Configuration](#example-configuration)
 - [Plugin Mechanism](#plugin-mechanism)
   - [Data Import](#data-import)
@@ -248,6 +249,7 @@ All configuration properties support Spring Boot's standard configuration mechan
 | `jeap.governance.prometheus.amp.workspace`                           | Amazon Managed Prometheus workspace id                                                                                                                 | -                             | Yes, if enabled                  |
 | `jeap.governance.prometheus.amp.role-arn`                            | ARN of the role to assume for accessing the Amazon Managed Prometheus                                                                                  | -                             | Yes, if enabled                  |
 | `jeap.governance.prometheus.amp.role-session-name`                   | Name of the session to be used for accessing the Amazon Managed Prometheus                                                                             | -                             | Yes, if enabled                  |
+| `jeap.governance.prometheus.amp.query-lookback`                      | How far back the Prometheus queries look for the most recent sample of a service                                                                       | 'PT6H'                        | No                               |
 | `jeap.governance.reactionobserver.enabled`                           | Enable/disable import of data from the of ReactionObserver                                                                                             | `true`                        | No                               |
 | `jeap.governance.reactionobserver.url`                               | URL of the ReactionObserver                                                                                                                            | -                             | Yes, if ReactionObserver enabled |
 | `jeap.governance.reactionobserver.username`                          | Username to access the ReactionObserver                                                                                                                | -                             | Yes, if ReactionObserver enabled |
@@ -284,6 +286,26 @@ All configuration properties support Spring Boot's standard configuration mechan
 | `jeap.governance.reporting.confluence.ancestor-id`                   | ID of the ancestor page under which reports are published                                                                                              | —                             | Yes, if reporting is enabled     |
 | `jeap.governance.reporting.confluence.username`                      | Username for Confluence authentication                                                                                                                 | —                             | Yes, if reporting is enabled     |
 | `jeap.governance.reporting.confluence.password`                      | Password for Confluence authentication                                                                                                                 | —                             | Yes, if reporting is enabled     |
+
+#### Prometheus Query Lookback
+
+All Prometheus queries return the most recent sample a service exported within the lookback window configured with
+`jeap.governance.prometheus.amp.query-lookback` (default six hours).
+
+The window is not a memory: once a service stops exporting a time series, that series drops out of the query results
+after the window has elapsed, and the rules based on Prometheus data no longer see it. The window only tolerates a
+service not being scraped for a while, for example while it is being redeployed.
+
+This has two consequences when choosing the value:
+
+- A shorter window makes the rules reflect a changed service configuration sooner - at the next data import rather than
+  after the window has elapsed. For example, an endpoint that is no longer exposed disappears from the
+  `endpoints-protected-by-jwt` rule once the redeployed service has stopped exporting the corresponding metric for
+  longer than the window. Note that the metric value alone does not tell the rule whether a violation is still current:
+  the counter behind `jeap_rest_endpoint_without_jwt_total` keeps its last value for as long as the service runs.
+- A longer window keeps rules from failing for a service that is not permanently running or scraped. If components are
+  regularly unavailable at data import time, either raise the lookback or configure a `violation-delay` for the
+  affected rules.
 
 #### Example Configuration
 
@@ -598,6 +620,10 @@ jeap:
 
 To use this rule, the following module must be enabled:
 - Prometheus module (`jeap.governance.prometheus.enabled=true`)
+
+An endpoint is reported for as long as the service exports the corresponding metric. A service that no longer exposes
+an endpoint stops reporting it once it has been redeployed and the
+[Prometheus query lookback](#prometheus-query-lookback) has elapsed.
 
 #### Built-in Messaging Rules
 
