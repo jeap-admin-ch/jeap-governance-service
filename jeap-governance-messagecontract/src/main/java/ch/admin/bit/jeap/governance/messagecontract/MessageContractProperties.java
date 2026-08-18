@@ -14,7 +14,7 @@ public class MessageContractProperties {
     private String environment = "PROD";
     private String username;
     private String password;
-    private Duration timeout = Duration.ofSeconds(10);
+    private Duration timeout = Duration.ofSeconds(30);
 
     @PostConstruct
     void validate() {

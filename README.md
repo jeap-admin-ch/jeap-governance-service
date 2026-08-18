@@ -643,7 +643,7 @@ jeap:
       environment: PROD
       username: governance-reader
       password: ${MESSAGE_CONTRACT_PASSWORD}
-      timeout: 10s
+      timeout: 30s
     rules:
       active:
         - id: component-uses-latest-message-versions
