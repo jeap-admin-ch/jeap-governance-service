@@ -37,6 +37,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 @SpringBootTest(properties = {
         "jeap.governance.reporting.enabled=true",
@@ -88,6 +89,9 @@ class ReportingIT extends GovernanceIntegrationTestBase {
         verify(confluenceAdapter).addOrUpdatePageUnderAncestor(any(), eq("Rule 2"), argThat(content ->
                 content.contains("Components in Violation Grace Period") &&
                         content.contains("Component 1") &&
+                        content.contains("Comment") &&
+                        content.contains("Outdated message contracts:") &&
+                        content.contains("FirstEvent uses 1.0.0, latest is 2.0.0") &&
                         content.contains("Violation Detected") &&
                         content.contains("Grace Period Ends")));
         verify(confluenceAdapter, never()).deleteOrphanPages(anyString(), anySet());
@@ -225,8 +229,13 @@ class ReportingIT extends GovernanceIntegrationTestBase {
                 .state(State.FAIL)
                 .build();
         ZonedDateTime now = ZonedDateTime.now();
-        RuleState ruleState2 = RuleState.createWithTimestamps(
-                RuleId.of("rule2"), systemComponent1, State.OK, now.minusDays(1), now, now.minusDays(1));
+        RuleState ruleState2 = RuleState.builder()
+                .systemComponent(systemComponent1)
+                .ruleId(RuleId.of("rule2"))
+                .state(State.OK)
+                .ruleStateComment("Outdated message contracts:\nFirstEvent uses 1.0.0, latest is 2.0.0")
+                .build();
+        setField(ruleState2, "violationDetectedAt", now.minusDays(1));
 
         entityManager.persist(ruleState1);
         entityManager.persist(ruleState2);

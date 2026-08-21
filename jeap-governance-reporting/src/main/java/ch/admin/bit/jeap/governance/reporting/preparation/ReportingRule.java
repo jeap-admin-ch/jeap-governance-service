@@ -49,9 +49,10 @@ public class ReportingRule {
     }
 
     void addGracePeriodComponent(long systemId, String systemName, long componentId, String componentName,
-                                 ZonedDateTime violationDetectedAt, ZonedDateTime gracePeriodEndsAt) {
+                                 String stateComment, ZonedDateTime violationDetectedAt,
+                                 ZonedDateTime gracePeriodEndsAt) {
         gracePeriodComponents.add(new ReportingRuleGracePeriodComponent(systemId, systemName, componentId,
-                componentName, violationDetectedAt, gracePeriodEndsAt));
+                componentName, stateComment, violationDetectedAt, gracePeriodEndsAt));
         gracePeriodComponents.sort(Comparator
                 .comparing(ReportingRuleGracePeriodComponent::getGracePeriodEndsAt)
                 .thenComparing(ReportingRuleGracePeriodComponent::getSystemName, String.CASE_INSENSITIVE_ORDER)

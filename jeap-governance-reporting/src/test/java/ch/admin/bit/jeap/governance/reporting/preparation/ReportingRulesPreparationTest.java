@@ -37,6 +37,7 @@ class ReportingRulesPreparationTest {
     private static final String SYSTEM_NAME = "System A";
     private static final long COMPONENT_ID = 20L;
     private static final String COMPONENT_NAME = "Component X";
+    private static final String GRACE_PERIOD_COMMENT = "Outdated message contracts:\nFirstEvent uses 1.0.0, latest is 2.0.0";
     private static final ZonedDateTime TIMESTAMP = ZonedDateTime.parse("2026-08-21T10:00:00+02:00[Europe/Zurich]");
 
     @Mock
@@ -261,6 +262,7 @@ class ReportingRulesPreparationTest {
                 .satisfies(rule -> assertThat(rule.getGracePeriodComponents())
                         .singleElement()
                         .satisfies(component -> {
+                            assertThat(component.getStateComment()).isEqualTo(GRACE_PERIOD_COMMENT);
                             assertThat(component.getViolationDetectedAt()).isEqualTo(firstDetectedAt);
                             assertThat(component.getGracePeriodEndsAt()).isEqualTo(firstDetectedAt.plusDays(7));
                         }));
@@ -381,6 +383,7 @@ class ReportingRulesPreparationTest {
         when(entry.getRuleId()).thenReturn(ruleId);
         when(entry.getSystemId()).thenReturn(systemId);
         when(entry.getSystemComponentId()).thenReturn(componentId);
+        when(entry.getStateComment()).thenReturn(GRACE_PERIOD_COMMENT);
         when(entry.getViolationDetectedAt()).thenReturn(violationDetectedAt);
         return entry;
     }

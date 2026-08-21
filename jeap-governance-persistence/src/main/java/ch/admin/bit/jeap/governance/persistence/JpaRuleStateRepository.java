@@ -39,6 +39,7 @@ interface JpaRuleStateRepository extends JpaRepository<RuleState, Long> {
             SELECT rs.systemComponent.system.id AS systemId,
                    rs.systemComponent.id        AS systemComponentId,
                    rs.ruleId                    AS ruleId,
+                   rs.stateComment              AS stateComment,
                    rs.violationDetectedAt       AS violationDetectedAt
             FROM RuleState rs
             WHERE rs.state = ch.admin.bit.jeap.governance.domain.rule.State.OK

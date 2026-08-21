@@ -140,6 +140,7 @@ public class ReportingRulesPreparation {
                     systemReference.getName(),
                     componentReference.getId(),
                     componentReference.getName(),
+                    entry.getStateComment(),
                     violationDetectedAt,
                     gracePeriodEndsAt);
         }

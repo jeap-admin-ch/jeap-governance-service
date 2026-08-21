@@ -124,6 +124,7 @@ class TemplateRendererTest {
                 .pageSuffix(" (Component scores)")
                 .systemName("System A")
                 .systemPageSuffix(" (System scores)")
+                .stateComment("Outdated message contracts:\nFirstEvent uses 1.0.0, latest is 2.0.0\nSecondEvent uses 1.1.0, latest is 2.0.0")
                 .violationDetectedAt(detectedAt)
                 .gracePeriodEndsAt(detectedAt.plusDays(7))
                 .build();
@@ -143,8 +144,12 @@ class TemplateRendererTest {
 
         assertThat(result)
                 .contains("<h2>Components in Violation Grace Period</h2>")
+                .contains("<th>Comment</th>")
                 .contains("System A")
                 .contains("Component B")
+                .contains("<div>Outdated message contracts:</div>")
+                .contains("<li>FirstEvent uses 1.0.0, latest is 2.0.0</li>")
+                .contains("<li>SecondEvent uses 1.1.0, latest is 2.0.0</li>")
                 .contains("21.08.2026 10:30")
                 .contains("28.08.2026 10:30");
     }

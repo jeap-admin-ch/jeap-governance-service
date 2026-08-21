@@ -6,5 +6,6 @@ public interface GracePeriodComponentEntry {
     Long getSystemId();
     Long getSystemComponentId();
     String getRuleId();
+    String getStateComment();
     ZonedDateTime getViolationDetectedAt();
 }

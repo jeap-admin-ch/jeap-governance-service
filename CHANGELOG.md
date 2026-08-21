@@ -10,7 +10,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [8.1.0] - 2026-08-21
 
 ### Changed
-- Rule reports show components within configured violation grace periods, including detection and expiry timestamps.
+- Rule reports show components within configured violation grace periods, including rule comments and detection and expiry timestamps.
 - Violation grace-period comments use the runtime's local timezone and a human-readable timestamp format.
 
 ## [8.0.0] - 2026-08-21

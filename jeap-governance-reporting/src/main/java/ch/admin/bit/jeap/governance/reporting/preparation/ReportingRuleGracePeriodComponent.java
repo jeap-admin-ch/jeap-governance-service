@@ -13,6 +13,7 @@ public class ReportingRuleGracePeriodComponent {
     private final String systemName;
     private final Long componentId;
     private final String componentName;
+    private final String stateComment;
     private final ZonedDateTime violationDetectedAt;
     private final ZonedDateTime gracePeriodEndsAt;
 }

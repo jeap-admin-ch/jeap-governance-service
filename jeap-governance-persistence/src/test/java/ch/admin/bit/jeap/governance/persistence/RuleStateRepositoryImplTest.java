@@ -25,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -206,9 +207,16 @@ class RuleStateRepositoryImplTest extends PostgresTestContainerBase {
         ZonedDateTime now = ZonedDateTime.now();
         ZonedDateTime detectedAt = now.minusDays(3);
         SystemComponent component = createAndPersistSystemWithComponent();
+        String stateComment = "Outdated message contracts:\nFirstEvent uses 1.0.0, latest is 2.0.0";
 
-        entityManager.persist(RuleState.createWithTimestamps(
-                RuleId.of("GRACE-PERIOD"), component, State.OK, now, now, detectedAt));
+        RuleState gracePeriodState = RuleState.builder()
+                .ruleId(RuleId.of("GRACE-PERIOD"))
+                .systemComponent(component)
+                .state(State.OK)
+                .ruleStateComment(stateComment)
+                .build();
+        setField(gracePeriodState, "violationDetectedAt", detectedAt);
+        entityManager.persist(gracePeriodState);
         entityManager.persist(RuleState.createWithTimestamps(
                 RuleId.of("REGULAR-OK"), component, State.OK, now, now));
         entityManager.persist(RuleState.createWithTimestamps(
@@ -223,6 +231,7 @@ class RuleStateRepositoryImplTest extends PostgresTestContainerBase {
             assertThat(entry.getRuleId()).isEqualTo("GRACE-PERIOD");
             assertThat(entry.getSystemId()).isEqualTo(component.getSystem().getId());
             assertThat(entry.getSystemComponentId()).isEqualTo(component.getId());
+            assertThat(entry.getStateComment()).isEqualTo(stateComment);
             assertThat(entry.getViolationDetectedAt().truncatedTo(ChronoUnit.MILLIS).toInstant())
                     .isEqualTo(detectedAt.truncatedTo(ChronoUnit.MILLIS).toInstant());
         });

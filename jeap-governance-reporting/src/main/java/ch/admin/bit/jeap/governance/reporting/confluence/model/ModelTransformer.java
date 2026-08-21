@@ -135,6 +135,7 @@ public class ModelTransformer {
                 .pageSuffix(componentPageSuffix)
                 .systemName(gracePeriodComponent.getSystemName())
                 .systemPageSuffix(systemPageSuffix)
+                .stateComment(gracePeriodComponent.getStateComment())
                 .violationDetectedAt(gracePeriodComponent.getViolationDetectedAt().withZoneSameInstant(reportingZone))
                 .gracePeriodEndsAt(gracePeriodComponent.getGracePeriodEndsAt().withZoneSameInstant(reportingZone))
                 .build();

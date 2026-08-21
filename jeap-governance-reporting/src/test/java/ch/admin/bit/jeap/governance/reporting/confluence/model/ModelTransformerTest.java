@@ -106,6 +106,7 @@ class ModelTransformerTest {
         when(gracePeriodComponent.getSystemName()).thenReturn("System A");
         when(gracePeriodComponent.getComponentId()).thenReturn(2L);
         when(gracePeriodComponent.getComponentName()).thenReturn("Component B");
+        when(gracePeriodComponent.getStateComment()).thenReturn("Outdated message contracts:\nFirstEvent uses 1.0.0, latest is 2.0.0");
         when(gracePeriodComponent.getViolationDetectedAt()).thenReturn(TIMESTAMP);
         when(gracePeriodComponent.getGracePeriodEndsAt()).thenReturn(TIMESTAMP.plusDays(7));
 
@@ -150,6 +151,7 @@ class ModelTransformerTest {
             assertThat(component.getSystemName()).isEqualTo(gracePeriodComponent.getSystemName());
             assertThat(component.getId()).isEqualTo(gracePeriodComponent.getComponentId());
             assertThat(component.getName()).isEqualTo(gracePeriodComponent.getComponentName());
+            assertThat(component.getStateComment()).isEqualTo(gracePeriodComponent.getStateComment());
             assertThat(component.getViolationDetectedAt()).isEqualTo(gracePeriodComponent.getViolationDetectedAt());
             assertThat(component.getGracePeriodEndsAt()).isEqualTo(gracePeriodComponent.getGracePeriodEndsAt());
         });

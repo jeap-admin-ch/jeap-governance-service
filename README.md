@@ -945,8 +945,9 @@ Root Page
 ```
 
 For rules with a configured `violation-delay`, each rule page lists components currently within the grace period,
-including when the violation was detected and when the grace period ends. These components remain compliant for
-scoring until the grace period expires. Timestamps use the runtime's local timezone.
+including the rule comment, when the violation was detected and when the grace period ends. Multiline comments show
+their details as a list, making individual violations visible from the rule overview. These components remain compliant
+for scoring until the grace period expires. Timestamps use the runtime's local timezone.
 
 To find out the ancestor of a page, you can use the Confluence REST API, the following example retrieves the ancestors of a page with the title "BAZG-Governance" in the space "ARCDOCDEV":
 

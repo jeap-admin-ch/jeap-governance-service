@@ -59,6 +59,7 @@
             <tr>
                 <th>System</th>
                 <th>Component</th>
+                <th>Comment</th>
                 <th>Violation Detected</th>
                 <th>Grace Period Ends</th>
             </tr>
@@ -80,6 +81,17 @@
                             <![CDATA[[[${component.name}]]]]>
                         </ac:plain-text-link-body>
                     </ac:link>
+                </td>
+                <td>
+                    <span th:if="${component.stateComment == null or #strings.isEmpty(component.stateComment)}">-</span>
+                    <span th:if="${component.stateComment != null and !#strings.isEmpty(component.stateComment) and !component.hasStateCommentDetails()}"
+                          th:text="${component.stateComment}">-</span>
+                    <th:block th:if="${component.hasStateCommentDetails()}">
+                        <div th:text="${component.stateCommentHeading}">-</div>
+                        <ul>
+                            <li th:each="detail : ${component.stateCommentDetails}" th:text="${detail}">-</li>
+                        </ul>
+                    </th:block>
                 </td>
                 <td th:text="${#temporals.format(component.violationDetectedAt, 'dd.MM.yyyy HH:mm')}"></td>
                 <td th:text="${#temporals.format(component.gracePeriodEndsAt, 'dd.MM.yyyy HH:mm')}"></td>
