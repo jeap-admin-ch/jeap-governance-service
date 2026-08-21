@@ -1,19 +1,29 @@
 package ch.admin.bit.jeap.governance.reporting.confluence.model;
 
 import ch.admin.bit.jeap.governance.reporting.preparation.*;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-@RequiredArgsConstructor
 @Slf4j
 public class ModelTransformer {
 
     private final String systemPageSuffix;
     private final String componentPageSuffix;
+    private final ZoneId reportingZone;
+
+    public ModelTransformer(String systemPageSuffix, String componentPageSuffix) {
+        this(systemPageSuffix, componentPageSuffix, ZoneId.systemDefault());
+    }
+
+    ModelTransformer(String systemPageSuffix, String componentPageSuffix, ZoneId reportingZone) {
+        this.systemPageSuffix = systemPageSuffix;
+        this.componentPageSuffix = componentPageSuffix;
+        this.reportingZone = reportingZone;
+    }
 
     public SystemScoreReportModel toConfluenceModel(ReportingSystemScore reportingSystemScore) {
         return SystemScoreReportModel.builder()
@@ -34,6 +44,8 @@ public class ModelTransformer {
                 .conformanceRate(reportingRule.getLatestConformanceRate())
                 .trend(toConfluenceTrend(reportingRule.getConformanceRateTrend()))
                 .systems(ruleSystemToConfluenceModel(reportingRule.getSystemConformanceRates()))
+                .violationGracePeriodConfigured(reportingRule.hasViolationGracePeriod())
+                .gracePeriodComponents(gracePeriodComponentsToConfluenceModel(reportingRule.getGracePeriodComponents()))
                 .nonCompliantComponents(ruleComponentsToConfluenceModel(reportingRule.getNonCompliantComponents()))
                 .build();
     }
@@ -106,6 +118,25 @@ public class ModelTransformer {
                 .systemName(nonCompliantComponent.getSystemName())
                 .systemPageSuffix(systemPageSuffix)
                 .nonCompliantSince(nonCompliantComponent.getNonComplianceSince())
+                .build();
+    }
+
+    private List<RuleReportComponentModel> gracePeriodComponentsToConfluenceModel(
+            List<ReportingRuleGracePeriodComponent> gracePeriodComponents) {
+        return gracePeriodComponents.stream()
+                .map(this::toConfluenceModel)
+                .toList();
+    }
+
+    private RuleReportComponentModel toConfluenceModel(ReportingRuleGracePeriodComponent gracePeriodComponent) {
+        return RuleReportComponentModel.builder()
+                .id(gracePeriodComponent.getComponentId())
+                .name(gracePeriodComponent.getComponentName())
+                .pageSuffix(componentPageSuffix)
+                .systemName(gracePeriodComponent.getSystemName())
+                .systemPageSuffix(systemPageSuffix)
+                .violationDetectedAt(gracePeriodComponent.getViolationDetectedAt().withZoneSameInstant(reportingZone))
+                .gracePeriodEndsAt(gracePeriodComponent.getGracePeriodEndsAt().withZoneSameInstant(reportingZone))
                 .build();
     }
 

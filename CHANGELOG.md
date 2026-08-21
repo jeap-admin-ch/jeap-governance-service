@@ -7,6 +7,12 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > - Spring Boot 3 maintenance (bug fixes, patches, and regular updates) continues on branch `release/springboot3`.
 
+## [8.1.0] - 2026-08-21
+
+### Changed
+- Rule reports show components within configured violation grace periods, including detection and expiry timestamps.
+- Violation grace-period comments use the runtime's local timezone and a human-readable timestamp format.
+
 ## [8.0.0] - 2026-08-21
 
 ### Dependencies

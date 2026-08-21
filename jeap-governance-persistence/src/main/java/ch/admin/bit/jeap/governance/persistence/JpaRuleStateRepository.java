@@ -1,6 +1,7 @@
 package ch.admin.bit.jeap.governance.persistence;
 
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
+import ch.admin.bit.jeap.governance.domain.rule.GracePeriodComponentEntry;
 import ch.admin.bit.jeap.governance.domain.rule.NonCompliantComponentEntry;
 import ch.admin.bit.jeap.governance.domain.rule.RuleState;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -33,6 +34,17 @@ interface JpaRuleStateRepository extends JpaRepository<RuleState, Long> {
             WHERE rs.state = ch.admin.bit.jeap.governance.domain.rule.State.FAIL
             """)
     List<NonCompliantComponentEntry> findNonCompliantSince();
+
+    @Query("""
+            SELECT rs.systemComponent.system.id AS systemId,
+                   rs.systemComponent.id        AS systemComponentId,
+                   rs.ruleId                    AS ruleId,
+                   rs.violationDetectedAt       AS violationDetectedAt
+            FROM RuleState rs
+            WHERE rs.state = ch.admin.bit.jeap.governance.domain.rule.State.OK
+              AND rs.violationDetectedAt IS NOT NULL
+            """)
+    List<GracePeriodComponentEntry> findGracePeriodComponents();
 
     @Modifying
     @Query("DELETE FROM RuleState rs WHERE rs.systemComponent.id = :systemComponentId")

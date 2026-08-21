@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.TimeZone;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -134,10 +135,10 @@ class RuleEvaluationResultTest {
                 FirstEvent uses 1.0.0, latest is 2.0.0
                 SecondEvent uses 1.0.0, latest is 2.0.0""", Duration.ofDays(70));
 
-        var delayed = result.delayedUntil(deadline);
+        var delayed = withDefaultTimeZone("Europe/Zurich", () -> result.delayedUntil(deadline));
 
         assertThat(delayed.stateComment()).isEqualTo("""
-                Outdated message contracts: Violation grace period ends at 2026-10-27T10:00Z
+                Outdated message contracts: Violation grace period ends at 27.10.2026 11:00
                 FirstEvent uses 1.0.0, latest is 2.0.0
                 SecondEvent uses 1.0.0, latest is 2.0.0""");
     }
@@ -148,10 +149,20 @@ class RuleEvaluationResultTest {
         var result = new RuleEvaluationResult(RULE_ID, State.FAIL,
                 "Outdated message contracts:\rFirstEvent uses 1.0.0, latest is 2.0.0", Duration.ofDays(70));
 
-        var delayed = result.delayedUntil(deadline);
+        var delayed = withDefaultTimeZone("Europe/Zurich", () -> result.delayedUntil(deadline));
 
         assertThat(delayed.stateComment()).isEqualTo("""
-                Outdated message contracts: Violation grace period ends at 2026-10-27T10:00Z
+                Outdated message contracts: Violation grace period ends at 27.10.2026 11:00
                 FirstEvent uses 1.0.0, latest is 2.0.0""");
+    }
+
+    private static <T> T withDefaultTimeZone(String timeZoneId, java.util.function.Supplier<T> action) {
+        TimeZone originalTimeZone = TimeZone.getDefault();
+        try {
+            TimeZone.setDefault(TimeZone.getTimeZone(timeZoneId));
+            return action.get();
+        } finally {
+            TimeZone.setDefault(originalTimeZone);
+        }
     }
 }

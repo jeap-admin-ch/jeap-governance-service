@@ -941,8 +941,12 @@ Root Page
 │   └── <System Name> (System scores)                 ← Score, trend, score history chart and component list for a single system
 │       └── <Component Name> (Component scores)       ← Score, trend, score history chart and rule compliance breakdown for a single component
 └── Rules                                             ← Overview of all rules with conformance rate and trend
-    └── <Rule Name>                                   ← Rule metadata, conformance rate per system and list of non-compliant components
+    └── <Rule Name>                                   ← Rule metadata, conformance rate per system, grace periods and non-compliant components
 ```
+
+For rules with a configured `violation-delay`, each rule page lists components currently within the grace period,
+including when the violation was detected and when the grace period ends. These components remain compliant for
+scoring until the grace period expires. Timestamps use the runtime's local timezone.
 
 To find out the ancestor of a page, you can use the Confluence REST API, the following example retrieves the ancestors of a page with the title "BAZG-Governance" in the space "ARCDOCDEV":
 

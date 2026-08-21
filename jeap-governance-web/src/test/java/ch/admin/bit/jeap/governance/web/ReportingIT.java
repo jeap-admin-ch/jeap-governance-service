@@ -23,13 +23,16 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -82,6 +85,11 @@ class ReportingIT extends GovernanceIntegrationTestBase {
         verify(confluenceAdapter).addOrUpdatePageUnderAncestor(any(), eq("Rules"), any());
         verify(confluenceAdapter).addOrUpdatePageUnderAncestor(any(), eq("Rule 1"), any());
         verify(confluenceAdapter).addOrUpdatePageUnderAncestor(any(), eq("Rule 2"), any());
+        verify(confluenceAdapter).addOrUpdatePageUnderAncestor(any(), eq("Rule 2"), argThat(content ->
+                content.contains("Components in Violation Grace Period") &&
+                        content.contains("Component 1") &&
+                        content.contains("Violation Detected") &&
+                        content.contains("Grace Period Ends")));
         verify(confluenceAdapter, never()).deleteOrphanPages(anyString(), anySet());
     }
 
@@ -176,7 +184,8 @@ class ReportingIT extends GovernanceIntegrationTestBase {
         entityManager.persist(componentScore21);
 
         RuleInfo ruleInfo1 = new RuleInfo(RuleId.of("rule1"), "Rule 1", "http://documentation-link-for-rule-1");
-        RuleInfo ruleInfo2 = new RuleInfo(RuleId.of("rule2"), "Rule 2", "http://documentation-link-for-rule-2");
+        RuleInfo ruleInfo2 = new RuleInfo(RuleId.of("rule2"), "Rule 2", "http://documentation-link-for-rule-2",
+                Duration.ofDays(7));
 
         when(ruleRepository.getActiveRuleInfos()).thenReturn(List.of(ruleInfo1, ruleInfo2));
 
@@ -215,11 +224,9 @@ class ReportingIT extends GovernanceIntegrationTestBase {
                 .ruleId(RuleId.of("rule1"))
                 .state(State.FAIL)
                 .build();
-        RuleState ruleState2 = RuleState.builder()
-                .systemComponent(systemComponent1)
-                .ruleId(RuleId.of("rule2"))
-                .state(State.OK)
-                .build();
+        ZonedDateTime now = ZonedDateTime.now();
+        RuleState ruleState2 = RuleState.createWithTimestamps(
+                RuleId.of("rule2"), systemComponent1, State.OK, now.minusDays(1), now, now.minusDays(1));
 
         entityManager.persist(ruleState1);
         entityManager.persist(ruleState2);

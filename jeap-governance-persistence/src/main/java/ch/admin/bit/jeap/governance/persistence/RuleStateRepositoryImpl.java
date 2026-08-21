@@ -1,6 +1,7 @@
 package ch.admin.bit.jeap.governance.persistence;
 
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
+import ch.admin.bit.jeap.governance.domain.rule.GracePeriodComponentEntry;
 import ch.admin.bit.jeap.governance.domain.rule.NonCompliantComponentEntry;
 import ch.admin.bit.jeap.governance.domain.rule.RuleId;
 import ch.admin.bit.jeap.governance.domain.rule.RuleState;
@@ -35,6 +36,11 @@ public class RuleStateRepositoryImpl implements RuleStateRepository {
     @Override
     public List<NonCompliantComponentEntry> findNonCompliantSince() {
         return jpaRuleStateRepository.findNonCompliantSince();
+    }
+
+    @Override
+    public List<GracePeriodComponentEntry> findGracePeriodComponents() {
+        return jpaRuleStateRepository.findGracePeriodComponents();
     }
 
     @Override

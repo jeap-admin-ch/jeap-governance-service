@@ -4,12 +4,16 @@ import ch.admin.bit.jeap.governance.domain.SystemComponent;
 import org.springframework.util.StringUtils;
 
 import java.time.Duration;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * The outcome of evaluating a rule against a component, carrying the resulting state and an optional comment for failed rules.
  */
 public record RuleEvaluationResult(RuleId ruleId, State state, String stateComment, Duration violationDelay) {
+
+    private static final DateTimeFormatter GRACE_PERIOD_DEADLINE_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
     public RuleEvaluationResult(RuleId ruleId, State state, String stateComment) {
         this(ruleId, state, stateComment, Duration.ZERO);
@@ -41,7 +45,9 @@ public record RuleEvaluationResult(RuleId ruleId, State state, String stateComme
 
     RuleEvaluationResult delayedUntil(ZonedDateTime deadline) {
         String comment = StringUtils.hasText(stateComment) ? stateComment : "";
-        String gracePeriod = "Violation grace period ends at " + deadline;
+        String formattedDeadline = deadline.withZoneSameInstant(ZoneId.systemDefault())
+                .format(GRACE_PERIOD_DEADLINE_FORMAT);
+        String gracePeriod = "Violation grace period ends at " + formattedDeadline;
         String[] commentParts = comment.split("\\R", 2);
         String delayedComment = commentParts.length == 1
                 ? (comment.isEmpty() ? "" : comment + ". ") + gracePeriod

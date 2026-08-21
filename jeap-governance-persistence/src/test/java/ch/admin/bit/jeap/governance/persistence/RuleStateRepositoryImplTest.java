@@ -3,6 +3,7 @@ package ch.admin.bit.jeap.governance.persistence;
 import ch.admin.bit.jeap.governance.domain.ComponentType;
 import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
+import ch.admin.bit.jeap.governance.domain.rule.GracePeriodComponentEntry;
 import ch.admin.bit.jeap.governance.domain.rule.NonCompliantComponentEntry;
 import ch.admin.bit.jeap.governance.domain.rule.RuleId;
 import ch.admin.bit.jeap.governance.domain.rule.RuleState;
@@ -198,6 +199,33 @@ class RuleStateRepositoryImplTest extends PostgresTestContainerBase {
             assertEquals("RULE-002", entry.getRuleId());
             assertEquals(timestamp2.truncatedTo(ChronoUnit.MILLIS).toInstant(), entry.getNonCompliantSince().truncatedTo(ChronoUnit.MILLIS).toInstant());
         }
+    }
+
+    @Test
+    void findGracePeriodComponents_returnsOnlyOkStatesWithViolationDetectionTime() {
+        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime detectedAt = now.minusDays(3);
+        SystemComponent component = createAndPersistSystemWithComponent();
+
+        entityManager.persist(RuleState.createWithTimestamps(
+                RuleId.of("GRACE-PERIOD"), component, State.OK, now, now, detectedAt));
+        entityManager.persist(RuleState.createWithTimestamps(
+                RuleId.of("REGULAR-OK"), component, State.OK, now, now));
+        entityManager.persist(RuleState.createWithTimestamps(
+                RuleId.of("EXPIRED"), component, State.FAIL, now, now, detectedAt));
+        entityManager.persist(RuleState.createWithTimestamps(
+                RuleId.of("PAUSED"), component, State.PAUSED, now, now, detectedAt));
+        entityManager.flush();
+
+        List<GracePeriodComponentEntry> result = repository.findGracePeriodComponents();
+
+        assertThat(result).singleElement().satisfies(entry -> {
+            assertThat(entry.getRuleId()).isEqualTo("GRACE-PERIOD");
+            assertThat(entry.getSystemId()).isEqualTo(component.getSystem().getId());
+            assertThat(entry.getSystemComponentId()).isEqualTo(component.getId());
+            assertThat(entry.getViolationDetectedAt().truncatedTo(ChronoUnit.MILLIS).toInstant())
+                    .isEqualTo(detectedAt.truncatedTo(ChronoUnit.MILLIS).toInstant());
+        });
     }
 
     @Test

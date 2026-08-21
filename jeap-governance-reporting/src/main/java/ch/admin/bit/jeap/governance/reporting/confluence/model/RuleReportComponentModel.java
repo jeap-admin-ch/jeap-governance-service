@@ -14,4 +14,6 @@ public class RuleReportComponentModel {
     private String systemName;
     private String systemPageSuffix;
     private ZonedDateTime nonCompliantSince;
+    private ZonedDateTime violationDetectedAt;
+    private ZonedDateTime gracePeriodEndsAt;
 }

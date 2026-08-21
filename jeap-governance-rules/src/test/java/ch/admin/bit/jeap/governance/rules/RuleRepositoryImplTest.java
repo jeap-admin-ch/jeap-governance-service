@@ -3,6 +3,7 @@ package ch.admin.bit.jeap.governance.rules;
 import ch.admin.bit.jeap.governance.domain.ComponentType;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
 import ch.admin.bit.jeap.governance.domain.plugin.rule.Rule;
+import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleInfo;
 import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleMetadata;
 import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleParameters;
 import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleResult;
@@ -18,6 +19,7 @@ import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.Duration;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,6 +63,16 @@ class RuleRepositoryImplTest {
 
         RuleEvaluation oauth2 = findByRuleId(evaluations, RuleId.of("enforce-oauth2"));
         assertThat(oauth2.activationState()).isEqualTo(RuleActivationState.ACTIVE);
+    }
+
+    @Test
+    void activeRuleInfo_containsConfiguredViolationDelay() {
+        RuleInfo oauth2 = ruleRepository.getActiveRuleInfos().stream()
+                .filter(ruleInfo -> ruleInfo.ruleId().equals(RuleId.of("enforce-oauth2")))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(oauth2.violationDelay()).isEqualTo(Duration.ofDays(7));
     }
 
     @Test

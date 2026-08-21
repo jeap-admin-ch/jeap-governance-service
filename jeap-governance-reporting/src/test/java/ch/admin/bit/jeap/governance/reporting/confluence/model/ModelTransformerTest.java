@@ -5,9 +5,11 @@ import ch.admin.bit.jeap.governance.reporting.preparation.*;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -99,6 +101,14 @@ class ModelTransformerTest {
         when(nonCompliantComponent.getComponentName()).thenReturn("Component A");
         when(nonCompliantComponent.getNonComplianceSince()).thenReturn(TIMESTAMP);
 
+        ReportingRuleGracePeriodComponent gracePeriodComponent = mock(ReportingRuleGracePeriodComponent.class);
+        when(gracePeriodComponent.getSystemId()).thenReturn(1L);
+        when(gracePeriodComponent.getSystemName()).thenReturn("System A");
+        when(gracePeriodComponent.getComponentId()).thenReturn(2L);
+        when(gracePeriodComponent.getComponentName()).thenReturn("Component B");
+        when(gracePeriodComponent.getViolationDetectedAt()).thenReturn(TIMESTAMP);
+        when(gracePeriodComponent.getGracePeriodEndsAt()).thenReturn(TIMESTAMP.plusDays(7));
+
 
         String ruleId = "rule1";
         String ruleName = "Rule 1";
@@ -114,6 +124,8 @@ class ModelTransformerTest {
         when(reportingRule.getConformanceRates()).thenReturn(conformanceRates);
         when(reportingRule.getSystemConformanceRates()).thenReturn(systemConformanceRates);
         when(reportingRule.getNonCompliantComponents()).thenReturn(nonCompliantComponents);
+        when(reportingRule.hasViolationGracePeriod()).thenReturn(true);
+        when(reportingRule.getGracePeriodComponents()).thenReturn(List.of(gracePeriodComponent));
 
 
         RuleReportModel confluenceModel = transformer.toConfluenceModel(reportingRule);
@@ -133,6 +145,14 @@ class ModelTransformerTest {
         assertEquals(nonCompliantComponent.getComponentId(), ruleReportComponentModel.getId());
         assertEquals(nonCompliantComponent.getComponentName(), ruleReportComponentModel.getName());
         assertEquals(nonCompliantComponent.getNonComplianceSince(), ruleReportComponentModel.getNonCompliantSince());
+        assertThat(confluenceModel.isViolationGracePeriodConfigured()).isTrue();
+        assertThat(confluenceModel.getGracePeriodComponents()).singleElement().satisfies(component -> {
+            assertThat(component.getSystemName()).isEqualTo(gracePeriodComponent.getSystemName());
+            assertThat(component.getId()).isEqualTo(gracePeriodComponent.getComponentId());
+            assertThat(component.getName()).isEqualTo(gracePeriodComponent.getComponentName());
+            assertThat(component.getViolationDetectedAt()).isEqualTo(gracePeriodComponent.getViolationDetectedAt());
+            assertThat(component.getGracePeriodEndsAt()).isEqualTo(gracePeriodComponent.getGracePeriodEndsAt());
+        });
     }
 
     @Test
@@ -143,6 +163,29 @@ class ModelTransformerTest {
         assertEquals(ch.admin.bit.jeap.governance.reporting.confluence.model.State.PAUSED, transformer.toConfluenceState(State.PAUSED));
         assertEquals(ch.admin.bit.jeap.governance.reporting.confluence.model.State.DISABLED, transformer.toConfluenceState(State.DISABLED));
         assertEquals(ch.admin.bit.jeap.governance.reporting.confluence.model.State.FAIL, transformer.toConfluenceState(State.FAIL));
+    }
+
+    @Test
+    void toRuleReportModel_convertsGracePeriodTimestampsToReportingTimezone() {
+        ModelTransformer transformer = new ModelTransformer(
+                "systemPageSuffix", "componentPageSuffix", ZoneId.of("Europe/Zurich"));
+        ZonedDateTime detectedAtUtc = ZonedDateTime.parse("2026-08-21T08:30:00Z");
+        ReportingRuleGracePeriodComponent gracePeriodComponent = mock(ReportingRuleGracePeriodComponent.class);
+        when(gracePeriodComponent.getViolationDetectedAt()).thenReturn(detectedAtUtc);
+        when(gracePeriodComponent.getGracePeriodEndsAt()).thenReturn(detectedAtUtc.plusDays(7));
+        ReportingRule reportingRule = mock(ReportingRule.class);
+        when(reportingRule.getConformanceRateTrend()).thenReturn(TrendIndicator.UNKNOWN);
+        when(reportingRule.getSystemConformanceRates()).thenReturn(List.of());
+        when(reportingRule.getNonCompliantComponents()).thenReturn(List.of());
+        when(reportingRule.getGracePeriodComponents()).thenReturn(List.of(gracePeriodComponent));
+
+        RuleReportComponentModel component = transformer.toConfluenceModel(reportingRule)
+                .getGracePeriodComponents().getFirst();
+
+        assertThat(component.getViolationDetectedAt())
+                .isEqualTo(ZonedDateTime.parse("2026-08-21T10:30:00+02:00[Europe/Zurich]"));
+        assertThat(component.getGracePeriodEndsAt())
+                .isEqualTo(ZonedDateTime.parse("2026-08-28T10:30:00+02:00[Europe/Zurich]"));
     }
 
     @Test

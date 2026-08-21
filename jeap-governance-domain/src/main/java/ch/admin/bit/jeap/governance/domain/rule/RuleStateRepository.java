@@ -15,5 +15,9 @@ public interface RuleStateRepository {
 
     List<NonCompliantComponentEntry> findNonCompliantSince();
 
+    default List<GracePeriodComponentEntry> findGracePeriodComponents() {
+        return List.of();
+    }
+
     void deleteAllBySystemComponentId(long systemComponentId);
 }

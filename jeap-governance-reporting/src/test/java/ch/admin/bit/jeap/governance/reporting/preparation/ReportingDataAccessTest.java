@@ -5,6 +5,7 @@ import ch.admin.bit.jeap.governance.domain.System;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
 import ch.admin.bit.jeap.governance.domain.SystemComponentRepository;
 import ch.admin.bit.jeap.governance.domain.SystemRepository;
+import ch.admin.bit.jeap.governance.domain.rule.GracePeriodComponentEntry;
 import ch.admin.bit.jeap.governance.domain.rule.RuleConformanceRateRepository;
 import ch.admin.bit.jeap.governance.domain.rule.RuleRepository;
 import ch.admin.bit.jeap.governance.domain.rule.RuleStateRepository;
@@ -58,6 +59,14 @@ class ReportingDataAccessTest {
         when(systemRepository.findAll()).thenReturn(List.of(system));
 
         assertThat(dataAccess.findIgnoredComponentIds()).containsExactly(2L);
+    }
+
+    @Test
+    void findGracePeriodComponents_delegatesToRuleStateRepository() {
+        GracePeriodComponentEntry entry = org.mockito.Mockito.mock(GracePeriodComponentEntry.class);
+        when(ruleStateRepository.findGracePeriodComponents()).thenReturn(List.of(entry));
+
+        assertThat(dataAccess.findGracePeriodComponents()).containsExactly(entry);
     }
 
     private static SystemComponent component(String name, ComponentType type, Long id) {

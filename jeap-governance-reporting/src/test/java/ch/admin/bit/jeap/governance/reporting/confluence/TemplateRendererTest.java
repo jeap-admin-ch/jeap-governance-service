@@ -1,6 +1,8 @@
 package ch.admin.bit.jeap.governance.reporting.confluence;
 
 import ch.admin.bit.jeap.governance.reporting.confluence.model.ComponentScoreReportModel;
+import ch.admin.bit.jeap.governance.reporting.confluence.model.RuleReportComponentModel;
+import ch.admin.bit.jeap.governance.reporting.confluence.model.RuleReportModel;
 import ch.admin.bit.jeap.governance.reporting.confluence.model.RuleStateReportModel;
 import ch.admin.bit.jeap.governance.reporting.confluence.model.State;
 import ch.admin.bit.jeap.governance.reporting.confluence.model.SystemScoreReportModel;
@@ -19,6 +21,7 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templatemode.TemplateMode;
 
 import java.nio.charset.StandardCharsets;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -82,14 +85,7 @@ class TemplateRendererTest {
 
     @Test
     void renderComponentScorePage_formatsMultilineRuleCommentAsBulletList() {
-        var resolver = new ClassLoaderTemplateResolver();
-        resolver.setPrefix("templates/confluence/");
-        resolver.setSuffix(".html");
-        resolver.setCharacterEncoding(StandardCharsets.UTF_8.displayName());
-        resolver.setTemplateMode(TemplateMode.HTML);
-        var templateEngine = new SpringTemplateEngine();
-        templateEngine.setTemplateResolver(resolver);
-        var renderer = new TemplateRenderer(templateEngine);
+        var renderer = new TemplateRenderer(templateEngine());
         var ruleState = RuleStateReportModel.builder()
                 .ruleId("message-contract-rule")
                 .label("Message contract rule")
@@ -116,6 +112,75 @@ class TemplateRendererTest {
                 .contains("<ul>")
                 .contains("<li>FirstEvent uses 1.0.0, latest is 2.0.0</li>")
                 .contains("<li>SecondEvent uses 1.1.0, latest is 2.0.0</li>");
+    }
+
+    @Test
+    void renderRulePage_showsComponentsInViolationGracePeriod() {
+        var renderer = new TemplateRenderer(templateEngine());
+        var detectedAt = ZonedDateTime.parse("2026-08-21T10:30:00+02:00[Europe/Zurich]");
+        var component = RuleReportComponentModel.builder()
+                .id(2L)
+                .name("Component B")
+                .pageSuffix(" (Component scores)")
+                .systemName("System A")
+                .systemPageSuffix(" (System scores)")
+                .violationDetectedAt(detectedAt)
+                .gracePeriodEndsAt(detectedAt.plusDays(7))
+                .build();
+        var model = RuleReportModel.builder()
+                .ruleId("rule-1")
+                .name("Rule One")
+                .documentationLink("https://example.org/rule-1")
+                .conformanceRate(100)
+                .trend(Trend.EVEN)
+                .systems(List.of())
+                .violationGracePeriodConfigured(true)
+                .gracePeriodComponents(List.of(component))
+                .nonCompliantComponents(List.of())
+                .build();
+
+        String result = renderer.renderRulePage(model);
+
+        assertThat(result)
+                .contains("<h2>Components in Violation Grace Period</h2>")
+                .contains("System A")
+                .contains("Component B")
+                .contains("21.08.2026 10:30")
+                .contains("28.08.2026 10:30");
+    }
+
+    @Test
+    void renderRulePage_showsNeutralMessageWhenNoComponentIsInViolationGracePeriod() {
+        var renderer = new TemplateRenderer(templateEngine());
+        var model = RuleReportModel.builder()
+                .ruleId("rule-1")
+                .name("Rule One")
+                .documentationLink("https://example.org/rule-1")
+                .conformanceRate(100)
+                .trend(Trend.EVEN)
+                .systems(List.of())
+                .violationGracePeriodConfigured(true)
+                .gracePeriodComponents(List.of())
+                .nonCompliantComponents(List.of())
+                .build();
+
+        String result = renderer.renderRulePage(model);
+
+        assertThat(result)
+                .contains("<h2>Components in Violation Grace Period</h2>")
+                .contains("No components are currently in the violation grace period.")
+                .doesNotContain("<th>Violation Detected</th>");
+    }
+
+    private static SpringTemplateEngine templateEngine() {
+        var resolver = new ClassLoaderTemplateResolver();
+        resolver.setPrefix("templates/confluence/");
+        resolver.setSuffix(".html");
+        resolver.setCharacterEncoding(StandardCharsets.UTF_8.displayName());
+        resolver.setTemplateMode(TemplateMode.HTML);
+        var templateEngine = new SpringTemplateEngine();
+        templateEngine.setTemplateResolver(resolver);
+        return templateEngine;
     }
 
 }

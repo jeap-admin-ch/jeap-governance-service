@@ -53,6 +53,10 @@ public class ReportingDataAccess {
         return ruleStateRepository.findNonCompliantSince();
     }
 
+    List<GracePeriodComponentEntry> findGracePeriodComponents() {
+        return ruleStateRepository.findGracePeriodComponents();
+    }
+
     List<RuleConformanceRate> findAllRuleConformanceByDayBetweenInclusive(LocalDate fromDay, LocalDate toDay) {
         return ruleConformanceRateRepository.findAllByDayBetweenInclusive(fromDay, toDay);
     }

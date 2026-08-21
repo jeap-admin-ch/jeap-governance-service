@@ -15,6 +15,8 @@ public class RuleReportModel {
     private int conformanceRate;
     private Trend trend;
     private List<RuleReportSystemModel> systems;
+    private boolean violationGracePeriodConfigured;
+    private List<RuleReportComponentModel> gracePeriodComponents;
     private List<RuleReportComponentModel> nonCompliantComponents;
 
     public String getHighlightColor() {

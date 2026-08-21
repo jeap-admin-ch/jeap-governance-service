@@ -9,6 +9,7 @@ jeap:
     rules:
       active:
         - id: enforce-oauth2
+          violation-delay: 7d
         - id: check-tls
           parameters:
             minVersion: "1.2"
