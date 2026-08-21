@@ -51,6 +51,37 @@
         </tr>
         </tbody>
     </table>
+    <h2>Non-Compliant Components</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>System</th>
+            <th>Component</th>
+            <th>Non-Compliant Since</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="component : ${model.nonCompliantComponents}">
+            <td>
+                <ac:link>
+                    <ri:page th:ri:content-title="${component.systemName + component.systemPageSuffix}"/>
+                    <ac:plain-text-link-body>
+                        <![CDATA[[[${component.systemName}]]]]>
+                    </ac:plain-text-link-body>
+                </ac:link>
+            </td>
+            <td>
+                <ac:link>
+                    <ri:page th:ri:content-title="${component.name + component.pageSuffix}"/>
+                    <ac:plain-text-link-body>
+                        <![CDATA[[[${component.name}]]]]>
+                    </ac:plain-text-link-body>
+                </ac:link>
+            </td>
+            <td th:text="${#temporals.format(component.nonCompliantSince, 'dd.MM.yyyy')}"></td>
+        </tr>
+        </tbody>
+    </table>
     <th:block th:if="${model.violationGracePeriodConfigured}">
         <h2>Components in Violation Grace Period</h2>
         <p th:if="${#lists.isEmpty(model.gracePeriodComponents)}">No components are currently in the violation grace period.</p>
@@ -99,35 +130,4 @@
             </tbody>
         </table>
     </th:block>
-    <h2>Non-Compliant Components</h2>
-    <table>
-        <thead>
-        <tr>
-            <th>System</th>
-            <th>Component</th>
-            <th>Non-Compliant Since</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="component : ${model.nonCompliantComponents}">
-            <td>
-                <ac:link>
-                    <ri:page th:ri:content-title="${component.systemName + component.systemPageSuffix}"/>
-                    <ac:plain-text-link-body>
-                        <![CDATA[[[${component.systemName}]]]]>
-                    </ac:plain-text-link-body>
-                </ac:link>
-            </td>
-            <td>
-                <ac:link>
-                    <ri:page th:ri:content-title="${component.name + component.pageSuffix}"/>
-                    <ac:plain-text-link-body>
-                        <![CDATA[[[${component.name}]]]]>
-                    </ac:plain-text-link-body>
-                </ac:link>
-            </td>
-            <td th:text="${#temporals.format(component.nonCompliantSince, 'dd.MM.yyyy')}"></td>
-        </tr>
-        </tbody>
-    </table>
 </th:block>

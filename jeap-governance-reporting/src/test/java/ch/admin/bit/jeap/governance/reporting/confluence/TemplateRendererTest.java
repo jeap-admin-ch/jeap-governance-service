@@ -152,6 +152,8 @@ class TemplateRendererTest {
                 .contains("<li>SecondEvent uses 1.1.0, latest is 2.0.0</li>")
                 .contains("21.08.2026 10:30")
                 .contains("28.08.2026 10:30");
+        assertThat(result.indexOf("<h2>Non-Compliant Components</h2>"))
+                .isLessThan(result.indexOf("<h2>Components in Violation Grace Period</h2>"));
     }
 
     @Test
