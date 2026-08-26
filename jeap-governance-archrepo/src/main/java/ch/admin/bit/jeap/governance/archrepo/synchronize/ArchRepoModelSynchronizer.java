@@ -18,7 +18,7 @@ public class ArchRepoModelSynchronizer {
     private final ArchRepoModelSystemSynchronizer archRepoModelSystemSynchronizer;
 
     public void synchronizeWithArchRepo(ArchRepoModelDto archRepoModel) {
-        List<ArchRepoSystemDto> archRepoSystems = archRepoModel.getSystems();
+        List<ArchRepoSystemDto> archRepoSystems = getSystems(archRepoModel);
         Set<String> allArchRepoSystemNames = new HashSet<>();
         for (ArchRepoSystemDto archRepoSystem : archRepoSystems) {
             archRepoModelSystemSynchronizer.synchronizeWithArchRepo(archRepoSystem);
@@ -26,5 +26,16 @@ public class ArchRepoModelSynchronizer {
         }
 
         archRepoModelSystemSynchronizer.deleteNoMoreExistingSystems(allArchRepoSystemNames);
+    }
+
+    private List<ArchRepoSystemDto> getSystems(ArchRepoModelDto archRepoModel) {
+        if (archRepoModel.getSystems() == null) {
+            return List.of();
+        }
+        return archRepoModel.getSystems().stream().filter(this::hasComponents).toList();
+    }
+
+    private boolean hasComponents(ArchRepoSystemDto system) {
+        return system.getSystemComponents() != null && !system.getSystemComponents().isEmpty();
     }
 }
