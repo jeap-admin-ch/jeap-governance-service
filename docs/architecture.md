@@ -402,7 +402,7 @@ erDiagram
         TIMESTAMPTZ created_at
     }
     system_aliases {
-        BIGINT system_id PK_FK
+        BIGINT system_id PK, FK
         VARCHAR aliases PK
     }
     system_component {
