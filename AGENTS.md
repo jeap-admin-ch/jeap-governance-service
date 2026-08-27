@@ -1,6 +1,7 @@
 # AGENTS.md
 
-This file provides guidance to coding agents when working with code in this repository.
+This file provides guidance to coding agents when working with code in this repository. For how to *use* the
+library in a consuming service, read [README.md](README.md) and the [docs/](docs/) folder instead.
 
 ## Project Overview
 
@@ -89,8 +90,8 @@ Built on Java 25 and the `jeap-spring-boot-parent` (Spring Boot 4).
 - `jeap-governance-service-instance/` - POM-only module; downstream projects inherit from this to create their own
   governance service instances.
 
-`jeap-governance-docgen/` and `jeap-governance-pactbroker/` directories exist but are NOT registered in the root
-`<modules>` and are not built.
+`jeap-governance-docgen/` directory exists but is NOT registered in the root `<modules>` and is not built (replaced by
+`jeap-governance-reporting/`). `jeap-governance-pactbroker/` has been removed entirely.
 
 **Core Flows**:
 
@@ -214,7 +215,18 @@ Defined in `ImportOrder` classes within archrepo and deploymentlog modules:
 
 ## Documentation
 
-- Make sure to update README.md for changes and new features. Follow existing patterns and style.
+- User-facing documentation lives under [docs/](docs/) (one topic per file: `architecture.md`, `configuration.md`,
+  `rules.md`, `plugin-mechanism.md`, `reporting.md`, `metrics.md`). When changing public behaviour, update the
+  matching focused file and, if needed, the documentation index/link table in README.md. Keep README.md short —
+  orientation and links only, no depth.
+- Internal, BIT-only documentation (e.g. GovDashboard rule explanations tied to the BAZG Governance Dashboard) stays
+  on Confluence, not in `docs/`.
+- Pages must be valid MDX (Docusaurus renders every `.md` as MDX) and any Mermaid diagrams must use correct
+  Mermaid syntax — see the [writing principles](https://github.com/jeap-admin-ch/jeap/blob/master/docs/documenting-jeap.md#writing-principles).
+  There is no standalone linter for this; validate by actually building the docs site locally against this
+  checkout, using the [site repository](https://github.com/jeap-admin-ch/jeap-admin-ch.github.io)'s
+  `preview.sh --local <path-to-this-repo> --no-autodiscover` (production build, catches MDX/Mermaid syntax errors
+  and broken links) or `dev.sh` for a faster hot-reload check.
 - Update AGENTS.md if there are new patterns, architectural changes, or important information for coding agents.
 - Do not reference JIRA issues in comments or documentation, as these may not be accessible to all users. Instead,
   describe the rationale and context directly in the code or documentation.
