@@ -1,8 +1,8 @@
 publiccodeYmlVersion: 0.5.0
 name: jeap-governance-service
 applicationSuite: jEAP
-softwareVersion: 8.7.0
-releaseDate: 2026-09-03
+softwareVersion: 8.8.0
+releaseDate: 2026-09-06
 url: "https://github.com/jeap-admin-ch/jeap-governance-service.git"
 landingURL: "https://github.com/jeap-admin-ch/jeap"
 platforms:
