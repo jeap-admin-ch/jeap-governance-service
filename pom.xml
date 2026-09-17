@@ -34,7 +34,7 @@
 
     <artifactId>jeap-governance-service</artifactId>
     <name>${project.groupId}:${project.artifactId}</name>
-    <version>9.2.0-SNAPSHOT</version>
+    <version>9.2.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -42,8 +42,6 @@
         <maven.javadoc.skip>false</maven.javadoc.skip>
         <java.version>25</java.version>
         <maven.compiler.release>25</maven.compiler.release>
-        <testcontainers.version>2.0.5</testcontainers.version>
-        <wiremock-spring-boot.version>4.2.3</wiremock-spring-boot.version>
     </properties>
 
     <modules>
@@ -72,99 +70,93 @@
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-dataimport</artifactId>
-                <version>9.2.0-SNAPSHOT</version>
+                <version>9.2.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-domain</artifactId>
-                <version>9.2.0-SNAPSHOT</version>
+                <version>9.2.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-persistence</artifactId>
-                <version>9.2.0-SNAPSHOT</version>
+                <version>9.2.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-rules</artifactId>
-                <version>9.2.0-SNAPSHOT</version>
+                <version>9.2.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-rules-core</artifactId>
-                <version>9.2.0-SNAPSHOT</version>
+                <version>9.2.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-archrepo</artifactId>
-                <version>9.2.0-SNAPSHOT</version>
+                <version>9.2.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-deploymentlog</artifactId>
-                <version>9.2.0-SNAPSHOT</version>
+                <version>9.2.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-reactionobserver</artifactId>
-                <version>9.2.0-SNAPSHOT</version>
+                <version>9.2.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-messagecontract</artifactId>
-                <version>9.2.0-SNAPSHOT</version>
+                <version>9.2.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-web</artifactId>
-                <version>9.2.0-SNAPSHOT</version>
+                <version>9.2.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-reporting</artifactId>
-                <version>9.2.0-SNAPSHOT</version>
+                <version>9.2.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-prometheus</artifactId>
-                <version>9.2.0-SNAPSHOT</version>
+                <version>9.2.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-secscan</artifactId>
-                <version>9.2.0-SNAPSHOT</version>
+                <version>9.2.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-rules-messaging</artifactId>
-                <version>9.2.0-SNAPSHOT</version>
+                <version>9.2.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-rules-dependency</artifactId>
-                <version>9.2.0-SNAPSHOT</version>
+                <version>9.2.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-rules-pact</artifactId>
-                <version>9.2.0-SNAPSHOT</version>
+                <version>9.2.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-service-instance</artifactId>
-                <version>9.2.0-SNAPSHOT</version>
+                <version>9.2.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.sahli.asciidoc.confluence.publisher</groupId>
                 <artifactId>asciidoc-confluence-publisher-client</artifactId>
                 <version>${asciidoc-confluence-publisher-client.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wiremock.integrations</groupId>
-                <artifactId>wiremock-spring-boot-standalone</artifactId>
-                <version>${wiremock-spring-boot.version}</version>
-                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
