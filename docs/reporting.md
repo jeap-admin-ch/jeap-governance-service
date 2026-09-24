@@ -21,10 +21,10 @@ their details as a list, making individual violations visible from the rule over
 compliant for scoring until the grace period expires. Timestamps use the runtime's local timezone.
 
 To find out the ancestor of a page, you can use the Confluence REST API, the following example retrieves the
-ancestors of a page with the title "BAZG-Governance" in the space "ARCDOCDEV":
+ancestors of a page with the title "MySystem-Governance" in the space "ARCDOCDEV":
 
 ```
-confluence.yourcompany/rest/api/content?spaceKey=ARCDOCDEV&title=BAZG-Governance&expand=ancestors
+confluence.yourcompany/rest/api/content?spaceKey=ARCDOCDEV&title=MySystem-Governance&expand=ancestors
 ```
 
 See [Configuration](configuration.md) for the `jeap.governance.reporting.*` properties, including the Confluence

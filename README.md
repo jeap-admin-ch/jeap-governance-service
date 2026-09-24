@@ -30,9 +30,6 @@ for how to configure an instance.
 | Reporting to Confluence                            | [docs/reporting.md](docs/reporting.md)               |
 | Metrics and recommended alerts                     | [docs/metrics.md](docs/metrics.md)                   |
 
-> Internal, BIT-only documentation (e.g. GovDashboard rule explanations for the BAZG Governance Dashboard) remains
-> on Confluence and is not part of this public repository.
-
 ## Changes
 This library needs to be versioned using [Semantic Versioning](http://semver.org/) and all changes need to be documented at [CHANGELOG.md](./CHANGELOG.md) following the format defined in [Keep a Changelog](http://keepachangelog.com/)
 
