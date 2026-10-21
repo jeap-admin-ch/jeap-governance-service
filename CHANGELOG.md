@@ -12,7 +12,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 - An HTTP 503 from the Message Contract Service is logged as a warning instead of an error; the previous snapshot is retained and the next import retries. Importers can signal such a temporarily unavailable data source with the new `DataSourceUnavailableException`; other import failures are still logged as errors.
-- The Flyway migration `V1500_1_0` adds the `state` column to `mc_version_status` and makes `latest_version` nullable.
+- The Flyway migration `V1500_1_0` replaces the `up_to_date` column of `mc_version_status` with a `state` column and makes `latest_version` nullable. The table is a snapshot that the next import rebuilds completely. Because the column is dropped and the schema is validated on startup, version 9.12.0 no longer starts against the migrated schema: a rollback requires re-adding `up_to_date` (`BOOLEAN NOT NULL DEFAULT false`) by hand.
 
 ## [9.12.0] - 2026-10-18
 

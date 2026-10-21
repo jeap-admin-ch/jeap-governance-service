@@ -22,7 +22,6 @@ public class MessageContractVersionStatus {
     private String latestVersion;
     private String topic;
     private String role;
-    private boolean upToDate;
     @Enumerated(EnumType.STRING)
     private MessageContractVersionState state;
 
@@ -37,7 +36,6 @@ public class MessageContractVersionStatus {
         this.topic = topic;
         this.role = role;
         this.state = state;
-        this.upToDate = state == MessageContractVersionState.UP_TO_DATE;
     }
 
     public boolean isUnknown() {

@@ -27,11 +27,9 @@ class MessageContractVersionStatusSynchronizerTest {
         ArgumentCaptor<List<MessageContractVersionStatus>> captor = ArgumentCaptor.forClass(List.class);
         verify(repository).replaceSnapshot(captor.capture());
         assertThat(captor.getValue())
-                .extracting(MessageContractVersionStatus::getState, MessageContractVersionStatus::isUpToDate)
-                .containsExactly(
-                        org.assertj.core.groups.Tuple.tuple(MessageContractVersionState.OUTDATED, false),
-                        org.assertj.core.groups.Tuple.tuple(MessageContractVersionState.UNKNOWN, false),
-                        org.assertj.core.groups.Tuple.tuple(MessageContractVersionState.UP_TO_DATE, true));
+                .extracting(MessageContractVersionStatus::getState)
+                .containsExactly(MessageContractVersionState.OUTDATED, MessageContractVersionState.UNKNOWN,
+                        MessageContractVersionState.UP_TO_DATE);
     }
 
     @Test

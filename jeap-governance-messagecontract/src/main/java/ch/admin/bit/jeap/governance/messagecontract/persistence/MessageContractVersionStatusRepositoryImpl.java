@@ -1,5 +1,6 @@
 package ch.admin.bit.jeap.governance.messagecontract.persistence;
 
+import ch.admin.bit.jeap.governance.messagecontract.domain.MessageContractVersionState;
 import ch.admin.bit.jeap.governance.messagecontract.domain.MessageContractVersionStatus;
 import ch.admin.bit.jeap.governance.messagecontract.domain.MessageContractVersionStatusRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,7 @@ public class MessageContractVersionStatusRepositoryImpl implements MessageContra
 
     @Override
     public List<MessageContractVersionStatus> findNotUpToDateByAppName(String appName) {
-        return statusRepository.findByAppNameAndUpToDateFalse(appName);
+        return statusRepository.findByAppNameAndStateNot(appName, MessageContractVersionState.UP_TO_DATE);
     }
 
     @Override
