@@ -8,7 +8,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [9.12.1] - 2026-10-21
 
 ### Fixed
-- The message contract version import no longer fails as a whole because of a single contract whose message type cannot be resolved in its registry. Such contracts are reported by the Message Contract Service with status `UNKNOWN`; they are imported with a warning and not evaluated by `component-uses-latest-message-versions`: they neither fail the rule nor count as up to date, and are listed in the rule comment. Responses of older Message Contract Service versions without a status are still interpreted via `upToDate`.
+- The message contract version import no longer fails as a whole because of a single contract whose message type cannot be resolved in its registry. Such contracts are reported by the Message Contract Service with status `UNKNOWN`; they are imported with a warning and do not cause `component-uses-latest-message-versions` to fail: the rule is compliant unless other contracts of the component are outdated, and the unknown contracts are listed in the rule comment. Responses of older Message Contract Service versions without a status are still interpreted via `upToDate`.
 
 ### Changed
 - An HTTP 503 from the Message Contract Service is logged as a warning instead of an error; the previous snapshot is retained and the next import retries. Importers can signal such a temporarily unavailable data source with the new `DataSourceUnavailableException`; other import failures are still logged as errors.
