@@ -1,6 +1,7 @@
 package ch.admin.bit.jeap.governance.dataimport;
 
 import ch.admin.bit.jeap.governance.domain.plugin.datasource.DataSourceImporter;
+import ch.admin.bit.jeap.governance.domain.plugin.datasource.DataSourceUnavailableException;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import jakarta.annotation.PostConstruct;
@@ -53,6 +54,10 @@ public class DataImporter {
             dataSourceImporter.importData();
             log.debug("Import data done");
             return true;
+        } catch (DataSourceUnavailableException e) {
+            log.warn("Import data with {} skipped, previous data retained: {}",
+                    dataSourceImporter.getClass().getSimpleName(), e.getMessage(), e);
+            return false;
         } catch (Exception e) {
             log.error("Import data with {} failed", dataSourceImporter.getClass().getSimpleName(), e);
             return false;
