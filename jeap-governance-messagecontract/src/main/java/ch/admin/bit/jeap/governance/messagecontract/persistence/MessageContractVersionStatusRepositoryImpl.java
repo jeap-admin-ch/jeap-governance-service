@@ -14,7 +14,7 @@ public class MessageContractVersionStatusRepositoryImpl implements MessageContra
     private final JpaMessageContractVersionStatusRepository statusRepository;
 
     @Override
-    public List<MessageContractVersionStatus> findOutdatedByAppName(String appName) {
+    public List<MessageContractVersionStatus> findNotUpToDateByAppName(String appName) {
         return statusRepository.findByAppNameAndUpToDateFalse(appName);
     }
 

@@ -18,13 +18,17 @@ public class MessageContractVersionStatus {
     private String appVersion;
     private String messageType;
     private String usedVersion;
+    /** {@code null} if the state is {@link MessageContractVersionState#UNKNOWN}. */
     private String latestVersion;
     private String topic;
     private String role;
     private boolean upToDate;
+    @Enumerated(EnumType.STRING)
+    private MessageContractVersionState state;
 
     public MessageContractVersionStatus(String appName, String appVersion, String messageType, String usedVersion,
-                                        String latestVersion, String topic, String role, boolean upToDate) {
+                                        String latestVersion, String topic, String role,
+                                        MessageContractVersionState state) {
         this.appName = appName;
         this.appVersion = appVersion;
         this.messageType = messageType;
@@ -32,6 +36,11 @@ public class MessageContractVersionStatus {
         this.latestVersion = latestVersion;
         this.topic = topic;
         this.role = role;
-        this.upToDate = upToDate;
+        this.state = state;
+        this.upToDate = state == MessageContractVersionState.UP_TO_DATE;
+    }
+
+    public boolean isUnknown() {
+        return state == MessageContractVersionState.UNKNOWN;
     }
 }

@@ -4,6 +4,7 @@ import ch.admin.bit.jeap.governance.domain.ComponentType;
 import ch.admin.bit.jeap.governance.domain.SystemComponent;
 import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleParameters;
 import ch.admin.bit.jeap.governance.domain.rule.State;
+import ch.admin.bit.jeap.governance.messagecontract.domain.MessageContractVersionState;
 import ch.admin.bit.jeap.governance.messagecontract.domain.MessageContractVersionStatus;
 import ch.admin.bit.jeap.governance.messagecontract.domain.MessageContractVersionStatusRepository;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,7 @@ class ComponentUsesLatestMessageVersionsRuleTest {
 
     @Test
     void missingDataIsCompliant() {
-        when(repository.findOutdatedByAppName("test-service")).thenReturn(List.of());
+        when(repository.findNotUpToDateByAppName("test-service")).thenReturn(List.of());
 
         assertThat(evaluate(component)).satisfies(result -> {
             assertThat(result.state()).isEqualTo(State.OK);
@@ -31,7 +32,7 @@ class ComponentUsesLatestMessageVersionsRuleTest {
 
     @Test
     void failsWithSortedOutdatedContractDetails() {
-        when(repository.findOutdatedByAppName("test-service")).thenReturn(List.of(
+        when(repository.findNotUpToDateByAppName("test-service")).thenReturn(List.of(
                 status("ZEvent", "1.0.0", "2.0.0"), status("AEvent", "1.1.0", "1.2.0")));
 
         var result = evaluate(component);
@@ -41,6 +42,34 @@ class ComponentUsesLatestMessageVersionsRuleTest {
                 Outdated message contracts:
                 AEvent (CONSUMER on topic) uses 1.1.0, latest is 1.2.0
                 ZEvent (CONSUMER on topic) uses 1.0.0, latest is 2.0.0""");
+    }
+
+    @Test
+    void unknownContractsAreNotEvaluatedButListed() {
+        when(repository.findNotUpToDateByAppName("test-service")).thenReturn(List.of(unknown("SharedEvent", "1.0.0")));
+
+        var result = evaluate(component);
+
+        assertThat(result.state()).isEqualTo(State.OK);
+        assertThat(result.stateComment()).isEqualTo("""
+                No outdated message contracts found
+                Message contracts with unknown latest version (not evaluated):
+                SharedEvent (CONSUMER on topic) uses 1.0.0""");
+    }
+
+    @Test
+    void failsForOutdatedContractsAndListsUnknownContracts() {
+        when(repository.findNotUpToDateByAppName("test-service")).thenReturn(List.of(
+                unknown("SharedEvent", "1.0.0"), status("AEvent", "1.1.0", "1.2.0")));
+
+        var result = evaluate(component);
+
+        assertThat(result.state()).isEqualTo(State.FAIL);
+        assertThat(result.stateComment()).isEqualTo("""
+                Outdated message contracts:
+                AEvent (CONSUMER on topic) uses 1.1.0, latest is 1.2.0
+                Message contracts with unknown latest version (not evaluated):
+                SharedEvent (CONSUMER on topic) uses 1.0.0""");
     }
 
     @Test
@@ -59,6 +88,13 @@ class ComponentUsesLatestMessageVersionsRuleTest {
 
     private static MessageContractVersionStatus status(String messageType, String used, String latest) {
         return new MessageContractVersionStatus(
-                "test-service", "1.0.0", messageType, used, latest, "topic", "CONSUMER", false);
+                "test-service", "1.0.0", messageType, used, latest, "topic", "CONSUMER",
+                MessageContractVersionState.OUTDATED);
+    }
+
+    private static MessageContractVersionStatus unknown(String messageType, String used) {
+        return new MessageContractVersionStatus(
+                "test-service", "1.0.0", messageType, used, null, "topic", "CONSUMER",
+                MessageContractVersionState.UNKNOWN);
     }
 }

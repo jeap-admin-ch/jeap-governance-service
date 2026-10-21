@@ -187,7 +187,11 @@ jeap:
 During `violation-delay`, a continuous violation is reported in the rule comment but remains compliant for scoring.
 Once the delay expires it becomes a regular rule failure. A successful evaluation resets the delay.
 Imported version status is persisted as a shared database snapshot so import and scoring can run on different service
-replicas. If no version status data is available, the rule is compliant. A failed import retains the previous snapshot.
+replicas. If no version status data is available, the rule is compliant. A failed import retains the previous snapshot;
+if the Message Contract Service answers with HTTP 503 (a message type registry cannot be read), the failure is logged as a
+warning and the next scheduled import retries. Contracts whose latest version the Message Contract Service cannot
+determine (status `UNKNOWN`, e.g. because the message type is missing from its registry) are imported with a warning
+but not evaluated: they neither fail the rule nor count as up to date, and are listed in the rule comment.
 The configured user requires the `messagecontract-read` role.
 
 **Component Consumes Signed Messages** (`component-consumes-signedmessages`)

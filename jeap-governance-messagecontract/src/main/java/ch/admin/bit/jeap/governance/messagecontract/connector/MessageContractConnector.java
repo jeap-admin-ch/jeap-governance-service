@@ -6,6 +6,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
@@ -41,6 +42,9 @@ public class MessageContractConnector {
                 throw new IllegalStateException("Message contract version response body must not be null");
             }
             return statuses;
+        } catch (HttpServerErrorException.ServiceUnavailable ex) {
+            throw new MessageContractVersionStatusUnavailableException(
+                    "Message contract version status is temporarily unavailable: " + ex.getResponseBodyAsString(), ex);
         } catch (Exception ex) {
             throw new MessageContractConnectorException("Failed to retrieve message contract version status", ex);
         }
