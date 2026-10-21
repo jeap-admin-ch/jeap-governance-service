@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [9.12.1] - 2026-10-21
+
+### Fixed
+- The message contract version import no longer fails as a whole because of a single contract whose message type cannot be resolved in its registry. Such contracts are reported by the Message Contract Service with status `UNKNOWN`; they are imported with a warning and not evaluated by `component-uses-latest-message-versions`: they neither fail the rule nor count as up to date, and are listed in the rule comment. Responses of older Message Contract Service versions without a status are still interpreted via `upToDate`.
+
+### Changed
+- An HTTP 503 from the Message Contract Service is logged as a warning instead of an error; the previous snapshot is retained and the next import retries. Importers can signal such a temporarily unavailable data source with the new `DataSourceUnavailableException`; other import failures are still logged as errors.
+- The Flyway migration `V1500_1_0` adds the `state` column to `mc_version_status` and makes `latest_version` nullable.
+
 ## [9.12.0] - 2026-10-18
 
 ### Dependencies
