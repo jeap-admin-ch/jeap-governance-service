@@ -4,7 +4,7 @@ The governance service provides an infrastructure to evaluate governance rules a
 regular basis. Besides using predefined rules, you may also provide custom rules specific to your context.
 
 **Implementation:**
-1. Implement the `Rule` interface (see [Rule.java](../jeap-governance-plugin-api/src/main/java/ch/admin/jeap/governance/plugin/api/rule/Rule.java))
+1. Implement the `Rule` interface (see [Rule.java](../jeap-governance-domain/src/main/java/ch/admin/bit/jeap/governance/domain/plugin/rule/Rule.java))
 2. Inject any necessary repositories into your implementation to access the data you need for the rule evaluation
 3. Provide the rule as a Spring bean
 4. It will be automatically be evaluated during the regular rule evaluation process
