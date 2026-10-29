@@ -16,15 +16,14 @@ import java.time.Duration;
 public class ReactionObserverProperties {
 
     private String url;
-    private String username;
-    private String password;
+    private String clientRegistration;
     private Duration timeout;
 
     @PostConstruct
     void checkAndLog() {
         log.info("ReactionObserverProperties initialized with url='{}', timeout='{}'", url, timeout);
-        if (!StringUtils.hasText(url) || !StringUtils.hasText(username) || !StringUtils.hasText(password)) {
-            throw new IllegalArgumentException("ReactionObserverProperties 'url', 'username' and 'password' must be provided and not empty.");
+        if (!StringUtils.hasText(url) || !StringUtils.hasText(clientRegistration)) {
+            throw new IllegalArgumentException("ReactionObserverProperties 'url' and 'clientRegistration' must be provided and not empty.");
         }
     }
 }

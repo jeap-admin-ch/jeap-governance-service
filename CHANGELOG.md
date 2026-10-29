@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [9.17.0] - 2026-10-29
+
+### Changed
+- Reaction Observer requests now use OAuth2 client credentials instead of Basic authentication. Configure the required
+  Spring Security OAuth2 client registration and set `jeap.governance.reactionobserver.client-registration`.
+
 ## [9.16.0] - 2026-10-28
 
 ### Dependencies

@@ -1,6 +1,7 @@
 package ch.admin.bit.jeap.governance.reactionobserver.connector;
 
 import ch.admin.bit.jeap.governance.reactionobserver.ReactionObserverProperties;
+import ch.admin.bit.jeap.security.restclient.JeapOAuth2RestClientBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
 import org.springframework.core.ParameterizedTypeReference;
@@ -19,15 +20,15 @@ public class ReactionObserverConnector {
     private final RestClient restClient;
     private final String reactionObserverUrl;
 
-    public ReactionObserverConnector(RestClient.Builder restClientBuilder, ReactionObserverProperties properties) {
+    public ReactionObserverConnector(JeapOAuth2RestClientBuilderFactory restClientBuilderFactory,
+                                      ReactionObserverProperties properties) {
         reactionObserverUrl = properties.getUrl();
         ClientHttpRequestFactory requestFactory = ClientHttpRequestFactoryBuilder
                 .simple()
                 .withCustomizer(c -> c.setConnectTimeout(properties.getTimeout()))
                 .build();
-        this.restClient = restClientBuilder
+        this.restClient = restClientBuilderFactory.createForClientRegistryId(properties.getClientRegistration())
                 .baseUrl(reactionObserverUrl)
-                .defaultHeaders(headers -> headers.setBasicAuth(properties.getUsername(), properties.getPassword()))
                 .requestFactory(requestFactory)
                 .build();
     }

@@ -27,8 +27,7 @@ environment variables, etc.).
 | `jeap.governance.prometheus.amp.query-lookback`                      | How far back the Prometheus queries look for the most recent sample of a service                                                                       | 'PT6H'                        | No                               |
 | `jeap.governance.reactionobserver.enabled`                           | Enable/disable import of data from the of ReactionObserver                                                                                             | `true`                        | No                               |
 | `jeap.governance.reactionobserver.url`                               | URL of the ReactionObserver                                                                                                                            | -                             | Yes, if ReactionObserver enabled |
-| `jeap.governance.reactionobserver.username`                          | Username to access the ReactionObserver                                                                                                                | -                             | Yes, if ReactionObserver enabled |
-| `jeap.governance.reactionobserver.password`                          | Password to access the ReactionObserver                                                                                                                | -                             | Yes, if ReactionObserver enabled |
+| `jeap.governance.reactionobserver.client-registration`               | Spring Security OAuth2 client registration used to access the ReactionObserver                                                                        | -                             | Yes, if ReactionObserver enabled |
 | `jeap.governance.reactionobserver.timeout`                           | ReactionObserver connection timeout duration.                                                                                                          | 'PT5M'                        | No                               |
 | `jeap.governance.secscan.enabled`                                    | Enable/disable the security scan of known system component APIs                                                                                        | true                          | No                               |
 | `jeap.governance.secscan.dataimport.target-environment`              | Environment to perform the security scan on                                                                                                            | REF                           | No                               |
@@ -115,8 +114,7 @@ jeap:
     reactionobserver:
       enabled: true
       url: https://reactionobserver.example.com
-      username: reactionobserver_user
-      password: securepassword
+      client-registration: reaction-observer
       timeout: PT15M
     prometheus:
       enabled: true
@@ -163,6 +161,25 @@ jeap:
             - enforce-oauth2
           reason: "Legacy service, migration planned"
           until: "2026-12-31"
+```
+
+Configure the referenced OAuth2 client registration using Spring Security's client-credentials
+properties. The jEAP security client starter attaches its access token to Reaction Observer requests:
+
+```yaml
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          reaction-observer:
+            provider: reaction-observer
+            client-id: ${REACTION_OBSERVER_CLIENT_ID}
+            client-secret: ${REACTION_OBSERVER_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
+        provider:
+          reaction-observer:
+            issuer-uri: https://identity.example.com/realms/services
 ```
 
 ## See also

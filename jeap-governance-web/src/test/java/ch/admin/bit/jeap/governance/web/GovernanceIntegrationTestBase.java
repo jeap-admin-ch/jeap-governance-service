@@ -31,8 +31,9 @@ public abstract class GovernanceIntegrationTestBase {
 
     private static final String DL_USERNAME = "myUsername";
     private static final String DL_PASSWORD = "myPassword";
-    private static final String RO_USERNAME = "myUsername";
-    private static final String RO_PASSWORD = "myPassword";
+    private static final String RO_CLIENT_ID = "reaction-observer-client";
+    private static final String RO_CLIENT_SECRET = "reaction-observer-secret";
+    private static final String RO_ACCESS_TOKEN = "reaction-observer-access-token";
     protected static final String MC_USERNAME = "messageContractReader";
     protected static final String MC_PASSWORD = "messageContractPassword";
     private static final GovernanceServiceEnvironment DL_ENVIRONMENT = GovernanceServiceEnvironment.PROD;
@@ -65,6 +66,13 @@ public abstract class GovernanceIntegrationTestBase {
         reactionObserverMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig()
                 .dynamicPort());
         reactionObserverMockServer.start();
+        reactionObserverMockServer.stubFor(post(urlEqualTo("/oauth/token"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("""
+                                {"access_token":"reaction-observer-access-token","token_type":"Bearer","expires_in":3600}
+                                """)));
         WireMock.configureFor(reactionObserverMockServer.port());
         messageContractMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig()
                 .dynamicPort());
@@ -106,8 +114,13 @@ public abstract class GovernanceIntegrationTestBase {
         registry.add("jeap.governance.deploymentlog.password", () -> DL_PASSWORD);
 
         registry.add("jeap.governance.reactionobserver.url", reactionObserverMockServer::baseUrl);
-        registry.add("jeap.governance.reactionobserver.username", () -> RO_USERNAME);
-        registry.add("jeap.governance.reactionobserver.password", () -> RO_PASSWORD);
+        registry.add("jeap.governance.reactionobserver.client-registration", () -> "reaction-observer");
+        registry.add("spring.security.oauth2.client.registration.reaction-observer.provider", () -> "reaction-observer");
+        registry.add("spring.security.oauth2.client.registration.reaction-observer.client-id", () -> RO_CLIENT_ID);
+        registry.add("spring.security.oauth2.client.registration.reaction-observer.client-secret", () -> RO_CLIENT_SECRET);
+        registry.add("spring.security.oauth2.client.registration.reaction-observer.authorization-grant-type", () -> "client_credentials");
+        registry.add("spring.security.oauth2.client.provider.reaction-observer.token-uri",
+                () -> reactionObserverMockServer.baseUrl() + "/oauth/token");
 
         registry.add("jeap.governance.message-contract.url",
                 () -> messageContractMockServer.baseUrl() + "/api/contracts/version-status?env={environment}");
@@ -166,7 +179,7 @@ public abstract class GovernanceIntegrationTestBase {
 
     protected void stubReactionObserverComponentLastObservationDates(Map<String, LocalDate> dates) throws Exception {
         reactionObserverMockServer.stubFor(get(urlEqualTo("/api/statistics/last-observation-date"))
-                .withBasicAuth(DL_USERNAME, DL_PASSWORD)
+                .withHeader("Authorization", equalTo("Bearer " + RO_ACCESS_TOKEN))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
