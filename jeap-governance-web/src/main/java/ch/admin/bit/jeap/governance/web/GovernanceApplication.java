@@ -9,7 +9,6 @@ import org.springframework.core.env.Environment;
 @Slf4j
 public class GovernanceApplication {
 
-
     public static void main(String[] args) {
         Environment env = SpringApplication.run(GovernanceApplication.class, args).getEnvironment();
 
@@ -20,7 +19,7 @@ public class GovernanceApplication {
             {} is running!\s
             \t\
             
-            \tSwaggerUI: \t\t\t\thttp://localhost:{}{}/swagger-ui/index.html?urls.primaryName=Governance-Service-API
+            \tSwaggerUI: \t\t\t\thttp://localhost:{}{}/swagger-ui.html
             \t\
             Profile(s): \t\t\t{}\
             

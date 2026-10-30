@@ -7,7 +7,52 @@ regular basis. Besides using predefined rules, you may also provide custom rules
 1. Implement the `Rule` interface (see [Rule.java](../jeap-governance-domain/src/main/java/ch/admin/bit/jeap/governance/domain/plugin/rule/Rule.java))
 2. Inject any necessary repositories into your implementation to access the data you need for the rule evaluation
 3. Provide the rule as a Spring bean
-4. It will be automatically be evaluated during the regular rule evaluation process
+4. Ship its explanation as the classpath resource `jeap-governance/rules/<rule-id>.md`, see
+   [Rule explanations](#rule-explanations)
+5. It will be automatically be evaluated during the regular rule evaluation process
+
+## Rule explanations
+
+Each rule carries its explanation - what it checks, why, and how a component complies - as a Markdown resource next to
+the rule, in the module that ships it. It is found by convention on the classpath at:
+
+```
+jeap-governance/rules/<rule-id>.md
+```
+
+i.e. in `src/main/resources/jeap-governance/rules/<rule-id>.md` of the module providing the rule. No `Rule` method and
+no property is needed. The [docs API](docs-api.md) delivers the explanation with the rule, and the jEAP Doc Service
+renders it on the rule's page.
+
+- Every rule the library ships has one; a test in each rule module fails the build when one of its rule beans has
+  none.
+- A custom rule of an instance ships its own under the same path. A custom rule without one is logged as a warning at
+  startup (`Rule '<rule-id>' ships no explanation`) and published with a note that no explanation is available.
+- Write it in English, without images and without raw HTML: the Doc Service shows raw HTML as text. Do not start with
+  a title, the page shows the rule's name already; start with what the rule checks, then use `##` sections.
+- Describe what differs between instances by the rule's parameters, which the rule page shows, rather than by naming
+  an instance.
+
+The former `jeap.governance.rules.active[].documentation-link` is deprecated: it is only used by the Confluence
+reporting and is not delivered by the docs API.
+
+## Rule comments
+
+A rule state's comment is plain text, not Markdown. Its first line is the summary, and every further non-blank line is
+one item, for instance one violation. The Doc Service shows the summary as text and the items as a bullet list, the
+Confluence reporting as a list too.
+
+Build such comments with `RuleResult` instead of joining the items yourself:
+
+```java
+// "Unprotected endpoints:" followed by one endpoint per line; blank items are left out
+return RuleResult.failed("Unprotected endpoints:", List.of("'GET /a'", "'POST /b'"));
+
+// Failed if any check failed, with the comment lines of the failing checks as items; OK without a comment otherwise
+return RuleResult.summarize("Outdated dependencies:", resultsOfEachCheck);
+```
+
+`RuleResult.summarize(List)`, which joins the comments with `; ` into one line, is deprecated.
 
 ## Built-in Rules
 
@@ -483,4 +528,5 @@ To use this rule, the following modules must be enabled:
 
 - [Configuration](configuration.md) — the `jeap.governance.rules.*` and related module properties.
 - [Plugin mechanism](plugin-mechanism.md) — implementing custom data importers.
+- [Docs API](docs-api.md) — the rules, their explanations and exemptions, for the jEAP Doc Service.
 - [Architecture](architecture.md) — the rule and scoring model.

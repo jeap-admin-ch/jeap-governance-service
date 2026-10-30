@@ -29,6 +29,7 @@ import static java.util.stream.Collectors.mapping;
 public class EndpointsProtectedByJwtRule implements Rule {
 
     private static final String OK_MESSAGE = "No rest endpoint without JWT bearer token protection detected";
+    static final String FAILED_SUMMARY = "Calls without a JWT bearer token:";
 
     private static final RuleMetadata METADATA = RuleMetadata.builder()
             .ruleId(RuleId.of("endpoints-protected-by-jwt"))
@@ -93,10 +94,10 @@ public class EndpointsProtectedByJwtRule implements Rule {
         List<String> endpointMessages = new ArrayList<>();
         groupedByEndpoint.forEach( (endpoint, environments) -> {
             log.info("Component '{}': Detected a call '{}' on environment(s) '{}' without a JWT bearer token.", serviceName, endpoint, environments);
-            endpointMessages.add("Call '" + endpoint + "' without a JWT bearer token detected on environment(s) '" + environments + "'");
+            endpointMessages.add("'" + endpoint + "' on environment(s) '" + environments + "'");
         });
 
-        return RuleResult.failed(String.join("; ", endpointMessages));
+        return RuleResult.failed(FAILED_SUMMARY, endpointMessages);
     }
 
     private record EndpointEnvironment(String endpoint, String environment) {

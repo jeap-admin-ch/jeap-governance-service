@@ -31,12 +31,6 @@
       "type": "java.time.Duration"
     },
     {
-      "name": "jeap.governance.reporting.trendPeriodDays",
-      "description": "Number of days to consider for trend calculation in the reporting",
-      "defaultValue": "30",
-      "type": "java.lang.Integer"
-    },
-    {
       "name": "jeap.governance.reporting.confluence.url",
       "description": "URL of the Confluence instance to publish reports to",
       "type": "java.lang.String"

@@ -4,6 +4,7 @@ import ch.admin.bit.jeap.governance.domain.rule.RuleId;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 
 import java.time.LocalDate;
@@ -24,7 +25,6 @@ import static java.util.stream.Collectors.joining;
 ///       active:
 ///         - id: enforce-oauth2
 ///           weight: 10
-///           documentation-link: https://wiki.example.com/enforce-oauth2
 ///         - id: another-rule
 ///           weight: 10
 ///         - id: some-special-rule
@@ -88,9 +88,11 @@ public class RuleConfigurationProperties {
         private Duration violationDelay = Duration.ZERO;
 
         /**
-         * Optional link to the documentation for this rule. Used when generating governance reports
-         * to provide a reference for violation explanations.
+         * Optional link to the documentation for this rule. Used only by the Confluence reporting.
+         *
+         * @deprecated each rule now ships its explanation next to it, see {@code docs/rules.md}
          */
+        @Deprecated(since = "9.18.0")
         private String documentationLink;
 
         /**
@@ -100,6 +102,17 @@ public class RuleConfigurationProperties {
 
         public RuleId getId() {
             return RuleId.of(id);
+        }
+
+        /**
+         * @deprecated each rule now ships its explanation next to it; the docs API does not deliver this link
+         */
+        @Deprecated(since = "9.18.0")
+        @DeprecatedConfigurationProperty(since = "9.18.0",
+                reason = "Each rule ships its explanation as the resource jeap-governance/rules/<rule-id>.md. "
+                         + "The link is only used by the Confluence reporting and is removed with it.")
+        public String getDocumentationLink() {
+            return documentationLink;
         }
 
         @Override

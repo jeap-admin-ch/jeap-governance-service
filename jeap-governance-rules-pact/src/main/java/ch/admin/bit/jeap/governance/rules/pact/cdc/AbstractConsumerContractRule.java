@@ -14,6 +14,7 @@ import java.util.List;
 @Slf4j
 public abstract class AbstractConsumerContractRule implements Rule {
 
+    static final String FAILED_SUMMARY = "REST relations without a consumer contract:";
     private static final String SERVICES_TO_IGNORE = "services-to-ignore";
     private static final String RELATIONS_TO_IGNORE = "relations-to-ignore";
     private final RestApiRelationWithoutPactRepository restApiRelationWithoutPactRepository;
@@ -38,7 +39,7 @@ public abstract class AbstractConsumerContractRule implements Rule {
         if (results.isEmpty()) {
             return RuleResult.ok("No rest relation without pact found");
         }
-        return RuleResult.summarize(results);
+        return RuleResult.summarize(FAILED_SUMMARY, results);
     }
 
     protected abstract boolean filterServices(RestApiRelationWithoutPact relation);
@@ -66,8 +67,8 @@ public abstract class AbstractConsumerContractRule implements Rule {
     }
 
     private static String formatFailMessage(RestApiRelationWithoutPact relation) {
-        return "No consumer contract found for relation with %s on '%s %s'".formatted(
-                relation.getProviderSystemComponent().getName(), relation.getMethod(), relation.getPath());
+        return "'%s %s' provided by %s".formatted(
+                relation.getMethod(), relation.getPath(), relation.getProviderSystemComponent().getName());
     }
 
 }

@@ -34,7 +34,7 @@
 
     <artifactId>jeap-governance-service</artifactId>
     <name>${project.groupId}:${project.artifactId}</name>
-    <version>9.17.0-SNAPSHOT</version>
+    <version>9.18.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -50,7 +50,9 @@
         <module>jeap-governance-persistence</module>
         <module>jeap-governance-rules</module>
         <module>jeap-governance-rules-core</module>
+        <module>jeap-governance-report-data</module>
         <module>jeap-governance-archrepo</module>
+        <module>jeap-governance-docservice</module>
         <module>jeap-governance-web</module>
         <module>jeap-governance-reporting</module>
         <module>jeap-governance-prometheus</module>
@@ -70,87 +72,104 @@
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-dataimport</artifactId>
-                <version>9.17.0-SNAPSHOT</version>
+                <version>9.18.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-domain</artifactId>
-                <version>9.17.0-SNAPSHOT</version>
+                <version>9.18.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.admin.bit.jeap</groupId>
+                <artifactId>jeap-governance-domain</artifactId>
+                <version>9.18.0-SNAPSHOT</version>
+                <type>test-jar</type>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-persistence</artifactId>
-                <version>9.17.0-SNAPSHOT</version>
+                <version>9.18.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-rules</artifactId>
-                <version>9.17.0-SNAPSHOT</version>
+                <version>9.18.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-rules-core</artifactId>
-                <version>9.17.0-SNAPSHOT</version>
+                <version>9.18.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-archrepo</artifactId>
-                <version>9.17.0-SNAPSHOT</version>
+                <version>9.18.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-deploymentlog</artifactId>
-                <version>9.17.0-SNAPSHOT</version>
+                <version>9.18.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-reactionobserver</artifactId>
-                <version>9.17.0-SNAPSHOT</version>
+                <version>9.18.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-messagecontract</artifactId>
-                <version>9.17.0-SNAPSHOT</version>
+                <version>9.18.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.admin.bit.jeap</groupId>
+                <artifactId>jeap-governance-docservice</artifactId>
+                <version>9.18.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-web</artifactId>
-                <version>9.17.0-SNAPSHOT</version>
+                <version>9.18.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-reporting</artifactId>
-                <version>9.17.0-SNAPSHOT</version>
+                <version>9.18.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.admin.bit.jeap</groupId>
+                <artifactId>jeap-governance-report-data</artifactId>
+                <version>9.18.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-prometheus</artifactId>
-                <version>9.17.0-SNAPSHOT</version>
+                <version>9.18.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-secscan</artifactId>
-                <version>9.17.0-SNAPSHOT</version>
+                <version>9.18.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-rules-messaging</artifactId>
-                <version>9.17.0-SNAPSHOT</version>
+                <version>9.18.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-rules-dependency</artifactId>
-                <version>9.17.0-SNAPSHOT</version>
+                <version>9.18.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-rules-pact</artifactId>
-                <version>9.17.0-SNAPSHOT</version>
+                <version>9.18.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.bit.jeap</groupId>
                 <artifactId>jeap-governance-service-instance</artifactId>
-                <version>9.17.0-SNAPSHOT</version>
+                <version>9.18.0-SNAPSHOT</version>
             </dependency>
 
             <dependency>

@@ -7,7 +7,7 @@
     <parent>
         <groupId>ch.admin.bit.jeap</groupId>
         <artifactId>jeap-governance-service</artifactId>
-        <version>9.17.0-SNAPSHOT</version>
+        <version>9.18.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>jeap-governance-domain</artifactId>
@@ -39,5 +39,22 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Shares RuleExplanationCoverage with the rule modules -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

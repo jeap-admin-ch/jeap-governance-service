@@ -8,6 +8,8 @@ import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleMetadata;
 import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleParameters;
 import ch.admin.bit.jeap.governance.domain.plugin.rule.RuleResult;
 import ch.admin.bit.jeap.governance.domain.rule.RuleActivationState;
+import ch.admin.bit.jeap.governance.domain.rule.RuleComponentExemption;
+import ch.admin.bit.jeap.governance.domain.rule.RuleDescription;
 import ch.admin.bit.jeap.governance.domain.rule.RuleEvaluation;
 import ch.admin.bit.jeap.governance.domain.rule.RuleId;
 import ch.admin.bit.jeap.governance.domain.rule.RuleRepository;
@@ -19,8 +21,11 @@ import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.math.BigDecimal;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -174,6 +179,90 @@ class RuleRepositoryImplTest {
                 .name(name)
                 .type(ComponentType.BACKEND_SERVICE)
                 .build();
+    }
+
+    @Test
+    void knownRules_containEveryRuleBeanSortedByRuleId() {
+        assertThat(ruleRepository.getKnownRules())
+                .extracting(rule -> rule.ruleId().id())
+                .containsExactly("check-tls", "enforce-oauth2", "unconfigured-rule");
+    }
+
+    @Test
+    void knownRules_describeAnActiveRuleAsConfigured() {
+        RuleDescription checkTls = findKnownRule("check-tls");
+
+        assertThat(checkTls.active()).isTrue();
+        assertThat(checkTls.label()).isEqualTo("Check TLS");
+        assertThat(checkTls.weight()).isEqualTo(5);
+        assertThat(checkTls.violationDelay()).isEqualTo(Duration.ZERO);
+        assertThat(checkTls.parameters()).isEqualTo(Map.of("minVersion", "1.2", "timeout", "30"));
+    }
+
+    @Test
+    void knownRules_describeAnInactiveRuleWithoutConfiguration() {
+        RuleDescription unconfigured = findKnownRule("unconfigured-rule");
+
+        assertThat(unconfigured.active()).isFalse();
+        assertThat(unconfigured.label()).isEqualTo("Unconfigured Rule");
+        assertThat(unconfigured.weight()).isNull();
+        assertThat(unconfigured.violationDelay()).isNull();
+        assertThat(unconfigured.parameters()).isEmpty();
+        assertThat(unconfigured.exemptions()).isEmpty();
+    }
+
+    @Test
+    void knownRules_carryTheExplanationResourceUnchanged() {
+        assertThat(findKnownRule("enforce-oauth2").explanation()).isEqualTo("""
+                Checks that every endpoint requires an OAuth2 token.
+
+                <b>Raw HTML</b> is passed on unchanged.
+                """);
+    }
+
+    @Test
+    void knownRules_ruleWithoutExplanationResource_hasNone() {
+        assertThat(findKnownRule("check-tls").explanation()).isNull();
+    }
+
+    @Test
+    void knownRules_listTheExemptionsNamingTheRule() {
+        assertThat(findKnownRule("enforce-oauth2").exemptions())
+                .extracting(RuleComponentExemption::id)
+                .containsExactly("permanent-exemption", "temporary-exemption", "expired-exemption", "two-rules-exemption");
+        assertThat(findKnownRule("enforce-oauth2").exemptions().getFirst()).isEqualTo(new RuleComponentExemption(
+                "permanent-exemption", "exempted-service", "Internal tool, no external access", null,
+                Map.of("scope", "internal")));
+        assertThat(findKnownRule("enforce-oauth2").exemptions().get(1).until()).isEqualTo(LocalDate.of(2099, 12, 31));
+    }
+
+    @Test
+    void knownRules_exemptionNamingTwoRules_isListedUnderBoth() {
+        assertThat(findKnownRule("check-tls").exemptions())
+                .extracting(RuleComponentExemption::id)
+                .containsExactly("two-rules-exemption");
+    }
+
+    @Test
+    void activeRuleWeights_skipAConfiguredRuleWithoutBean() {
+        assertThat(ruleRepository.getActiveRuleWeights()).isEqualTo(Map.of(
+                RuleId.of("enforce-oauth2"), 10,
+                RuleId.of("check-tls"), 5));
+    }
+
+    @Test
+    void activeRuleShares_areComputedFromTheActiveWeightsOfTheRuleBeans() {
+        // rule-without-bean is configured with weight 85, but neither scored nor part of the shares
+        assertThat(ruleRepository.getActiveRuleShares()).isEqualTo(Map.of(
+                RuleId.of("enforce-oauth2"), new BigDecimal("66.7"),
+                RuleId.of("check-tls"), new BigDecimal("33.3")));
+    }
+
+    private RuleDescription findKnownRule(String ruleId) {
+        return ruleRepository.getKnownRules().stream()
+                .filter(rule -> rule.ruleId().equals(RuleId.of(ruleId)))
+                .findFirst()
+                .orElseThrow();
     }
 
     static class TestRule implements Rule {

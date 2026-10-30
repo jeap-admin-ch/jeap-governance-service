@@ -17,7 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -113,20 +112,8 @@ class ComponentDependenciesVersionsRuleTest {
 
         //then
         assertThat(result.state()).isEqualTo(State.OK);
-
-        List<String> expectedComments = List.of(
-                "ch.admin.bit.jeap:jeap-spring-boot-application-starter is up to date with version 18.2.0",
-                "ch.admin.bit.jeap:jeap-messaging is up to date with version 9.3.1",
-                "ch.admin.bit.jeap:jeap-messaging-outbox is up to date with version 9.3.1",
-                "ch.admin.bit.jeap:jeap-messaging-sequential-inbox is up to date with version 9.3.1",
-                "ch.admin.bit.jeap:jeap-crypto is up to date with version 4.2.0",
-                "ch.admin.bit.jeap:jeap-error-handling-service is up to date with version 14.0.0",
-                "ch.admin.bit.jeap:jeap-process-context-scs is up to date with version 13.25.0",
-                "ch.admin.bit.jeap:jeap-process-archive-service is up to date with version 9.5.0",
-                "spring.boot is up to date with version 3.5.6"
-        );
-
-        assertThat(Arrays.asList(result.stateComment().split("; "))).containsExactlyInAnyOrderElementsOf(expectedComments);
+        // Only failing dependencies are listed
+        assertThat(result.stateComment()).isNull();
     }
 
     @Test
@@ -163,7 +150,7 @@ class ComponentDependenciesVersionsRuleTest {
                 "ch.admin.bit.jeap:jeap-process-context-scs is outdated with version 13.24.1, please update to at least version 13.25.0"
         );
 
-        assertThat(Arrays.asList(result.stateComment().split("; "))).containsExactlyInAnyOrderElementsOf(expectedComments);
+        assertThat(violations(result)).containsExactlyInAnyOrderElementsOf(expectedComments);
     }
 
     @Test
@@ -183,12 +170,10 @@ class ComponentDependenciesVersionsRuleTest {
         assertThat(result.state()).isEqualTo(State.FAIL);
 
         List<String> expectedComments = List.of(
-                "ch.admin.bit.jeap:jeap-crypto is up to date with version 4.2.0",
-                "ch.admin.bit.jeap:jeap-spring-boot-application-starter is up to date with version 18.2.0",
                 "ch.admin.bit.jeap:jeap-messaging is outdated with version 9.3.1, please update to at least version 10.9.1"
         );
 
-        assertThat(Arrays.asList(result.stateComment().split("; "))).containsExactlyElementsOf(expectedComments);
+        assertThat(violations(result)).containsExactlyElementsOf(expectedComments);
     }
 
     @Test
@@ -214,7 +199,7 @@ class ComponentDependenciesVersionsRuleTest {
                 "ch.admin.bit.jeap:jeap-spring-boot-application-starter is outdated with version 18.1.0, please update to at least version 18.2.0"
         );
 
-        assertThat(Arrays.asList(result.stateComment().split("; "))).containsExactlyElementsOf(expectedComments);
+        assertThat(violations(result)).containsExactlyElementsOf(expectedComments);
     }
 
     @Test
@@ -240,7 +225,17 @@ class ComponentDependenciesVersionsRuleTest {
                 "ch.admin.bit.jeap:jeap-crypto has an invalid version: Component seems to use an un-parsable version number: foo.bar"
         );
 
-        assertThat(Arrays.asList(result.stateComment().split("; "))).containsExactlyInAnyOrderElementsOf(expectedComments);
+        assertThat(violations(result)).containsExactlyInAnyOrderElementsOf(expectedComments);
+    }
+
+    /**
+     * @return the items of the comment, after asserting its summary line; no item is joined with another
+     */
+    private static List<String> violations(RuleResult result) {
+        List<String> lines = result.stateComment().lines().toList();
+        assertThat(lines.getFirst()).isEqualTo("Outdated dependencies:");
+        assertThat(result.stateComment()).doesNotContain("; ");
+        return lines.subList(1, lines.size());
     }
 
     private List<PromTimeSeries> createOkSamples(SystemComponent component) {

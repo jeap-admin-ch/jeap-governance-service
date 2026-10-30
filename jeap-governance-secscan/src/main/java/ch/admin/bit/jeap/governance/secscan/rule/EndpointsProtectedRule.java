@@ -26,6 +26,7 @@ public class EndpointsProtectedRule implements Rule {
 
     static final String OK_MESSAGE = "No rest endpoint without proper protection detected";
     static final String NO_SCAN_DATA_MESSAGE = "No security scan data available";
+    static final String FAILED_SUMMARY = "Unprotected endpoints:";
 
     private static final RuleMetadata METADATA = RuleMetadata.builder()
             .ruleId(RuleId.of("endpoints-protected"))
@@ -73,9 +74,9 @@ public class EndpointsProtectedRule implements Rule {
             String method = flaggedEndpoint.getMethod();
             if (!exemptions.shouldExemptHttpEndpoint(new HttpEndpoint(path, method), environment).exempted()) {
                 String endpointId = method + " " + path;
-                String message = "Endpoint '" + endpointId + "' not properly protected"
+                String message = "'" + endpointId + "'"
                         + (flaggedEndpoint.getScanMessage() != null ? " (" + flaggedEndpoint.getScanMessage() + ")" : "");
-                log.info("Component '{}': {}", serviceName, message);
+                log.info("Component '{}': Endpoint {} not properly protected", serviceName, message);
                 failedEndpointMessages.add(message);
             }
         }
@@ -86,7 +87,7 @@ public class EndpointsProtectedRule implements Rule {
 
         // Sort to get a repeatable, predictable result
         Collections.sort(failedEndpointMessages);
-        return RuleResult.failed(String.join("; ", failedEndpointMessages));
+        return RuleResult.failed(FAILED_SUMMARY, failedEndpointMessages);
     }
 
 }

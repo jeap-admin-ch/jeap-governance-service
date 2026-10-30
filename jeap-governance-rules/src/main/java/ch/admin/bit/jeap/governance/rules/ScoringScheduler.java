@@ -5,16 +5,20 @@ import ch.admin.bit.jeap.governance.domain.rule.RuleConformanceRateService;
 import ch.admin.bit.jeap.governance.domain.rule.RuleEvaluationResult;
 import ch.admin.bit.jeap.governance.domain.scheduler.SchedulerRunRepository;
 import ch.admin.bit.jeap.governance.domain.scheduler.SchedulerRunTracker;
+import ch.admin.bit.jeap.governance.domain.score.ScoringRunCompletedEvent;
 import ch.admin.bit.jeap.governance.domain.score.ScoringService;
 import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.core.LockAssert;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,14 +32,17 @@ public class ScoringScheduler {
     private final SystemRepository systemRepository;
     private final RuleConformanceRateService ruleConformanceRateService;
     private final SchedulerRunTracker runTracker;
+    private final ApplicationEventPublisher eventPublisher;
 
     public ScoringScheduler(ScoringService scoringService, SystemRepository systemRepository,
                             RuleConformanceRateService ruleConformanceRateService,
-                            SchedulerRunRepository schedulerRunRepository, MeterRegistry meterRegistry) {
+                            SchedulerRunRepository schedulerRunRepository, MeterRegistry meterRegistry,
+                            ApplicationEventPublisher eventPublisher) {
         this.scoringService = scoringService;
         this.systemRepository = systemRepository;
         this.ruleConformanceRateService = ruleConformanceRateService;
-        this.runTracker = new SchedulerRunTracker("scoring", "jeap_governance_service_scoring_last_run_from", schedulerRunRepository, meterRegistry);
+        this.eventPublisher = eventPublisher;
+        this.runTracker = new SchedulerRunTracker(SchedulerRunTracker.SCORING_JOB_NAME, "jeap_governance_service_scoring_last_run_from", schedulerRunRepository, meterRegistry);
     }
 
     @Scheduled(cron = "${jeap.governance.scoring.cron-expression}")
@@ -55,7 +62,8 @@ public class ScoringScheduler {
 
         ruleConformanceRateService.updateConformanceRates(allResults, day);
         ruleConformanceRateService.updateSystemConformanceRates(resultsBySystem, day);
-        runTracker.recordRun();
+        LocalDateTime scoredAt = runTracker.recordRun();
+        eventPublisher.publishEvent(new ScoringRunCompletedEvent(scoredAt.atZone(ZoneId.systemDefault()).toOffsetDateTime()));
     }
 
     private List<RuleEvaluationResult> updateSystemScore(long systemId, LocalDate day) {

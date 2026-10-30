@@ -6,6 +6,7 @@ import ch.admin.bit.jeap.governance.domain.rule.RuleEvaluationResult;
 import ch.admin.bit.jeap.governance.domain.rule.RuleId;
 import ch.admin.bit.jeap.governance.domain.rule.State;
 import ch.admin.bit.jeap.governance.domain.scheduler.SchedulerRunRepository;
+import ch.admin.bit.jeap.governance.domain.score.ScoringRunCompletedEvent;
 import ch.admin.bit.jeap.governance.domain.score.ScoringService;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import net.javacrumbs.shedlock.core.LockAssert;
@@ -15,6 +16,7 @@ import org.mockito.ArgumentCaptor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -30,7 +32,8 @@ class ScoringSchedulerTest {
     private final SystemRepository systemRepository = mock(SystemRepository.class);
     private final RuleConformanceRateService ruleConformanceRateService = mock(RuleConformanceRateService.class);
     private final SchedulerRunRepository schedulerRunRepository = mock(SchedulerRunRepository.class);
-    private final ScoringScheduler scheduler = new ScoringScheduler(scoringService, systemRepository, ruleConformanceRateService, schedulerRunRepository, new SimpleMeterRegistry());
+    private final List<Object> publishedEvents = new ArrayList<>();
+    private final ScoringScheduler scheduler = new ScoringScheduler(scoringService, systemRepository, ruleConformanceRateService, schedulerRunRepository, new SimpleMeterRegistry(), publishedEvents::add);
 
     @BeforeEach
     void setUp() {
@@ -83,5 +86,36 @@ class ScoringSchedulerTest {
         var captor = ArgumentCaptor.forClass(Long.class);
         verify(scoringService, times(3)).updateSystemScore(captor.capture(), any(LocalDate.class));
         assertThat(captor.getAllValues()).containsExactly(1L, 2L, 3L);
+    }
+
+    @Test
+    void updateScores_publishesTheCompletedRunWithItsRecordedTime() {
+        when(systemRepository.findAllIds()).thenReturn(List.of(1L));
+        when(scoringService.updateSystemScore(any(Long.class), any())).thenReturn(List.of());
+
+        scheduler.updateScores();
+
+        var recordedAt = ArgumentCaptor.forClass(LocalDateTime.class);
+        verify(schedulerRunRepository).saveLastRunDateTime(eq("scoring"), recordedAt.capture());
+        assertThat(publishedEvents).singleElement()
+                .isInstanceOfSatisfying(ScoringRunCompletedEvent.class, event ->
+                        assertThat(event.scoredAt().toLocalDateTime()).isEqualTo(recordedAt.getValue()));
+    }
+
+    @Test
+    void updateScores_publishesNothingBeforeTheRunIsRecorded() {
+        when(systemRepository.findAllIds()).thenReturn(List.of(1L));
+        when(scoringService.updateSystemScore(any(Long.class), any())).thenAnswer(_ -> {
+            assertThat(publishedEvents).isEmpty();
+            return List.of();
+        });
+        doAnswer(_ -> {
+            assertThat(publishedEvents).isEmpty();
+            return null;
+        }).when(schedulerRunRepository).saveLastRunDateTime(eq("scoring"), any());
+
+        scheduler.updateScores();
+
+        assertThat(publishedEvents).hasSize(1);
     }
 }

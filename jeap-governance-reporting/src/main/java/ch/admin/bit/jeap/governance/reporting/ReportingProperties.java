@@ -14,12 +14,11 @@ import org.springframework.util.StringUtils;
 @Slf4j
 public class ReportingProperties {
 
-    private int trendPeriodDays;
     private ConfluenceProperties confluence = new ConfluenceProperties();
 
     @PostConstruct
     void checkAndLog() {
-        log.info("ReportingProperties initialized with trendPeriodDays='{}' and confluence properties='{}'", trendPeriodDays, confluence);
+        log.info("ReportingProperties initialized with confluence properties='{}'", confluence);
         if (!StringUtils.hasText(confluence.getUrl())
                 || !StringUtils.hasText(confluence.getSpaceKey())
                 || !StringUtils.hasText(confluence.getRootPageName())

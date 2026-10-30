@@ -83,10 +83,18 @@ Built on Java 25 and the `jeap-spring-boot-parent` (Spring Boot 4).
   via `ReactionObserverConnector` and provides `ComponentObservesReactionsRule`. Own Flyway migration (`V1400_0_0`).
 - `jeap-governance-messagecontract/` - Message Contract adapter. Imports deployed/latest message versions into a shared
   database snapshot and provides `ComponentUsesLatestMessageVersionsRule`. Own Flyway migration (`V1500_0_0`).
+- `jeap-governance-report-data/` - The report data shared by the Confluence reporting and the docs API (package
+  `reportdata`): `ReportingSystemsPreparation`, `ReportingRulesPreparation`, `TrendIndicatorUtility`, the trend period
+  (`TrendPeriod`, `jeap.governance.report-data.trend-period-days`) and `LastScoringRun`. Always active.
 - `jeap-governance-reporting/` - Generates governance rule/score reports with trend indicators to Confluence (
-  `ReportingScheduler` -> `ReportingService` -> `ConfluenceAdapter`). Replaces the former `docgen` placeholder.
+  `ReportingScheduler` -> `ReportingService` -> `ConfluenceAdapter`), from the report data. Replaces the former
+  `docgen` placeholder.
+- `jeap-governance-docservice/` - Outbound connection to the jEAP Doc Service (`DocServiceAutoConfiguration`): the
+  webhook call after every completed scoring run (package `docservice.webhook`), like the other connector modules.
+  Its end-to-end test `DocServiceWebhookIT` lives in `jeap-governance-web`, as it needs the whole application.
 - `jeap-governance-web/` - Spring Boot application entry point (`GovernanceApplication`), REST controllers (
-  `ManagementController` at `/api/management`), security config, OpenAPI config.
+  `ManagementController` at `/api/management`, the docs API for the jEAP Doc Service in package `docsapi` at
+  `/docs-api`), security config, OpenAPI config.
 - `jeap-governance-service-instance/` - POM-only module; downstream projects inherit from this to create their own
   governance service instances.
 
@@ -100,7 +108,14 @@ Built on Java 25 and the `jeap-spring-boot-parent` (Spring Boot 4).
 2. **Scoring**: Scheduled cron -> `ScoringScheduler.updateScores()` -> for each system:
    `ScoringService.updateSystemScore()` -> `RuleEvaluationService` evaluates rules per component ->
    `ComponentScoreCalculator` and `SystemScoreCalculator` compute scores -> `RuleConformanceRateService` calculates
-   per-rule conformance rates across all components.
+   per-rule conformance rates across all components -> the run is recorded -> `ScoringRunCompletedEvent`.
+3. **Doc Service webhook** (only with `jeap.governance.doc-service.webhook.enabled`):
+   `ScoringRunCompletedEvent` -> `ScoringRunCompletedWebhookListener` (`@TransactionalEventListener`, own executor,
+   outside the scoring transaction and lock) -> `DocServiceWebhookClient` posts `{eventId, scoredAt}`. Failures are
+   logged as warnings, never thrown.
+4. **Docs API**: `SystemsController` / `RulesController` -> `DocsApiReader` (`@TransactionalReadReplica`,
+   `@RetryOnDatabaseFailover`) -> report data -> `DocsApiDtoFactory` -> `DocsApiEtagSupport` (strong
+   `"sha256:<hex>"` ETag, `304`). Index entries carry the ETag of the resource they name, computed from the same DTO.
 
 ## Key Domain Patterns
 
@@ -135,14 +150,22 @@ beans:
 - `ComponentDeletionListener` - `void preComponentDeletion(long systemComponentId)`. Called before component removal.
   Optional `@Order`.
 - `Rule` - `RuleMetadata metadata()` + `RuleResult evaluate(SystemComponent, RuleParameters)`. Automatically included in
-  scheduled scoring. Return `RuleResult.ok()`, `RuleResult.failed()`, or `RuleResult.failed(comment)`.
+  scheduled scoring. Return `RuleResult.ok()`, `RuleResult.failed()`, or `RuleResult.failed(comment)`. Comments are
+  plain text: summary on the first line, one item per further line - build lists with
+  `RuleResult.failed(summary, items)` / `RuleResult.summarize(summary, results)`, never join items with `; `.
+- **Rule explanations**: every rule ships `src/main/resources/jeap-governance/rules/<rule-id>.md` in its module
+  (`RuleExplanation`). Every rule module has a `RuleExplanationsTest` using `RuleExplanationCoverage` from the
+  `jeap-governance-domain` test-jar; it fails the build if a rule bean has no explanation. When adding a rule, add its
+  explanation and raise the expected count in the module's `RuleExplanationsTest`.
 
 ## Auto-Configuration
 
 Each module registers via `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`:
 
 - `DomainConfiguration`, `DataImportConfiguration`, `ArchRepoConfiguration`, `DeploymentLogConfiguration`,
-  `PersistenceConfiguration`, `GovernanceWebConfig`, `RulesAutoConfiguration`, `CoreRulesAutoConfiguration`,
+  `PersistenceConfiguration`, `GovernanceWebConfig`, `RulesAutoConfiguration`, `ReportDataAutoConfiguration`,
+  `DocServiceAutoConfiguration`,
+  `CoreRulesAutoConfiguration`,
   `DependencyRulesAutoConfiguration`, `MessagingRulesAutoConfiguration`, `PactRulesAutoConfiguration`,
   `PrometheusAutoconfiguration`, `SecscanAutoconfiguration`, `ReactionObserverConfiguration`,
   `ReportingAutoConfiguration`
@@ -197,6 +220,13 @@ Defined in `ImportOrder` classes within archrepo and deploymentlog modules:
 
 - `POST /api/management` - Triggers jobs (`DATA_IMPORT` or `SCORING`). Requires role `governance:admin`. Async and
   transactional.
+- `GET /docs-api/systems`, `/docs-api/systems/{system}`, `/docs-api/rules`, `/docs-api/rules/{ruleId}` - Docs API for
+  the jEAP Doc Service, always present. Secured by the default jEAP resource server chain plus method security: every
+  handler needs `@RequiresGovernanceDocumentationRead` (`governance-documentation` / `read`, enforced by
+  `DocsApiRoleCoverageTest`). 404 as RFC 9457 problem document (`DocsApiExceptionHandler`, scoped to the docs
+  controllers); 401/403 as the jEAP resource server answers them. Reads from the read replica, so right after the
+  webhook a lagging replica can still deliver the previous `scoredAt`. Payload field names are part of the Pact contract with the Doc Service:
+  change them only together with the consumer. Security tests import `DisableJeapPermitAllSecurityConfiguration`.
 - Swagger UI at `/swagger-ui/index.html?urls.primaryName=Governance-Service-API`
 - Context path: `/jeap-governance-service`
 
@@ -218,7 +248,7 @@ Defined in `ImportOrder` classes within archrepo and deploymentlog modules:
 - User-facing documentation lives under [docs/](docs/) (one topic per file: `architecture.md`, `configuration.md`,
   `rules.md`, `plugin-mechanism.md`, `reporting.md`, `metrics.md`). When changing public behaviour, update the
   matching focused file and, if needed, the documentation index/link table in README.md. Keep README.md short —
-  orientation and links only, no depth.
+  orientation and links only, no depth. The docs API and the webhook are documented in `docs-api.md`.
 - Internal, BIT-only documentation (e.g. GovDashboard rule explanations tied to the BAZG Governance Dashboard) stays
   on Confluence, not in `docs/`.
 - Pages must be valid MDX (Docusaurus renders every `.md` as MDX) and any Mermaid diagrams must use correct

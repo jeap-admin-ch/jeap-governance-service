@@ -67,7 +67,6 @@ class ReportingPropertiesTest {
     void checkProperties() {
         ReportingProperties properties = createProperties();
 
-        assertEquals(30, properties.getTrendPeriodDays());
         assertEquals("https://example.com/confluence", properties.getConfluenceUrl());
         assertEquals("12345", properties.getConfluenceSpaceKey());
         assertEquals("Test", properties.getConfluenceRootPageName());
@@ -78,8 +77,6 @@ class ReportingPropertiesTest {
 
     private static ReportingProperties createProperties() {
         ReportingProperties properties = new ReportingProperties();
-        properties.setTrendPeriodDays(30);
-
         properties.getConfluence().setUrl("https://example.com/confluence");
         properties.getConfluence().setSpaceKey("12345");
         properties.getConfluence().setRootPageName("Test");
