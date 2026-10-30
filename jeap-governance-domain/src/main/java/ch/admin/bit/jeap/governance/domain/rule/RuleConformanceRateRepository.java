@@ -17,4 +17,6 @@ public interface RuleConformanceRateRepository {
     void saveAll(List<RuleConformanceRate> rates);
 
     List<RuleConformanceRate> findAllByDayBetweenInclusive(LocalDate fromDay, LocalDate toDay);
+
+    List<RuleConformanceRate> findAllByRuleIdAndDayBetweenInclusive(String ruleId, LocalDate fromDay, LocalDate toDay);
 }

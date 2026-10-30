@@ -162,7 +162,8 @@ class DocsApiIT extends DocsApiTestBase {
         assertThat(index.rules()).extracting(RuleIndexEntryDto::ruleId).isSorted();
 
         assertThat(entry(index, RULE_A)).isEqualTo(new RuleIndexEntryDto(RULE_A, "Docs Rule A", true, 10,
-                new BigDecimal("50.0"), 60, Trend.DOWN, 3, entry(index, RULE_A).etag(), "/docs-api/rules/" + RULE_A));
+                // Three exemptions, one of them expired
+                new BigDecimal("50.0"), 60, Trend.DOWN, 2, entry(index, RULE_A).etag(), "/docs-api/rules/" + RULE_A));
         assertThat(entry(index, RULE_B)).isEqualTo(new RuleIndexEntryDto(RULE_B, "Docs Rule B", true, 5,
                 new BigDecimal("25.0"), 50, Trend.UNKNOWN, 1, entry(index, RULE_B).etag(), "/docs-api/rules/" + RULE_B));
         // Active, but not scored yet

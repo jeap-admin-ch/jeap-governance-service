@@ -37,8 +37,16 @@ public class ReportingDataAccess {
         return systemScoreRepository.findAllByDayBetweenInclusive(fromDay, toDay);
     }
 
+    List<SystemScore> findSystemScoresBySystemNameAndDayBetweenInclusive(String systemName, LocalDate fromDay, LocalDate toDay) {
+        return systemScoreRepository.findAllBySystemNameAndDayBetweenInclusive(systemName, fromDay, toDay);
+    }
+
     List<ComponentScore> findAllComponentScoreByDayBetweenInclusive(LocalDate fromDay, LocalDate toDay) {
         return componentScoreRepository.findAllByDayBetweenInclusive(fromDay, toDay);
+    }
+
+    List<ComponentScore> findComponentScoresBySystemNameAndDayBetweenInclusive(String systemName, LocalDate fromDay, LocalDate toDay) {
+        return componentScoreRepository.findAllBySystemNameAndDayBetweenInclusive(systemName, fromDay, toDay);
     }
 
     List<RuleInfo> findAllActiveRuleInfos() {
@@ -49,20 +57,40 @@ public class ReportingDataAccess {
         return ruleStateRepository.findAll();
     }
 
+    List<RuleState> findRuleStatesBySystemName(String systemName) {
+        return ruleStateRepository.findAllBySystemName(systemName);
+    }
+
     List<NonCompliantComponentEntry> findNonCompliantSince() {
         return ruleStateRepository.findNonCompliantSince();
+    }
+
+    List<NonCompliantComponentEntry> findNonCompliantSinceByRuleId(String ruleId) {
+        return ruleStateRepository.findNonCompliantSinceByRuleId(ruleId);
     }
 
     List<GracePeriodComponentEntry> findGracePeriodComponents() {
         return ruleStateRepository.findGracePeriodComponents();
     }
 
+    List<GracePeriodComponentEntry> findGracePeriodComponentsByRuleId(String ruleId) {
+        return ruleStateRepository.findGracePeriodComponentsByRuleId(ruleId);
+    }
+
     List<RuleConformanceRate> findAllRuleConformanceByDayBetweenInclusive(LocalDate fromDay, LocalDate toDay) {
         return ruleConformanceRateRepository.findAllByDayBetweenInclusive(fromDay, toDay);
     }
 
+    List<RuleConformanceRate> findRuleConformanceByRuleIdAndDayBetweenInclusive(String ruleId, LocalDate fromDay, LocalDate toDay) {
+        return ruleConformanceRateRepository.findAllByRuleIdAndDayBetweenInclusive(ruleId, fromDay, toDay);
+    }
+
     List<SystemRuleConformanceRate> findLatestPerRuleIdAndSystemId() {
         return systemRuleConformanceRateRepository.findLatestPerRuleIdAndSystemId();
+    }
+
+    List<SystemRuleConformanceRate> findLatestPerSystemIdByRuleId(String ruleId) {
+        return systemRuleConformanceRateRepository.findLatestPerSystemIdByRuleId(ruleId);
     }
 
     public List<SystemReference> findAllSystemReferences() {

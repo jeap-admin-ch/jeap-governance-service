@@ -44,4 +44,9 @@ public class RuleConformanceRateRepositoryImpl implements RuleConformanceRateRep
     public List<RuleConformanceRate> findAllByDayBetweenInclusive(LocalDate fromDay, LocalDate toDay) {
         return jpaRuleConformanceRateRepository.findAllByDayBetweenInclusive(fromDay, toDay);
     }
+
+    @Override
+    public List<RuleConformanceRate> findAllByRuleIdAndDayBetweenInclusive(String ruleId, LocalDate fromDay, LocalDate toDay) {
+        return jpaRuleConformanceRateRepository.findAllByRuleIdAndDayBetweenInclusive(ruleId, fromDay, toDay);
+    }
 }

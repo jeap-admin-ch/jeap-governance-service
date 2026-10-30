@@ -55,7 +55,7 @@ public class SystemsController {
             content = @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE,
                     schema = @Schema(implementation = ProblemDetail.class)))
     public ResponseEntity<byte[]> getSystem(@PathVariable("system") String systemName, WebRequest request) {
-        SystemsData data = reader.readSystems();
+        SystemsData data = reader.readSystem(systemName);
         SystemDto system = dtoFactory.system(data, systemName)
                 .orElseThrow(() -> SystemNotFoundException.systemNotFound(systemName));
         return etagSupport.respond(request, system);

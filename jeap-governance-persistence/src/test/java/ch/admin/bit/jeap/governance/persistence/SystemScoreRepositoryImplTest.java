@@ -241,6 +241,28 @@ class SystemScoreRepositoryImplTest extends PostgresTestContainerBase {
         assertEquals(2, results.size());
     }
 
+    @Test
+    void findAllBySystemNameAndDayBetweenInclusive_shouldReturnOnlyTheNamedSystemsScoresWithinTimeframe() {
+        LocalDate from = LocalDate.of(2026, 1, 1);
+        LocalDate to = LocalDate.of(2026, 1, 31);
+        System system1 = createAndPersistSystem("Test System 1");
+        System system2 = createAndPersistSystem("Test System 2");
+        entityManager.persist(SystemScore.builder()
+                .system(system1).score(77).day(LocalDate.of(2025, 12, 31)).build());
+        entityManager.persist(SystemScore.builder()
+                .system(system1).score(80).day(LocalDate.of(2026, 1, 1)).build());
+        entityManager.persist(SystemScore.builder()
+                .system(system1).score(90).day(LocalDate.of(2026, 1, 31)).build());
+        entityManager.persist(SystemScore.builder()
+                .system(system2).score(82).day(LocalDate.of(2026, 1, 15)).build());
+        entityManager.flush();
+
+        List<SystemScore> result = repository.findAllBySystemNameAndDayBetweenInclusive("Test System 1", from, to);
+
+        assertEquals(List.of(80, 90), result.stream().map(SystemScore::getScore).sorted().toList());
+        assertTrue(repository.findAllBySystemNameAndDayBetweenInclusive("Unknown", from, to).isEmpty());
+    }
+
     private System createAndPersistSystem(String name) {
         System system = System.builder()
                 .name(name)

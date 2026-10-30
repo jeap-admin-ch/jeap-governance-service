@@ -9,7 +9,7 @@ public record ExemptionDto(
         String id,
         String component,
         String reason,
-        @Schema(description = "The last day of a temporary exemption, null for a permanent one") LocalDate until,
+        @Schema(description = "The day a temporary exemption ends, from which the rule applies again; null for a permanent one") LocalDate until,
         ExemptionEffect effect,
         @Schema(description = "The exemption's own parameters, sorted by name") List<ParameterDto> parameters) {
 }

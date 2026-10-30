@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static ch.admin.bit.jeap.governance.domain.ComponentType.isIgnoredForGovernance;
@@ -37,6 +38,25 @@ public class ReportingSystemsPreparation {
         List<RuleState> ruleStates = dataAccess.findAllRuleStates();
 
         return prepareAllSystemsScores(systemScores, componentScores, activeRules, ruleStates);
+    }
+
+    /**
+     * Prepares one system as {@link #prepareAllSystemsScores(LocalDate, LocalDate)} does, loading only its data.
+     *
+     * @return the system, or empty if it has no score in the period
+     */
+    @TransactionalReadReplica
+    @Timed("jeap.governance.service.reporting.system.preparation")
+    public Optional<ReportingSystemScore> prepareSystemScores(String systemName, LocalDate fromDay, LocalDate toDay) {
+        List<SystemScore> systemScores = dataAccess.findSystemScoresBySystemNameAndDayBetweenInclusive(systemName, fromDay, toDay);
+        if (systemScores.isEmpty()) {
+            return Optional.empty();
+        }
+        List<ComponentScore> componentScores = dataAccess.findComponentScoresBySystemNameAndDayBetweenInclusive(systemName, fromDay, toDay);
+        List<RuleInfo> activeRules = dataAccess.findAllActiveRuleInfos();
+        List<RuleState> ruleStates = dataAccess.findRuleStatesBySystemName(systemName);
+
+        return prepareAllSystemsScores(systemScores, componentScores, activeRules, ruleStates).stream().findFirst();
     }
 
     private List<ReportingSystemScore> prepareAllSystemsScores(List<SystemScore> systemScores, List<ComponentScore> componentScores, List<RuleInfo> activeRules, List<RuleState> ruleStates) {

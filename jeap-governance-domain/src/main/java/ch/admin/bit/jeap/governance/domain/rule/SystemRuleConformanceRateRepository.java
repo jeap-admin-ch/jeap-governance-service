@@ -13,5 +13,7 @@ public interface SystemRuleConformanceRateRepository {
 
     List<SystemRuleConformanceRate> findLatestPerRuleIdAndSystemId();
 
+    List<SystemRuleConformanceRate> findLatestPerSystemIdByRuleId(String ruleId);
+
     void deleteAllBySystemId(long systemId);
 }

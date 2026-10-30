@@ -8,5 +8,6 @@ public record SystemIndexEntryDto(
         Trend trend,
         @Schema(description = "Byte-identical to the ETag header of the system resource",
                 example = "\"sha256:41ab7c\"") String etag,
-        @Schema(description = "Path of the system resource, relative to the service root") String url) {
+        @Schema(description = "Path of the system resource, with the service's context path and without scheme "
+                              + "and host") String url) {
 }

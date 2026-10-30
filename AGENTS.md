@@ -114,7 +114,8 @@ Built on Java 25 and the `jeap-spring-boot-parent` (Spring Boot 4).
    outside the scoring transaction and lock) -> `DocServiceWebhookClient` posts `{eventId, scoredAt}`. Failures are
    logged as warnings, never thrown.
 4. **Docs API**: `SystemsController` / `RulesController` -> `DocsApiReader` (`@TransactionalReadReplica`,
-   `@RetryOnDatabaseFailover`) -> report data -> `DocsApiDtoFactory` -> `DocsApiEtagSupport` (strong
+   `@RetryOnDatabaseFailover`) -> report data (the indexes prepare all systems or rules, a single resource only its own
+   via `prepareSystemScores` / `prepareRule`, from the same code, so both payloads are identical) -> `DocsApiDtoFactory` -> `DocsApiEtagSupport` (strong
    `"sha256:<hex>"` ETag, `304`). Index entries carry the ETag of the resource they name, computed from the same DTO.
 
 ## Key Domain Patterns
@@ -227,7 +228,8 @@ Defined in `ImportOrder` classes within archrepo and deploymentlog modules:
   controllers); 401/403 as the jEAP resource server answers them. Reads from the read replica, so right after the
   webhook a lagging replica can still deliver the previous `scoredAt`. Payload field names are part of the Pact contract with the Doc Service:
   change them only together with the consumer. Security tests import `DisableJeapPermitAllSecurityConfiguration`.
-- Swagger UI at `/swagger-ui/index.html?urls.primaryName=Governance-Service-API`
+- Swagger UI at `/swagger-ui/index.html?urls.primaryName=Governance-Service-Management-API` (management API) and
+  `...?urls.primaryName=Governance-Service-Docs-API` (docs API)
 - Context path: `/jeap-governance-service`
 
 ## Versioning and Commits

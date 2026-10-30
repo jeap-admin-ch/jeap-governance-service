@@ -39,6 +39,11 @@ public class SystemScoreRepositoryImpl implements SystemScoreRepository {
     }
 
     @Override
+    public List<SystemScore> findAllBySystemNameAndDayBetweenInclusive(String systemName, LocalDate fromDay, LocalDate toDay) {
+        return jpaSystemScoreRepository.findAllBySystemNameAndDayBetweenInclusive(systemName, fromDay, toDay);
+    }
+
+    @Override
     public void deleteAllBySystemId(long systemId) {
         jpaSystemScoreRepository.deleteAllBySystemId(systemId);
     }

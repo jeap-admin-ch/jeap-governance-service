@@ -299,6 +299,61 @@ class RuleStateRepositoryImplTest extends PostgresTestContainerBase {
         assertEquals(1, results.size());
     }
 
+    @Test
+    void findAllBySystemName_shouldReturnOnlyTheNamedSystemsRuleStates() {
+        SystemComponent component1 = createAndPersistSystemWithComponent("System 1", "Component 1");
+        SystemComponent component2 = createAndPersistSystemWithComponent("System 2", "Component 2");
+        entityManager.persist(RuleState.builder()
+                .ruleId(RuleId.of("RULE-001")).systemComponent(component1).state(State.OK).build());
+        entityManager.persist(RuleState.builder()
+                .ruleId(RuleId.of("RULE-002")).systemComponent(component1).state(State.FAIL).build());
+        entityManager.persist(RuleState.builder()
+                .ruleId(RuleId.of("RULE-001")).systemComponent(component2).state(State.OK).build());
+        entityManager.flush();
+        entityManager.clear();
+
+        List<RuleState> result = repository.findAllBySystemName("System 1");
+
+        assertThat(result).extracting(RuleState::getRuleId).containsExactlyInAnyOrder("RULE-001", "RULE-002");
+        assertThat(result).allSatisfy(ruleState ->
+                assertThat(ruleState.getSystemComponent().getId()).isEqualTo(component1.getId()));
+        assertThat(repository.findAllBySystemName("Unknown")).isEmpty();
+    }
+
+    @Test
+    void findNonCompliantSinceByRuleId_shouldReturnOnlyTheRulesFailingStates() {
+        ZonedDateTime now = ZonedDateTime.now();
+        SystemComponent component1 = createAndPersistSystemWithComponent("System 1", "Component 1");
+        SystemComponent component2 = createAndPersistSystemWithComponent("System 2", "Component 2");
+        entityManager.persist(RuleState.createWithTimestamps(RuleId.of("RULE-001"), component1, State.FAIL, now, now));
+        entityManager.persist(RuleState.createWithTimestamps(RuleId.of("RULE-001"), component2, State.OK, now, now));
+        entityManager.persist(RuleState.createWithTimestamps(RuleId.of("RULE-002"), component2, State.FAIL, now, now));
+        entityManager.flush();
+
+        List<NonCompliantComponentEntry> result = repository.findNonCompliantSinceByRuleId("RULE-001");
+
+        assertThat(result).singleElement().satisfies(entry -> {
+            assertThat(entry.getRuleId()).isEqualTo("RULE-001");
+            assertThat(entry.getSystemComponentId()).isEqualTo(component1.getId());
+        });
+    }
+
+    @Test
+    void findGracePeriodComponentsByRuleId_shouldReturnOnlyTheRulesGracePeriodStates() {
+        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime detectedAt = now.minusDays(3);
+        SystemComponent component = createAndPersistSystemWithComponent();
+        entityManager.persist(RuleState.createWithTimestamps(RuleId.of("RULE-001"), component, State.OK, now, now, detectedAt));
+        entityManager.persist(RuleState.createWithTimestamps(RuleId.of("RULE-002"), component, State.OK, now, now, detectedAt));
+        entityManager.flush();
+
+        List<GracePeriodComponentEntry> result = repository.findGracePeriodComponentsByRuleId("RULE-001");
+
+        assertThat(result).singleElement()
+                .extracting(GracePeriodComponentEntry::getRuleId)
+                .isEqualTo("RULE-001");
+    }
+
     private SystemComponent createAndPersistSystemWithComponent() {
         return createAndPersistSystemWithComponent("Test System", "Test Component");
     }

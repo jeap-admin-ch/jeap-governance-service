@@ -30,6 +30,9 @@ interface JpaSystemScoreRepository extends JpaRepository<SystemScore, Long> {
     @Query("SELECT ss FROM SystemScore ss JOIN FETCH ss.system WHERE ss.day >= :fromDay AND ss.day <= :toDay")
     List<SystemScore> findAllByDayBetweenInclusive(LocalDate fromDay, LocalDate toDay);
 
+    @Query("SELECT ss FROM SystemScore ss JOIN FETCH ss.system s WHERE s.name = :systemName AND ss.day >= :fromDay AND ss.day <= :toDay")
+    List<SystemScore> findAllBySystemNameAndDayBetweenInclusive(String systemName, LocalDate fromDay, LocalDate toDay);
+
     @Modifying
     @Query("DELETE FROM SystemScore ss WHERE ss.system.id = :systemId")
     void deleteAllBySystemId(long systemId);

@@ -125,6 +125,24 @@ class RuleConformanceRateRepositoryImplTest extends PostgresTestContainerBase {
         }
     }
 
+    @Test
+    void findAllByRuleIdAndDayBetweenInclusive_shouldReturnOnlyTheRulesRatesWithinTimeframe() {
+        LocalDate day1 = LocalDate.of(2026, 1, 1);
+        LocalDate day2 = LocalDate.of(2026, 1, 2);
+        LocalDate day3 = LocalDate.of(2026, 1, 3);
+        LocalDate day4 = LocalDate.of(2026, 1, 4);
+        entityManager.persist(createRate("RULE-001", 90, day1));
+        entityManager.persist(createRate("RULE-001", 95, day2));
+        entityManager.persist(createRate("RULE-001", 96, day3));
+        entityManager.persist(createRate("RULE-001", 90, day4));
+        entityManager.persist(createRate("RULE-002", 50, day2));
+        entityManager.flush();
+
+        List<RuleConformanceRate> result = repository.findAllByRuleIdAndDayBetweenInclusive("RULE-001", day2, day3);
+
+        assertEquals(List.of(95, 96), result.stream().map(RuleConformanceRate::getConformanceRate).sorted().toList());
+    }
+
     private RuleConformanceRate createRate(String ruleId, int conformanceRate, LocalDate day) {
         return RuleConformanceRate.builder()
                 .ruleId(ruleId)
