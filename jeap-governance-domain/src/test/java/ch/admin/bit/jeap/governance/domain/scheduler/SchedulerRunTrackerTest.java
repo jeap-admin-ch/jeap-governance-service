@@ -53,4 +53,15 @@ class SchedulerRunTrackerTest {
         assertThat(gauge).isNotNull();
         assertThat(gauge.value()).isLessThanOrEqualTo(1);
     }
+
+    @Test
+    void recordRun_returnsThePersistedTimeInWholeSeconds() {
+        when(repository.findLastRunDateTime("test-job")).thenReturn(Optional.empty());
+        tracker.init();
+
+        LocalDateTime recorded = tracker.recordRun();
+
+        verify(repository).saveLastRunDateTime("test-job", recorded);
+        assertThat(recorded.getNano()).isZero();
+    }
 }

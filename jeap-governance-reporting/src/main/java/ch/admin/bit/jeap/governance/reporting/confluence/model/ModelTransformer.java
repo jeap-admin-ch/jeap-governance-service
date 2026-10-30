@@ -1,6 +1,6 @@
 package ch.admin.bit.jeap.governance.reporting.confluence.model;
 
-import ch.admin.bit.jeap.governance.reporting.preparation.*;
+import ch.admin.bit.jeap.governance.reportdata.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.ZoneId;

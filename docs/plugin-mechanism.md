@@ -104,6 +104,18 @@ public interface SystemDeletionListener {
 3. Add the implementation as a Spring bean
 4. It will be automatically included in the deletion process
 
+## Rules
+
+Custom governance rules are Spring beans implementing `Rule`, see [Rules](rules.md). Two conventions apply to them:
+
+- **Explanation:** ship the rule's explanation as the classpath resource `jeap-governance/rules/<rule-id>.md`, e.g.
+  `src/main/resources/jeap-governance/rules/my-custom-rule.md`. It is delivered with the rule by the
+  [docs API](docs-api.md); a rule without one is logged as a warning at startup. See
+  [Rule explanations](rules.md#rule-explanations).
+- **Comment:** a rule result's comment is plain text with the summary on its first line and one item per further
+  line. Build it with `RuleResult.failed(String summary, List<String> items)` or
+  `RuleResult.summarize(String summary, List<RuleResult> results)`. See [Rule comments](rules.md#rule-comments).
+
 ## See also
 
 - [Rules](rules.md) — implementing custom governance rules.

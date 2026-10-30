@@ -1,10 +1,11 @@
 package ch.admin.bit.jeap.governance.reporting;
 
 import ch.admin.bit.jeap.governance.reporting.confluence.ReportGenerator;
-import ch.admin.bit.jeap.governance.reporting.preparation.ReportingRule;
-import ch.admin.bit.jeap.governance.reporting.preparation.ReportingRulesPreparation;
-import ch.admin.bit.jeap.governance.reporting.preparation.ReportingSystemScore;
-import ch.admin.bit.jeap.governance.reporting.preparation.ReportingSystemsPreparation;
+import ch.admin.bit.jeap.governance.reportdata.ReportingRule;
+import ch.admin.bit.jeap.governance.reportdata.ReportingRulesPreparation;
+import ch.admin.bit.jeap.governance.reportdata.ReportingSystemScore;
+import ch.admin.bit.jeap.governance.reportdata.ReportingSystemsPreparation;
+import ch.admin.bit.jeap.governance.reportdata.TrendPeriod;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,8 +28,6 @@ class ReportingServiceTest {
     private static final LocalDate DAY = LocalDate.now();
 
     @Mock
-    private ReportingProperties reportingProperties;
-    @Mock
     private ReportingSystemsPreparation systemsPreparation;
     @Mock
     private ReportingRulesPreparation reportingRulesPreparation;
@@ -41,8 +40,6 @@ class ReportingServiceTest {
 
     @Test
     void generateSystemsReport() {
-        when(reportingProperties.getTrendPeriodDays()).thenReturn(TREND_PERIOD_DAYS);
-
         List<ReportingSystemScore> reportingSystemScores = mock(List.class);
         when(systemsPreparation.prepareAllSystemsScores(DAY.minusDays(TREND_PERIOD_DAYS), DAY)).thenReturn(reportingSystemScores);
 
@@ -53,8 +50,6 @@ class ReportingServiceTest {
 
     @Test
     void generateRulesReport() {
-        when(reportingProperties.getTrendPeriodDays()).thenReturn(TREND_PERIOD_DAYS);
-
         List<ReportingRule> reportingRules = mock(List.class);
         when(reportingRulesPreparation.prepareAllRules(DAY.minusDays(TREND_PERIOD_DAYS), DAY)).thenReturn(reportingRules);
 
@@ -65,6 +60,6 @@ class ReportingServiceTest {
 
     @BeforeEach
     void setUp() {
-        reportingService = new ReportingService(reportingProperties, systemsPreparation, reportingRulesPreparation, reportGenerator, meterRegistry);
+        reportingService = new ReportingService(new TrendPeriod(TREND_PERIOD_DAYS), systemsPreparation, reportingRulesPreparation, reportGenerator, meterRegistry);
     }
 }

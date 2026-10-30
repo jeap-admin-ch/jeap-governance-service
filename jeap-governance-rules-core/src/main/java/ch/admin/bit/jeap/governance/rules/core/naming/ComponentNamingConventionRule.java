@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 /**
@@ -23,6 +24,8 @@ class ComponentNamingConventionRule implements Rule {
             .ruleId(RuleId.of("component-naming-convention"))
             .label("Component Naming Convention")
             .build();
+
+    static final String FAILED_SUMMARY = "Component name violates the naming convention:";
 
     private static final Pattern SYSTEM_NAME_PATTERN = Pattern.compile("[a-z][a-z0-9_]*");
     private static final Pattern CONTEXT_PATTERN = Pattern.compile("[a-z][a-z0-9-]*");
@@ -61,14 +64,16 @@ class ComponentNamingConventionRule implements Rule {
 
         String typeIdPart = parts[parts.length - 1];
         if (!VALID_TYPE_IDS.contains(typeIdPart)) {
-            violations.add("Type-id '%s' is not valid. Must be one of: %s.".formatted(typeIdPart, VALID_TYPE_IDS));
+            // Sorted, so that the comment does not change with the iteration order of the set
+            violations.add("Type-id '%s' is not valid. Must be one of: %s.".formatted(typeIdPart,
+                    String.join(", ", new TreeSet<>(VALID_TYPE_IDS))));
         }
 
         if (violations.isEmpty()) {
             return RuleResult.ok();
         }
 
-        return RuleResult.failed(String.join(" ", violations));
+        return RuleResult.failed(FAILED_SUMMARY, violations);
     }
 
     private static boolean matchesSystemNameOrAlias(String systemNamePart, SystemComponent systemComponent) {

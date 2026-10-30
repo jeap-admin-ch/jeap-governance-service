@@ -37,7 +37,7 @@ environment variables, etc.).
 | `jeap.governance.secscan.httpcheck.read-timeout`                     | Timout (specified as duration) for the read timeout when checking an HTTP endpoint                                                                     | true                          | No                               |
 | `jeap.governance.rules.active[].id`                                  | Rule identifier, must match a known rule implementation                                                                                                | -                             | Yes                              |
 | `jeap.governance.rules.active[].weight`                              | Rule weight for scoring (positive integer, >= 1)                                                                                                       | -                             | Yes                              |
-| `jeap.governance.rules.active[].documentation-link`                  | Optional link to the documentation for this rule, used in governance reports                                                                           | -                             | No                               |
+| `jeap.governance.rules.active[].documentation-link`                  | **Deprecated**, used only by the Confluence reporting and not delivered by the docs API. Each rule ships its explanation, see [Rules](rules.md#rule-explanations) | -                   | No                               |
 | `jeap.governance.rules.active[].parameters`                          | Optional key-value parameters passed to the rule                                                                                                       | `{}`                          | No                               |
 | `jeap.governance.rules.component-exemptions[].id`                    | Unique exemption identifier                                                                                                                            | -                             | Yes                              |
 | `jeap.governance.rules.component-exemptions[].component-name`        | Name of the component this exemption applies to                                                                                                        | -                             | Yes                              |
@@ -48,12 +48,17 @@ environment variables, etc.).
 | `jeap.governance.scoring.cron-expression`                            | Cron expression to schedule the rule evaluation and scoring of components/systems                                                                      | `0 0,45 6-20 * * MON-FRI`     | No                               |
 | `jeap.governance.scoring.lock-at-least`                              | Minimum duration for which the lock should be held during the data import job                                                                          | `PT1M`                        | No                               |
 | `jeap.governance.scoring.lock-at-most`                               | Maximum lock duration for the data import job                                                                                                          | `PT15M`                       | No                               |
+| `jeap.governance.report-data.trend-period-days`                      | Number of days the trends are calculated over, and the length of the score histories, for the Confluence reporting and the docs API                   | `30`                          | No                               |
+| `jeap.governance.doc-service.webhook.enabled`                        | Calls the Doc Service's webhook after every completed scoring run, see [Docs API](docs-api.md#webhook-after-scoring)                                   | `false`                       | No                               |
+| `jeap.governance.doc-service.webhook.url`                            | URL of the Doc Service's governance webhook, e.g. `https://doc.example.com/doc-service/api/governance/webhook`                                         | -                             | Yes, if the webhook is enabled   |
+| `jeap.governance.doc-service.webhook.client-registration`            | Spring Security OAuth2 client registration the webhook is called with                                                                                  | -                             | Yes, if the webhook is enabled   |
+| `jeap.governance.doc-service.webhook.timeout`                        | Connect and read timeout of the webhook call                                                                                                           | `PT10S`                       | No                               |
 | `jeap.governance.reporting.enabled`                                  | Enables or disables the reporting job                                                                                                                  | `false`                       | No                               |
 | `jeap.governance.reporting.cron-expression`                          | Cron expression for the reporting job. Defaults to 55 minutes past the hour to avoid overlap with the data import job (:15) and scoring job (:00, :45) | `0 55 6-20 * * MON-FRI`       | No                               |
 | `jeap.governance.reporting.orphancleanup.cron-expression`            | Cron expression for the orphan page cleanup job                                                                                                        | `0 10 3 * * MON-FRI`          | No                               |
 | `jeap.governance.reporting.lock-at-least`                            | Minimum lock duration for the reporting job (ISO-8601 duration)                                                                                        | `PT1M`                        | No                               |
 | `jeap.governance.reporting.lock-at-most`                             | Maximum lock duration for the reporting job (ISO-8601 duration)                                                                                        | `PT20M`                       | No                               |
-| `jeap.governance.reporting.trendPeriodDays`                          | Number of days used to calculate the trend                                                                                                             | `30`                          | No                               |
+| `jeap.governance.reporting.trend-period-days`                        | **Deprecated** alias of `jeap.governance.report-data.trend-period-days`; takes precedence over it when set                                            | -                             | No                               |
 | `jeap.governance.reporting.confluence.url`                           | Base URL of the Confluence instance                                                                                                                    | —                             | Yes, if reporting is enabled     |
 | `jeap.governance.reporting.confluence.space-key`                     | Confluence space key where pages will be created or updated                                                                                            | —                             | Yes, if reporting is enabled     |
 | `jeap.governance.reporting.confluence.root-page-name`                | Name of the root page under which reports are published                                                                                                | —                             | Yes, if reporting is enabled     |
@@ -136,20 +141,25 @@ jeap:
         cron-expression: "0 10 3 * * MON-FRI"
       lock-at-least: PT1M
       lock-at-most: PT20M
-      trendPeriodDays: 30
       confluence:
         url: https://confluence.example.com
         space-key: GOV
         root-page-name: Governance Reports
         username: confluence_user
         password: securepassword
+    report-data:
+      trend-period-days: 30
+    doc-service:
+      webhook:
+        enabled: true
+        url: https://doc.example.com/doc-service/api/governance/webhook
+        client-registration: doc-service-webhook
     rules:
       active:
         - id: component-name
           weight: 10
         - id: enforce-oauth2
           weight: 10
-          documentation-link: https://wiki.example.com/enforce-oauth2
         - id: custom-rule
           weight: 5
           parameters:
@@ -182,8 +192,36 @@ spring:
             issuer-uri: https://identity.example.com/realms/services
 ```
 
+## Doc Service
+
+The [docs API](docs-api.md) is always available and needs no configuration of its own: the Doc Service's client needs
+the semantic role `governance-documentation` / `read` of the system configured in
+`jeap.security.oauth2.resourceserver.system-name`.
+
+The webhook call after every scoring run is switched on with `jeap.governance.doc-service.webhook.enabled`. Its
+client registration, here `doc-service-webhook`, is configured with Spring Security's client-credentials properties
+like the one of the Reaction Observer; its token must carry the Doc Service's role `governance-notifications` /
+`write`:
+
+```yaml
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          doc-service-webhook:
+            provider: doc-service-webhook
+            client-id: ${DOC_SERVICE_WEBHOOK_CLIENT_ID}
+            client-secret: ${DOC_SERVICE_WEBHOOK_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
+        provider:
+          doc-service-webhook:
+            issuer-uri: https://identity.example.com/realms/services
+```
+
 ## See also
 
 - [Architecture](architecture.md) — modules, domain model and database schema.
+- [Docs API](docs-api.md) — the read API for the Doc Service and the webhook after scoring.
 - [Rules](rules.md) — the built-in governance rules and their parameters.
 - [Reporting](reporting.md) — Confluence report generation.

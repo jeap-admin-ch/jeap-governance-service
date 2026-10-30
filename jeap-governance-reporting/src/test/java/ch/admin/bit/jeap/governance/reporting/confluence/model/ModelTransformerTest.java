@@ -1,7 +1,7 @@
 package ch.admin.bit.jeap.governance.reporting.confluence.model;
 
 import ch.admin.bit.jeap.governance.domain.rule.State;
-import ch.admin.bit.jeap.governance.reporting.preparation.*;
+import ch.admin.bit.jeap.governance.reportdata.*;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;

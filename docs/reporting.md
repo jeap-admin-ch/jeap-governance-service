@@ -28,9 +28,12 @@ confluence.yourcompany/rest/api/content?spaceKey=ARCDOCDEV&title=MySystem-Govern
 ```
 
 See [Configuration](configuration.md) for the `jeap.governance.reporting.*` properties, including the Confluence
-connection settings.
+connection settings. The trend period is `jeap.governance.report-data.trend-period-days` since 9.18.0, shared with the
+[docs API](docs-api.md), which delivers the same data to the jEAP Doc Service;
+`jeap.governance.reporting.trend-period-days` is a deprecated alias that still takes precedence when set.
 
 ## See also
 
 - [Configuration](configuration.md) — reporting configuration properties.
 - [Metrics](metrics.md) — reporting job metrics and recommended alerts.
+- [Docs API](docs-api.md) — the same report data, for the jEAP Doc Service.

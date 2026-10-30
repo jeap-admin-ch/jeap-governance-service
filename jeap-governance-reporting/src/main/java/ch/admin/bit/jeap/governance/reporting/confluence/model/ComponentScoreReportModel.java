@@ -1,7 +1,7 @@
 package ch.admin.bit.jeap.governance.reporting.confluence.model;
 
 import ch.admin.bit.jeap.governance.reporting.confluence.style.ColorUtility;
-import ch.admin.bit.jeap.governance.reporting.preparation.ReportingScore;
+import ch.admin.bit.jeap.governance.reportdata.ReportingScore;
 import lombok.Builder;
 import lombok.Data;
 

@@ -88,7 +88,9 @@ class ConsumerContractBetweenSystemsRuleTest {
 
         //then
         assertThat(result.state()).isEqualTo(State.FAIL);
-        assertThat(result.stateComment()).isEqualTo("No consumer contract found for relation with test2 on 'GET /foo/bar'");
+        assertThat(result.stateComment()).isEqualTo("""
+                REST relations without a consumer contract:
+                'GET /foo/bar' provided by test2""");
     }
 
     @Test
@@ -162,7 +164,11 @@ class ConsumerContractBetweenSystemsRuleTest {
 
         //then
         assertThat(result.state()).isEqualTo(State.FAIL);
-        assertThat(result.stateComment()).isEqualTo("No consumer contract found for relation with otherComponent1 on 'GET /foo/bar1'; No consumer contract found for relation with otherComponent2 on 'POST /foo/bar2'");
+        assertThat(result.stateComment()).isEqualTo("""
+                REST relations without a consumer contract:
+                'GET /foo/bar1' provided by otherComponent1
+                'POST /foo/bar2' provided by otherComponent2""");
+        assertThat(result.stateComment()).doesNotContain("; ");
     }
 
     private SystemComponent createComponent(long id, String name, System system) {

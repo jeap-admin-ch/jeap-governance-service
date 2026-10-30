@@ -5,6 +5,47 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [9.18.0] - 2026-10-29
+
+### Added
+- A docs API for the jEAP Doc Service under `/docs-api`: `GET /docs-api/systems`, `/docs-api/systems/{system}`,
+  `/docs-api/rules` and `/docs-api/rules/{ruleId}` deliver everything the governance reports show, plus every known
+  rule, active or not, with its explanation, weight, nominal share, parameters and component exemptions, and the time
+  of the last completed scoring run. It is always available, has a filter chain of its own and requires the semantic
+  role `governance-documentation` / `read`; every resource carries a strong `ETag` and answers `304` to a matching
+  `If-None-Match`. `/api/management` is unchanged. See `docs/docs-api.md`.
+- A webhook call to the Doc Service after every completed scoring run, switched on with
+  `jeap.governance.doc-service.webhook.enabled` (default `false`). When on, `jeap.governance.doc-service.webhook.url`
+  and `jeap.governance.doc-service.webhook.client-registration` are required at startup. A failed call is logged as a
+  warning and never fails the scoring.
+- Each of the 15 built-in rules ships its explanation as the classpath resource `jeap-governance/rules/<rule-id>.md`;
+  a test in each rule module fails the build for a rule without one. Custom rules can ship theirs under the same path,
+  a rule without one is logged as a warning at startup.
+- `RuleResult.failed(String summary, List<String> items)` and `RuleResult.summarize(String summary, List<RuleResult>
+  results)` build rule comments in the documented format: plain text, summary on the first line, one item per line.
+- The module `jeap-governance-report-data` with the report data shared by the Confluence reporting and the docs API.
+- The module `jeap-governance-docservice` with the webhook client of the Doc Service, included through
+  `jeap-governance-web`, which serves the docs API.
+
+### Changed
+- The rules that listed several violations in one line now write one violation per line under a summary line:
+  `endpoints-protected-by-jwt`, `endpoints-protected`, `component-dependencies-versions`,
+  `component-cdc-contractwithinsystem`, `component-cdc-contractbetweensystems` and `component-naming-convention`.
+  Since the comment of an affected rule state changes once, the first scoring run after the update sets the last
+  status change of the components these rules fail. `component-dependencies-versions` no longer lists the up-to-date
+  dependencies of a compliant component.
+- The comment of `component-naming-convention` lists the valid type IDs sorted, so it no longer changes between
+  restarts of the service.
+- The time of a recorded scheduler run is kept in whole seconds.
+- The trend period is configured with `jeap.governance.report-data.trend-period-days` (default 30).
+
+### Deprecated
+- `jeap.governance.reporting.trendPeriodDays`: use `jeap.governance.report-data.trend-period-days`. When set, the
+  deprecated property still takes precedence.
+- `jeap.governance.rules.active[].documentation-link`: each rule ships its explanation. The link is still used by the
+  Confluence reporting, but is no longer delivered by the docs API.
+- `RuleResult.summarize(List<RuleResult>)`, which joins comments with `; `: use `RuleResult.summarize(String, List)`.
+
 ## [9.17.0] - 2026-10-29
 
 ### Changed

@@ -78,6 +78,16 @@ class ComponentNamingConventionRuleTest {
     }
 
     @Test
+    void fail_multipleViolations_oneViolationPerLine() {
+        var component = createComponent("mysystem", "123bad-context-webapp");
+        var result = rule.evaluate(component, emptyParams);
+        assertThat(result.stateComment().lines().toList()).containsExactly(
+                "Component name violates the naming convention:",
+                "System name part '123bad' must match pattern [a-z]+[a-z0-9_]*.",
+                "Type-id 'webapp' is not valid. Must be one of: db, gateway, mobileapp, scs, service, ui.");
+    }
+
+    @Test
     void validName_allTypeIds() {
         for (String typeId : List.of("service", "ui", "scs", "mobileapp", "gateway", "db")) {
             var component = createComponent("mysystem", "mysystem-context-" + typeId);

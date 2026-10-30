@@ -70,9 +70,11 @@ class EndpointsProtectedByJwtRuleTest {
 
         assertThat(result.state()).isEqualTo(State.FAIL);
         // Endpoints sorted alphabetically
-        assertThat(result.stateComment()).isEqualTo(
-                "Call 'GET /foo/bar' without a JWT bearer token detected on environment(s) 'unknown'; " +
-                "Call 'POST /bar/foo' without a JWT bearer token detected on environment(s) 'unknown'");
+        assertThat(result.stateComment()).isEqualTo("""
+                Calls without a JWT bearer token:
+                'GET /foo/bar' on environment(s) 'unknown'
+                'POST /bar/foo' on environment(s) 'unknown'""");
+        assertThat(result.stateComment()).doesNotContain("; ");
     }
 
     @Test
@@ -88,8 +90,9 @@ class EndpointsProtectedByJwtRuleTest {
 
         assertThat(result.state()).isEqualTo(State.FAIL);
         // Environments sorted alphabetically
-        assertThat(result.stateComment()).isEqualTo(
-                "Call 'GET /foo/bar' without a JWT bearer token detected on environment(s) 'prod, ref'");
+        assertThat(result.stateComment()).isEqualTo("""
+                Calls without a JWT bearer token:
+                'GET /foo/bar' on environment(s) 'prod, ref'""");
     }
 
     @Test

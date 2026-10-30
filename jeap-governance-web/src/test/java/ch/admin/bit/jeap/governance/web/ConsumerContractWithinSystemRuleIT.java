@@ -80,7 +80,9 @@ class ConsumerContractWithinSystemRuleIT extends GovernanceIntegrationTestBase {
         var ruleState = ruleStateRepository.findBySystemComponentAndRuleId(component, RuleId.of("component-cdc-contractwithinsystem"));
         assertThat(ruleState).isPresent();
         assertThat(ruleState.get().getState()).isEqualTo(State.FAIL);
-        assertThat(ruleState.get().getStateComment()).isEqualTo("No consumer contract found for relation with service2 on 'GET /foo/bar'");
+        assertThat(ruleState.get().getStateComment()).isEqualTo("""
+                REST relations without a consumer contract:
+                'GET /foo/bar' provided by service2""");
     }
 
     @Test

@@ -6,9 +6,15 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Slf4j
 public class SchedulerRunTracker {
+
+    /**
+     * The job name the scoring records its runs under.
+     */
+    public static final String SCORING_JOB_NAME = "scoring";
 
     private final String jobName;
     private final String metricName;
@@ -29,9 +35,14 @@ public class SchedulerRunTracker {
         registerMetric();
     }
 
-    public void recordRun() {
-        lastRunDateTime = LocalDateTime.now();
+    /**
+     * @return the recorded time of the run, in whole seconds so that it reads the same wherever it is passed on,
+     * whatever the precision of the database
+     */
+    public LocalDateTime recordRun() {
+        lastRunDateTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
         schedulerRunRepository.saveLastRunDateTime(jobName, lastRunDateTime);
+        return lastRunDateTime;
     }
 
     private void loadLastRunDateTime() {

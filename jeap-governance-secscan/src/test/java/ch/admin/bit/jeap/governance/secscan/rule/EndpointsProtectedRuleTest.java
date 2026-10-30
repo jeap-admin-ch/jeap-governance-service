@@ -284,7 +284,9 @@ class EndpointsProtectedRuleTest {
         RuleResult result = rule.evaluate(systemComponent, EMPTY_PARAMS);
 
         assertThat(result.state()).isEqualTo(State.FAIL);
-        assertThat(result.stateComment()).isEqualTo("Endpoint 'GET /api/test' not properly protected");
+        assertThat(result.stateComment()).isEqualTo("""
+                Unprotected endpoints:
+                'GET /api/test'""");
     }
 
     @Test
@@ -302,7 +304,11 @@ class EndpointsProtectedRuleTest {
 
         assertThat(result.state()).isEqualTo(State.FAIL);
         // Check sorted order: /a/path before /z/path
-        assertThat(result.stateComment()).startsWith("Endpoint 'GET /a/path'");
+        assertThat(result.stateComment()).isEqualTo("""
+                Unprotected endpoints:
+                'GET /a/path'
+                'POST /z/path'""");
+        assertThat(result.stateComment()).doesNotContain("; ");
     }
 
     // --- Parameter validation tests ---

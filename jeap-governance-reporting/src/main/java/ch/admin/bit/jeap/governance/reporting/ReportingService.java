@@ -1,10 +1,11 @@
 package ch.admin.bit.jeap.governance.reporting;
 
 import ch.admin.bit.jeap.governance.reporting.confluence.ReportGenerator;
-import ch.admin.bit.jeap.governance.reporting.preparation.ReportingRule;
-import ch.admin.bit.jeap.governance.reporting.preparation.ReportingRulesPreparation;
-import ch.admin.bit.jeap.governance.reporting.preparation.ReportingSystemScore;
-import ch.admin.bit.jeap.governance.reporting.preparation.ReportingSystemsPreparation;
+import ch.admin.bit.jeap.governance.reportdata.ReportingRule;
+import ch.admin.bit.jeap.governance.reportdata.ReportingRulesPreparation;
+import ch.admin.bit.jeap.governance.reportdata.ReportingSystemScore;
+import ch.admin.bit.jeap.governance.reportdata.ReportingSystemsPreparation;
+import ch.admin.bit.jeap.governance.reportdata.TrendPeriod;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ import java.util.List;
 @Slf4j
 public class ReportingService {
 
-    private final ReportingProperties reportingProperties;
+    private final TrendPeriod trendPeriod;
     private final ReportingSystemsPreparation systemsPreparation;
     private final ReportingRulesPreparation reportingRulesPreparation;
     private final ReportGenerator reportGenerator;
@@ -45,8 +46,7 @@ public class ReportingService {
     }
 
     private void doGenerateRulesReport(LocalDate untilDay, boolean withOrphanCleanup) {
-        int trendPeriodDays = reportingProperties.getTrendPeriodDays();
-        LocalDate fromDay = untilDay.minusDays(trendPeriodDays);
+        LocalDate fromDay = trendPeriod.fromDay(untilDay);
 
         log.info("Start preparing rules report for timeframe from '{}' to '{}'", fromDay, untilDay);
         List<ReportingRule> reportingRules = reportingRulesPreparation.prepareAllRules(fromDay, untilDay);
@@ -55,8 +55,7 @@ public class ReportingService {
     }
 
     private void doGenerateSystemsReport(LocalDate untilDay, boolean withOrphanCleanup) {
-        int trendPeriodDays = reportingProperties.getTrendPeriodDays();
-        LocalDate fromDay = untilDay.minusDays(trendPeriodDays);
+        LocalDate fromDay = trendPeriod.fromDay(untilDay);
 
         log.info("Start preparing systems report for timeframe from '{}' to '{}'", fromDay, untilDay);
         List<ReportingSystemScore> allScoresPerSystem = systemsPreparation.prepareAllSystemsScores(fromDay, untilDay);

@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ComponentDependenciesVersionsRule implements Rule {
 
+    static final String FAILED_SUMMARY = "Outdated dependencies:";
+
     private final PromTimeSeriesQueryRepository promTimeSeriesQueryRepository;
 
     @Override
@@ -69,7 +71,7 @@ public class ComponentDependenciesVersionsRule implements Rule {
         if (ruleResults.isEmpty()) {
             return RuleResult.ok("No dependency version information available");
         }
-        return RuleResult.summarize(ruleResults);
+        return RuleResult.summarize(FAILED_SUMMARY, ruleResults);
     }
 
     private Map<String, String> getVersionsToCheck(RuleParameters ruleParameters) {

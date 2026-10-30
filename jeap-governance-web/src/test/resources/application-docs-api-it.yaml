@@ -1,0 +1,42 @@
+jeap:
+  security:
+    oauth2:
+      resourceserver:
+        system-name: "jme"
+        authorization-server:
+          issuer: "http://localhost:8180/auth"
+  governance:
+    rules:
+      active:
+        - id: docs-rule-a
+          weight: 10
+          documentation-link: https://wiki.example.com/docs-rule-a
+        - id: docs-rule-b
+          weight: 5
+          violation-delay: 7d
+          parameters:
+            ignored-service-names: "jme-legacy-service"
+            exempt-paths: "/api/public"
+        - id: component-naming-convention
+          weight: 5
+      component-exemptions:
+        - id: exemption-both
+          component-name: jme-b-service
+          rule-id:
+            - docs-rule-a
+            - docs-rule-b
+          reason: "Exempted from both rules"
+        - id: exemption-paused
+          component-name: jme-c-service
+          rule-id:
+            - docs-rule-a
+          reason: "Migrating"
+          until: "2099-12-31"
+        - id: exemption-expired
+          component-name: jme-d-service
+          rule-id:
+            - docs-rule-a
+          reason: "Was migrating"
+          until: "2020-01-01"
+          parameters:
+            scope: internal
