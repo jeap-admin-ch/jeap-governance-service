@@ -32,14 +32,14 @@ class RuleStateTest {
     }
 
     @Test
-    void modify_differentComment_updatesCommentAndModifiedAt() {
+    void modify_differentComment_updatesCommentButKeepsModifiedAt() {
         var ruleState = RuleState.createWithTimestamps(RULE_ID, component, State.FAIL, CREATED_AT, MODIFIED_AT);
 
         ruleState.modify(State.FAIL, "non-compliant");
 
         assertThat(ruleState.getState()).isEqualTo(State.FAIL);
         assertThat(ruleState.getStateComment()).isEqualTo("non-compliant");
-        assertThat(ruleState.getModifiedAt()).isAfter(MODIFIED_AT);
+        assertThat(ruleState.getModifiedAt()).isEqualTo(MODIFIED_AT);
     }
 
     @Test
@@ -65,16 +65,14 @@ class RuleStateTest {
     }
 
     @Test
-    void modify_commentChangedFromNonNullToNull_updatesModifiedAt() {
+    void modify_commentChangedFromNonNullToNull_keepsModifiedAt() {
         var ruleState = RuleState.createWithTimestamps(RULE_ID, component, State.FAIL, CREATED_AT, MODIFIED_AT);
-        // First set a comment
         ruleState.modify(State.FAIL, "some comment");
-        var modifiedAtAfterFirstChange = ruleState.getModifiedAt();
 
         ruleState.modify(State.FAIL, null);
 
         assertThat(ruleState.getStateComment()).isNull();
-        assertThat(ruleState.getModifiedAt()).isAfterOrEqualTo(modifiedAtAfterFirstChange);
+        assertThat(ruleState.getModifiedAt()).isEqualTo(MODIFIED_AT);
     }
 
     @Test

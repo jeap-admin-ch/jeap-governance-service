@@ -28,6 +28,11 @@ interface JpaSystemRuleConformanceRateRepository extends JpaRepository<SystemRul
             "WHERE r2.ruleId = r.ruleId AND r2.systemId = r.systemId)")
     List<SystemRuleConformanceRate> findLatestPerRuleIdAndSystemId();
 
+    @Query("SELECT r FROM SystemRuleConformanceRate r WHERE r.ruleId = :ruleId AND r.createdAt = (" +
+            "SELECT MAX(r2.createdAt) FROM SystemRuleConformanceRate r2 " +
+            "WHERE r2.ruleId = r.ruleId AND r2.systemId = r.systemId)")
+    List<SystemRuleConformanceRate> findLatestPerSystemIdByRuleId(String ruleId);
+
     @Modifying
     @Query("DELETE FROM SystemRuleConformanceRate r WHERE r.systemId = :systemId")
     void deleteAllBySystemId(long systemId);

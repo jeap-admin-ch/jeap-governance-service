@@ -47,6 +47,11 @@ class DocsApiEtagSupport {
 
     /**
      * Answers with the body and its entity tag, or with {@code 304} and an empty body when the caller already has it.
+     * <p>
+     * Serializes {@code body} exactly once. An index request additionally serializes each resource it lists, further
+     * upstream in {@code DocsApiDtoFactory}, to compute the byte-identical tag it embeds for that resource - on a
+     * separate request from this one, so there is nothing here to reuse. Bodies are small JSON DTOs, so this
+     * unavoidable re-serialization across requests is accepted rather than cached; revisit if payloads grow.
      *
      * @return the response, or null when the prepared {@code 304} is to be sent
      */
@@ -65,6 +70,8 @@ class DocsApiEtagSupport {
                 .body(serialized);
     }
 
+    // The docs API is only ever served through Spring MVC, so request is always a ServletWebRequest in practice;
+    // the check below is a defensive fallback for a non-servlet dispatch this codebase doesn't otherwise use.
     private static void setNoCache(WebRequest request) {
         if (request instanceof ServletWebRequest servletWebRequest) {
             HttpServletResponse response = servletWebRequest.getResponse();

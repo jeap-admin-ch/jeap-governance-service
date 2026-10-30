@@ -28,4 +28,7 @@ interface JpaRuleConformanceRateRepository extends JpaRepository<RuleConformance
 
     @Query("SELECT rcr FROM RuleConformanceRate rcr WHERE rcr.day >= :fromDay AND rcr.day <= :toDay")
     List<RuleConformanceRate> findAllByDayBetweenInclusive(LocalDate fromDay, LocalDate toDay);
+
+    @Query("SELECT rcr FROM RuleConformanceRate rcr WHERE rcr.ruleId = :ruleId AND rcr.day >= :fromDay AND rcr.day <= :toDay")
+    List<RuleConformanceRate> findAllByRuleIdAndDayBetweenInclusive(String ruleId, LocalDate fromDay, LocalDate toDay);
 }

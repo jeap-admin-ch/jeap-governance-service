@@ -38,6 +38,11 @@ import java.util.Optional;
 @Component
 class DocsApiDtoFactory {
 
+    /**
+     * Neither the ID nor the component name of an exemption is validated, so either may be missing.
+     */
+    private static final Comparator<String> NULLS_LAST = Comparator.nullsLast(Comparator.naturalOrder());
+
     private final DocsApiEtagSupport etagSupport;
     private final ZoneId zone;
 
@@ -74,7 +79,7 @@ class DocsApiDtoFactory {
                 .map(description -> {
                     RuleDto dto = rule(data, description);
                     return new RuleIndexEntryDto(dto.ruleId(), dto.name(), dto.active(), dto.weight(), dto.share(),
-                            dto.conformanceRate(), dto.trend(), dto.active() ? dto.exemptions().size() : null,
+                            dto.conformanceRate(), dto.trend(), dto.active() ? exemptionsInForce(dto) : null,
                             etagSupport.entityTagOf(dto), DocsApiPaths.rulePath(dto.ruleId()));
                 })
                 .toList();
@@ -181,11 +186,17 @@ class DocsApiDtoFactory {
 
     private static List<ExemptionDto> exemptions(List<RuleComponentExemption> exemptions, LocalDate today) {
         return exemptions.stream()
-                .sorted(Comparator.comparing(RuleComponentExemption::componentName)
-                        .thenComparing(RuleComponentExemption::id))
+                .sorted(Comparator.comparing(RuleComponentExemption::componentName, NULLS_LAST)
+                        .thenComparing(RuleComponentExemption::id, NULLS_LAST))
                 .map(exemption -> new ExemptionDto(exemption.id(), exemption.componentName(), exemption.reason(),
                         exemption.until(), effect(exemption.activationState(today)), parameters(exemption.parameters())))
                 .toList();
+    }
+
+    private static int exemptionsInForce(RuleDto rule) {
+        return (int) rule.exemptions().stream()
+                .filter(exemption -> exemption.effect() != ExemptionEffect.EXPIRED)
+                .count();
     }
 
     private static ExemptionEffect effect(RuleActivationState activationState) {

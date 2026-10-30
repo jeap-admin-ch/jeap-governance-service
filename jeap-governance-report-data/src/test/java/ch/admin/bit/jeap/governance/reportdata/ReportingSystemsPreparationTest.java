@@ -17,10 +17,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 
@@ -175,6 +179,40 @@ class ReportingSystemsPreparationTest {
 
         assertNotNull(reportingSystemScores);
         assertTrue(reportingSystemScores.isEmpty());
+    }
+
+    @Test
+    void prepareSystemScores_loadsOnlyTheNamedSystem() {
+        String systemName = SYSTEM_A.getName();
+        when(dataAccess.findSystemScoresBySystemNameAndDayBetweenInclusive(systemName, DAY1, DAY3))
+                .thenReturn(List.of(createSystemScore(SYSTEM_A, DAY3, 95), createSystemScore(SYSTEM_A, DAY1, 80)));
+        when(dataAccess.findComponentScoresBySystemNameAndDayBetweenInclusive(systemName, DAY1, DAY3))
+                .thenReturn(List.of(createComponentScore(COMPONENT_A_1, DAY3, 60), createComponentScore(GATEWAY_A, DAY3, 10)));
+        when(dataAccess.findAllActiveRuleInfos()).thenReturn(List.of(RULE_INFO_1));
+        when(dataAccess.findRuleStatesBySystemName(systemName))
+                .thenReturn(List.of(createRuleState(COMPONENT_A_1, RULE_INFO_1, State.FAIL)));
+
+        Optional<ReportingSystemScore> result = preparation.prepareSystemScores(systemName, DAY1, DAY3);
+
+        assertTrue(result.isPresent());
+        ReportingSystemScore systemScore = result.get();
+        assertEquals(systemName, systemScore.getSystemName());
+        assertEquals(List.of(DAY1, DAY3), systemScore.getScores().stream().map(ReportingScore::getDay).toList());
+        assertEquals(1, systemScore.getComponentScores().size());
+        ReportingComponentScore componentScore = systemScore.getComponentScores().getFirst();
+        assertEquals(COMPONENT_A_1.getId(), componentScore.getComponentId());
+        assertEquals(State.FAIL, componentScore.getRuleStates().getFirst().state());
+        verify(dataAccess, never()).findAllSystemScoresByDayBetweenInclusive(any(), any());
+        verify(dataAccess, never()).findAllComponentScoreByDayBetweenInclusive(any(), any());
+        verify(dataAccess, never()).findAllRuleStates();
+    }
+
+    @Test
+    void prepareSystemScores_systemWithoutScores_isEmpty() {
+        when(dataAccess.findSystemScoresBySystemNameAndDayBetweenInclusive("unknown", DAY1, DAY3)).thenReturn(List.of());
+
+        assertTrue(preparation.prepareSystemScores("unknown", DAY1, DAY3).isEmpty());
+        verify(dataAccess, never()).findComponentScoresBySystemNameAndDayBetweenInclusive(any(), any(), any());
     }
 
     private SystemScore createSystemScore(System system, LocalDate day, int score) {

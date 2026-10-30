@@ -6,7 +6,8 @@ import java.util.Map;
 /**
  * A configured exemption of one component from a rule.
  *
- * @param until the last day of a temporary exemption, null for a permanent one
+ * @param until the day a temporary exemption ends: the rule applies again from that day on (exclusive end), null
+ *              for a permanent one
  */
 public record RuleComponentExemption(String id,
                                      String componentName,

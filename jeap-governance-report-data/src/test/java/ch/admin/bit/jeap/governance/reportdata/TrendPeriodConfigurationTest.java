@@ -42,8 +42,11 @@ class TrendPeriodConfigurationTest {
     }
 
     @Test
-    void fromDay_isTheGivenNumberOfDaysBefore() {
-        assertThat(new TrendPeriod(30).fromDay(LocalDate.of(2026, 10, 31))).isEqualTo(LocalDate.of(2026, 10, 1));
+    void fromDay_includesTheGivenNumberOfDays() {
+        LocalDate untilDay = LocalDate.of(2026, 10, 31);
+
+        assertThat(new TrendPeriod(30).fromDay(untilDay)).isEqualTo(LocalDate.of(2026, 10, 2));
+        assertThat(new TrendPeriod(1).fromDay(untilDay)).isEqualTo(untilDay);
     }
 
     @Test

@@ -71,7 +71,7 @@ public record RuleResult(State state, String stateComment) {
      * @deprecated joins the comments with {@code "; "} into a single line, which readers cannot show as a list. Use
      * {@link #summarize(String, List)} instead.
      */
-    @Deprecated(since = "9.18.0")
+    @Deprecated(since = "10.0.0")
     public static RuleResult summarize(List<RuleResult> results) {
         boolean hasFailure = results.stream().anyMatch(result -> result.state().equals(State.FAIL));
         String stateComment = results.stream().map(RuleResult::stateComment).filter(Objects::nonNull).collect(Collectors.joining("; "));

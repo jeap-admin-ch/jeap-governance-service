@@ -34,13 +34,28 @@ public class RuleStateRepositoryImpl implements RuleStateRepository {
     }
 
     @Override
+    public List<RuleState> findAllBySystemName(String systemName) {
+        return jpaRuleStateRepository.findAllBySystemName(systemName);
+    }
+
+    @Override
     public List<NonCompliantComponentEntry> findNonCompliantSince() {
         return jpaRuleStateRepository.findNonCompliantSince();
     }
 
     @Override
+    public List<NonCompliantComponentEntry> findNonCompliantSinceByRuleId(String ruleId) {
+        return jpaRuleStateRepository.findNonCompliantSinceByRuleId(ruleId);
+    }
+
+    @Override
     public List<GracePeriodComponentEntry> findGracePeriodComponents() {
         return jpaRuleStateRepository.findGracePeriodComponents();
+    }
+
+    @Override
+    public List<GracePeriodComponentEntry> findGracePeriodComponentsByRuleId(String ruleId) {
+        return jpaRuleStateRepository.findGracePeriodComponentsByRuleId(ruleId);
     }
 
     @Override

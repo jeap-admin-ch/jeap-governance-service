@@ -19,6 +19,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -54,6 +55,33 @@ public class ReportingRulesPreparation {
         return prepareRules(latestRuleConformanceRatesPerRuleId, latestPerRuleIdAndSystemId, activeRuleInfos,
                 nonCompliantComponentEntries, gracePeriodComponentEntries, allSystemReferences, allComponentReferences,
                 ignoredComponentIds);
+    }
+
+    /**
+     * Prepares one rule as {@link #prepareAllRules(LocalDate, LocalDate)} does, loading only its data.
+     *
+     * @return the rule, or empty if it is not active or has no conformance rate in the period
+     */
+    @TransactionalReadReplica
+    @Timed("jeap.governance.service.reporting.rule.preparation")
+    public Optional<ReportingRule> prepareRule(String ruleId, LocalDate fromDay, LocalDate toDay) {
+        List<RuleInfo> activeRuleInfos = dataAccess.findAllActiveRuleInfos().stream()
+                .filter(ruleInfo -> ruleInfo.ruleId().id().equals(ruleId))
+                .toList();
+        if (activeRuleInfos.isEmpty()) {
+            return Optional.empty();
+        }
+        List<RuleConformanceRate> ruleConformanceRates = dataAccess.findRuleConformanceByRuleIdAndDayBetweenInclusive(ruleId, fromDay, toDay);
+        List<SystemRuleConformanceRate> latestPerSystemId = dataAccess.findLatestPerSystemIdByRuleId(ruleId);
+        List<NonCompliantComponentEntry> nonCompliantComponentEntries = dataAccess.findNonCompliantSinceByRuleId(ruleId);
+        List<GracePeriodComponentEntry> gracePeriodComponentEntries = dataAccess.findGracePeriodComponentsByRuleId(ruleId);
+        List<SystemReference> allSystemReferences = dataAccess.findAllSystemReferences();
+        List<SystemComponentReference> allComponentReferences = dataAccess.findAllComponentReferences();
+        Set<Long> ignoredComponentIds = dataAccess.findIgnoredComponentIds();
+
+        return prepareRules(ruleConformanceRates, latestPerSystemId, activeRuleInfos, nonCompliantComponentEntries,
+                gracePeriodComponentEntries, allSystemReferences, allComponentReferences, ignoredComponentIds)
+                .stream().findFirst();
     }
 
     List<ReportingRule> prepareRules(List<RuleConformanceRate> latestRuleConformanceRatesPerRuleId, List<SystemRuleConformanceRate> latestPerRuleIdAndSystemId, List<RuleInfo> activeRuleInfos,

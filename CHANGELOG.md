@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [9.18.0] - 2026-10-29
+## [10.0.0] - 2026-11-02
 
 ### Added
 - A docs API for the jEAP Doc Service under `/docs-api`: `GET /docs-api/systems`, `/docs-api/systems/{system}`,
@@ -32,15 +32,34 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - The rules that listed several violations in one line now write one violation per line under a summary line:
   `endpoints-protected-by-jwt`, `endpoints-protected`, `component-dependencies-versions`,
   `component-cdc-contractwithinsystem`, `component-cdc-contractbetweensystems` and `component-naming-convention`.
-  Since the comment of an affected rule state changes once, the first scoring run after the update sets the last
-  status change of the components these rules fail. `component-dependencies-versions` no longer lists the up-to-date
-  dependencies of a compliant component.
+  `component-dependencies-versions` no longer lists the up-to-date dependencies of a compliant component.
+- The last status change of a rule state (reported as "non-compliant since") only moves when the state changes, no
+  longer when only the comment changes. The new comment format above therefore keeps the date of components that
+  were already failing.
 - The comment of `component-naming-convention` lists the valid type IDs sorted, so it no longer changes between
   restarts of the service.
 - The time of a recorded scheduler run is kept in whole seconds.
 - `RuleRepository.getActiveRuleWeights()` skips a rule configured as active that has no rule bean, like the other
   methods of the rule repository. The scoring is unaffected, as it never evaluated such a rule.
 - The trend period is configured with `jeap.governance.report-data.trend-period-days` (default 30).
+- The OpenAPI group of the management API is renamed from `Governance-Service-API` to
+  `Governance-Service-Management-API`; the docs API has its own group `Governance-Service-Docs-API`. Swagger UI links
+  and clients fetching `/api-docs/Governance-Service-API` must be updated.
+- The report data classes moved from the package `ch.admin.bit.jeap.governance.reporting.preparation` of
+  `jeap-governance-reporting` to `ch.admin.bit.jeap.governance.reportdata` of `jeap-governance-report-data`
+  (e.g. `ReportingSystemsPreparation`, `ReportingRulesPreparation`, `TrendIndicatorUtility`). Code using them must
+  update its imports.
+- `SchedulerRunTracker.recordRun()` returns the recorded time instead of `void`. This is binary-incompatible: code
+  calling it must be recompiled.
+- `ScoringScheduler` takes an additional `ApplicationEventPublisher` constructor argument to publish the
+  `ScoringRunCompletedEvent`.
+- `RuleRepository` has the new abstract method `getKnownRules()`; custom implementations must implement it.
+- The repository ports gained queries scoped to a single system or rule, used by the docs API to read only the
+  resource it answers with: `SystemScoreRepository` and `ComponentScoreRepository`
+  `findAllBySystemNameAndDayBetweenInclusive`, `RuleStateRepository` `findAllBySystemName` and
+  `findNonCompliantSinceByRuleId`, `RuleConformanceRateRepository` `findAllByRuleIdAndDayBetweenInclusive` and
+  `SystemRuleConformanceRateRepository` `findLatestPerSystemIdByRuleId`. Custom implementations of these ports must
+  implement them.
 
 ### Deprecated
 - `jeap.governance.reporting.trendPeriodDays`: use `jeap.governance.report-data.trend-period-days`. When set, the

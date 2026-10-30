@@ -223,6 +223,28 @@ class ComponentScoreRepositoryImplTest extends PostgresTestContainerBase {
         assertEquals(1, results.size());
     }
 
+    @Test
+    void findAllBySystemNameAndDayBetweenInclusive_shouldReturnOnlyTheNamedSystemsScoresWithinTimeframe() {
+        System systemA = createAndPersistSystem("System A", "Component A1", "Component A2");
+        System systemB = createAndPersistSystem("System B", "Component B");
+        SystemComponent componentA1 = systemA.getSystemComponents().get(0);
+        SystemComponent componentA2 = systemA.getSystemComponents().get(1);
+        SystemComponent componentB = systemB.getSystemComponents().getFirst();
+        LocalDate from = LocalDate.of(2026, 1, 1);
+        LocalDate to = LocalDate.of(2026, 1, 31);
+        entityManager.persist(ComponentScore.builder().systemComponent(componentA1).score(10).day(LocalDate.of(2025, 12, 31)).build());
+        entityManager.persist(ComponentScore.builder().systemComponent(componentA1).score(20).day(from).build());
+        entityManager.persist(ComponentScore.builder().systemComponent(componentA2).score(30).day(to).build());
+        entityManager.persist(ComponentScore.builder().systemComponent(componentB).score(40).day(from).build());
+        entityManager.flush();
+        entityManager.clear();
+
+        List<ComponentScore> result = repository.findAllBySystemNameAndDayBetweenInclusive("System A", from, to);
+
+        assertEquals(List.of(20, 30), result.stream().map(ComponentScore::getScore).sorted().toList());
+        assertTrue(repository.findAllBySystemNameAndDayBetweenInclusive("Unknown", from, to).isEmpty());
+    }
+
     private SystemComponent createAndPersistSystemWithComponent() {
         System system = createAndPersistSystem("Test System", "Test Component");
         return system.getSystemComponents().getFirst();

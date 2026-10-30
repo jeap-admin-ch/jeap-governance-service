@@ -17,6 +17,6 @@ public record TrendPeriod(int days) {
      * @return the first day of the period that ends on the given day
      */
     public LocalDate fromDay(LocalDate untilDay) {
-        return untilDay.minusDays(days);
+        return untilDay.minusDays(days - 1L);
     }
 }

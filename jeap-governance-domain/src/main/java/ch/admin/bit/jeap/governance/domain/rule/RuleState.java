@@ -82,12 +82,16 @@ public class RuleState {
         modify(state, stateComment, ZonedDateTime.now());
     }
 
+    /**
+     * Updates state and comment. {@code modifiedAt} only moves when the state changes, as it is reported as the time
+     * since which a component is non-compliant; a changed comment alone keeps it.
+     */
     void modify(State state, String stateComment, ZonedDateTime now) {
-        if (this.state != state || !Objects.equals(this.stateComment, stateComment)) {
-            this.state = state;
-            this.stateComment = stateComment;
+        if (this.state != state) {
             this.modifiedAt = now;
         }
+        this.state = state;
+        this.stateComment = stateComment;
     }
 
     void startViolation(ZonedDateTime detectedAt) {

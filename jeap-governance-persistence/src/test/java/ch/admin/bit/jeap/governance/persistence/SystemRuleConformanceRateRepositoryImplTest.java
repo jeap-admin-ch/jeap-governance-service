@@ -13,6 +13,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -168,6 +169,24 @@ class SystemRuleConformanceRateRepositoryImplTest extends PostgresTestContainerB
                 .createQuery("SELECT s FROM SystemRuleConformanceRate s", SystemRuleConformanceRate.class)
                 .getResultList();
         assertEquals(1, results.size());
+    }
+
+    @Test
+    void findLatestPerSystemIdByRuleId_shouldReturnTheLatestRatePerSystemOfTheRuleOnly() {
+        entityManager.persist(createRate(1L, "rule-1", 85, LocalDate.of(2026, 1, 15)));
+        entityManager.persist(createRate(1L, "rule-1", 90, LocalDate.of(2026, 1, 17)));
+        entityManager.persist(createRate(2L, "rule-1", 70, LocalDate.of(2026, 1, 16)));
+        entityManager.persist(createRate(1L, "rule-2", 50, LocalDate.of(2026, 1, 17)));
+        entityManager.flush();
+        entityManager.clear();
+
+        List<SystemRuleConformanceRate> result = repository.findLatestPerSystemIdByRuleId("rule-1");
+
+        assertThat(result)
+                .extracting(SystemRuleConformanceRate::getSystemId, SystemRuleConformanceRate::getConformanceRate)
+                .containsExactlyInAnyOrder(
+                        tuple(1L, 90),
+                        tuple(2L, 70));
     }
 
     private SystemRuleConformanceRate createRate(long systemId, String ruleId, int conformanceRate, LocalDate day) {

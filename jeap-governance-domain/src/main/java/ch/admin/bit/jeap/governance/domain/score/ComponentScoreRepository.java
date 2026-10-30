@@ -19,5 +19,7 @@ public interface ComponentScoreRepository {
 
     List<ComponentScore> findAllByDayBetweenInclusive(LocalDate fromDay, LocalDate toDay);
 
+    List<ComponentScore> findAllBySystemNameAndDayBetweenInclusive(String systemName, LocalDate fromDay, LocalDate toDay);
+
     void deleteAllBySystemComponentId(long componentId);
 }

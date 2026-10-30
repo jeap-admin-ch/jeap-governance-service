@@ -35,6 +35,11 @@ public class SystemRuleConformanceRateRepositoryImpl implements SystemRuleConfor
     }
 
     @Override
+    public List<SystemRuleConformanceRate> findLatestPerSystemIdByRuleId(String ruleId) {
+        return jpaSystemRuleConformanceRateRepository.findLatestPerSystemIdByRuleId(ruleId);
+    }
+
+    @Override
     public void deleteAllBySystemId(long systemId) {
         jpaSystemRuleConformanceRateRepository.deleteAllBySystemId(systemId);
     }

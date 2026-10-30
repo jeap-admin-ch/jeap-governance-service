@@ -15,8 +15,10 @@ public record RuleIndexEntryDto(
                 example = "12.5") BigDecimal share,
         @Schema(description = "The latest conformance rate in percent, null without one") Integer conformanceRate,
         Trend trend,
-        @Schema(description = "The number of component exemptions naming the rule") Integer exemptionCount,
+        @Schema(description = "The number of component exemptions of the rule in force, expired ones not "
+                              + "counted") Integer exemptionCount,
         @Schema(description = "Byte-identical to the ETag header of the rule resource",
                 example = "\"sha256:41ab7c\"") String etag,
-        @Schema(description = "Path of the rule resource, relative to the service root") String url) {
+        @Schema(description = "Path of the rule resource, with the service's context path and without scheme "
+                              + "and host") String url) {
 }

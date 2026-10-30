@@ -47,9 +47,10 @@ to `<system-name>_@governance-documentation_#read` with the system name configur
   rounded to one decimal, computed from the weights the scoring uses. A rule ID configured as active without a rule
   bean is left out, as the scoring leaves it out. The share is nominal: on a component for which other rules are
   disabled, the rule weighs more.
-- **An exemption** carries its ID, component, reason, `until` day, its own parameters and its `effect`: `PAUSED` (an
-  `until` day not yet passed), `DISABLED` (no `until`) or `EXPIRED` (the `until` day has passed). An exemption naming
-  several rules is listed under each of them.
+- **An exemption** carries its ID, component, reason, `until` day, its own parameters and its `effect`: `PAUSED` (before
+  the `until` day), `DISABLED` (no `until`) or `EXPIRED` (from the `until` day on: the rule applies again on that
+  day). An exemption naming several rules is listed under each of them. The `exemptionCount` of the rule index counts
+  only the exemptions in force, not the expired ones.
 - **The explanation** is the rule's Markdown resource (see [Rules](rules.md#rule-explanations)), delivered unchanged,
   or `null` for a rule that ships none. It is not sanitized: render it with raw HTML shown as text.
 - **The parameters** are the rule's configured `parameters`, as name and value. The deprecated `documentation-link` is

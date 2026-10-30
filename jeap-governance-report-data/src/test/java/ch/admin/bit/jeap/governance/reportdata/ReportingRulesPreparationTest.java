@@ -18,13 +18,18 @@ import org.mockito.quality.Strictness;
 
 import java.time.Clock;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -345,6 +350,80 @@ class ReportingRulesPreparationTest {
                 .isEqualTo("Active");
     }
 
+    @Test
+    void prepareRule_loadsOnlyTheNamedRule() {
+        LocalDate fromDay = TIMESTAMP.toLocalDate().minusDays(30);
+        LocalDate toDay = TIMESTAMP.toLocalDate();
+
+        // Prepare return values before Mockito stubbing
+        List<RuleConformanceRate> conformanceRates = List.of(
+                conformanceRate(RULE_ID, TIMESTAMP, 85));
+
+        List<SystemRuleConformanceRate> systemConformanceRates = List.of(
+                systemConformanceRate(RULE_ID, SYSTEM_ID, 90));
+
+        List<NonCompliantComponentEntry> nonCompliantEntries = List.of(
+                nonCompliantEntry(RULE_ID, SYSTEM_ID, COMPONENT_ID, TIMESTAMP.minusDays(5)));
+
+        List<GracePeriodComponentEntry> gracePeriodEntries = List.of(
+                gracePeriodEntry(RULE_ID, SYSTEM_ID, COMPONENT_ID + 1, TIMESTAMP.minusDays(1)));
+
+        SystemReference systemReference = systemRef(SYSTEM_ID, SYSTEM_NAME);
+
+        SystemComponentReference systemComponentReference = componentRef(COMPONENT_ID, COMPONENT_NAME);
+
+        SystemComponentReference systemComponentReference1 = componentRef(COMPONENT_ID + 1, "Component Y");
+
+        // Mockito stubbing
+        when(dataAccess.findAllActiveRuleInfos()).thenReturn(List.of(
+                ruleInfo(RULE_ID, RULE_LABEL, Duration.ofDays(7)),
+                ruleInfo("rule-2", "Rule Two")));
+
+        when(dataAccess.findRuleConformanceByRuleIdAndDayBetweenInclusive(RULE_ID, fromDay, toDay))
+                .thenReturn(conformanceRates);
+
+        when(dataAccess.findLatestPerSystemIdByRuleId(RULE_ID))
+                .thenReturn(systemConformanceRates);
+
+        when(dataAccess.findNonCompliantSinceByRuleId(RULE_ID))
+                .thenReturn(nonCompliantEntries);
+
+        when(dataAccess.findGracePeriodComponentsByRuleId(RULE_ID))
+                .thenReturn(gracePeriodEntries);
+
+        when(dataAccess.findAllSystemReferences())
+                .thenReturn(List.of(systemReference));
+
+        when(dataAccess.findAllComponentReferences()).thenReturn(List.of(
+                systemComponentReference,
+                systemComponentReference1));
+
+        when(dataAccess.findIgnoredComponentIds()).thenReturn(Set.of());
+
+        Optional<ReportingRule> result = preparation.prepareRule(RULE_ID, fromDay, toDay);
+
+        // Keep your existing assertions and verifications
+        assertThat(result).hasValueSatisfying(rule -> {
+            assertThat(rule.getRuleId()).isEqualTo(RULE_ID);
+            assertThat(rule.getConformanceRates()).hasSize(1);
+            assertThat(rule.getSystemConformanceRates()).hasSize(1);
+            assertThat(rule.getNonCompliantComponents()).hasSize(1);
+            assertThat(rule.getGracePeriodComponents()).hasSize(1);
+        });
+
+        verify(dataAccess, never()).findAllRuleConformanceByDayBetweenInclusive(any(), any());
+        verify(dataAccess, never()).findLatestPerRuleIdAndSystemId();
+        verify(dataAccess, never()).findNonCompliantSince();
+        verify(dataAccess, never()).findGracePeriodComponents();
+    }
+
+    @Test
+    void prepareRule_inactiveRule_isEmpty() {
+        when(dataAccess.findAllActiveRuleInfos()).thenReturn(List.of(ruleInfo("rule-2", "Rule Two")));
+
+        assertThat(preparation.prepareRule(RULE_ID, TIMESTAMP.toLocalDate(), TIMESTAMP.toLocalDate())).isEmpty();
+        verify(dataAccess, never()).findRuleConformanceByRuleIdAndDayBetweenInclusive(any(), any(), any());
+    }
 
     private RuleInfo ruleInfo(String ruleId, String label) {
         return new RuleInfo(RuleId.of(ruleId), label, label + " documentation link");

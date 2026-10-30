@@ -92,7 +92,7 @@ public class RuleConfigurationProperties {
          *
          * @deprecated each rule now ships its explanation next to it, see {@code docs/rules.md}
          */
-        @Deprecated(since = "9.18.0")
+        @Deprecated(since = "10.0.0")
         private String documentationLink;
 
         /**
@@ -107,8 +107,8 @@ public class RuleConfigurationProperties {
         /**
          * @deprecated each rule now ships its explanation next to it; the docs API does not deliver this link
          */
-        @Deprecated(since = "9.18.0")
-        @DeprecatedConfigurationProperty(since = "9.18.0",
+        @Deprecated(since = "10.0.0")
+        @DeprecatedConfigurationProperty(since = "10.0.0",
                 reason = "Each rule ships its explanation as the resource jeap-governance/rules/<rule-id>.md. "
                          + "The link is only used by the Confluence reporting and is removed with it.")
         public String getDocumentationLink() {

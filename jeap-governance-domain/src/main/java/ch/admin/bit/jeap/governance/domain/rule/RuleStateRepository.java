@@ -13,10 +13,20 @@ public interface RuleStateRepository {
 
     List<RuleState> findAll();
 
+    List<RuleState> findAllBySystemName(String systemName);
+
     List<NonCompliantComponentEntry> findNonCompliantSince();
+
+    List<NonCompliantComponentEntry> findNonCompliantSinceByRuleId(String ruleId);
 
     default List<GracePeriodComponentEntry> findGracePeriodComponents() {
         return List.of();
+    }
+
+    default List<GracePeriodComponentEntry> findGracePeriodComponentsByRuleId(String ruleId) {
+        return findGracePeriodComponents().stream()
+                .filter(entry -> ruleId.equals(entry.getRuleId()))
+                .toList();
     }
 
     void deleteAllBySystemComponentId(long systemComponentId);

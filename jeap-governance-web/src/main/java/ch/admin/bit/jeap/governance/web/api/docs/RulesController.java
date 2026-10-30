@@ -54,7 +54,7 @@ public class RulesController {
             content = @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE,
                     schema = @Schema(implementation = ProblemDetail.class)))
     public ResponseEntity<byte[]> getRule(@PathVariable("ruleId") String ruleId, WebRequest request) {
-        RuleDto rule = dtoFactory.rule(reader.readRules(), ruleId)
+        RuleDto rule = dtoFactory.rule(reader.readRule(ruleId), ruleId)
                 .orElseThrow(() -> RuleNotFoundException.ruleNotFound(ruleId));
         return etagSupport.respond(request, rule);
     }

@@ -36,6 +36,19 @@ interface JpaRuleStateRepository extends JpaRepository<RuleState, Long> {
     List<NonCompliantComponentEntry> findNonCompliantSince();
 
     @Query("""
+            SELECT rs.systemComponent.system.id   AS systemId,
+                   rs.systemComponent.id          AS systemComponentId,
+                   rs.systemComponent.name        AS systemComponentName,
+                   rs.ruleId                      AS ruleId,
+                   rs.stateComment                AS stateComment,
+                   rs.modifiedAt                  AS nonCompliantSince
+            FROM RuleState rs
+            WHERE rs.state = ch.admin.bit.jeap.governance.domain.rule.State.FAIL
+              AND rs.ruleId = :ruleId
+            """)
+    List<NonCompliantComponentEntry> findNonCompliantSinceByRuleId(String ruleId);
+
+    @Query("""
             SELECT rs.systemComponent.system.id AS systemId,
                    rs.systemComponent.id        AS systemComponentId,
                    rs.ruleId                    AS ruleId,
@@ -46,6 +59,22 @@ interface JpaRuleStateRepository extends JpaRepository<RuleState, Long> {
               AND rs.violationDetectedAt IS NOT NULL
             """)
     List<GracePeriodComponentEntry> findGracePeriodComponents();
+
+    @Query("""
+            SELECT rs.systemComponent.system.id AS systemId,
+                   rs.systemComponent.id        AS systemComponentId,
+                   rs.ruleId                    AS ruleId,
+                   rs.stateComment              AS stateComment,
+                   rs.violationDetectedAt       AS violationDetectedAt
+            FROM RuleState rs
+            WHERE rs.state = ch.admin.bit.jeap.governance.domain.rule.State.OK
+              AND rs.violationDetectedAt IS NOT NULL
+              AND rs.ruleId = :ruleId
+            """)
+    List<GracePeriodComponentEntry> findGracePeriodComponentsByRuleId(String ruleId);
+
+    @Query("SELECT rs FROM RuleState rs JOIN FETCH rs.systemComponent sc JOIN FETCH sc.system s WHERE s.name = :systemName")
+    List<RuleState> findAllBySystemName(String systemName);
 
     @Modifying
     @Query("DELETE FROM RuleState rs WHERE rs.systemComponent.id = :systemComponentId")
