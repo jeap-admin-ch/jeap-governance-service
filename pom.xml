@@ -28,7 +28,7 @@
     <parent>
         <groupId>ch.admin.bit.jeap</groupId>
         <artifactId>jeap-spring-boot-parent</artifactId>
-        <version>41.29.0</version>
+        <version>41.29.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -40,8 +40,6 @@
     <properties>
         <asciidoc-confluence-publisher-client.version>0.36.0</asciidoc-confluence-publisher-client.version>
         <maven.javadoc.skip>false</maven.javadoc.skip>
-        <java.version>25</java.version>
-        <maven.compiler.release>25</maven.compiler.release>
     </properties>
 
     <modules>
