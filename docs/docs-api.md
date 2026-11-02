@@ -36,7 +36,8 @@ to `<system-name>_@governance-documentation_#read` with the system name configur
 ### Values
 
 - Timestamps are ISO 8601 with offset, days ISO dates. Scores and rates are whole percent, `null` where there is no
-  value yet. Histories hold one value per scored day of the trend period, oldest first.
+  value yet. Histories hold one value per scored day of the trend period, oldest first. The period covers
+  `jeap.governance.report-data.trend-period-days` days up to and including the day of the last completed scoring run.
 - A trend is `UP`, `DOWN` or `STABLE`, as the governance service calculates it over the trend period
   (`jeap.governance.report-data.trend-period-days`); `UNKNOWN` with a single value, `NO_DATA` without any.
 - A rule state is `OK`, `FAIL`, `PAUSED`, `DISABLED` or `UNKNOWN`. Its comment is plain text, not Markdown: `comment` is

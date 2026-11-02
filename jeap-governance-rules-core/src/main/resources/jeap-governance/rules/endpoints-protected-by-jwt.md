@@ -35,3 +35,7 @@ The instance can configure the following parameters. Paths and component names s
 ## Exemptions
 
 Besides the parameters above, a component can be exempted from the rule as a whole (permanently or until a given date) by the governance service instance's configuration.
+
+## See
+
+- [Authentication and Authorization](https://jeap-admin-ch.github.io/docs/concepts/authentication-and-authorization/)

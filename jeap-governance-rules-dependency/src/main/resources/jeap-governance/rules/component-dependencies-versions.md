@@ -37,3 +37,7 @@ Update the dependencies listed in the rule comment to at least the required mini
 ## Exemptions
 
 A component can be exempted from the rule as a whole (permanently or until a given date) by the governance service instance's configuration.
+
+## See
+
+- [Message Type Registry](https://jeap-admin-ch.github.io/docs/building-blocks/libraries/jeap-messaging/message-type-registry/)

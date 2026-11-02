@@ -93,8 +93,8 @@ Built on Java 25 and the `jeap-spring-boot-parent` (Spring Boot 4).
   webhook call after every completed scoring run (package `docservice.webhook`), like the other connector modules.
   Its end-to-end test `DocServiceWebhookIT` lives in `jeap-governance-web`, as it needs the whole application.
 - `jeap-governance-web/` - Spring Boot application entry point (`GovernanceApplication`), REST controllers (
-  `ManagementController` at `/api/management`, the docs API for the jEAP Doc Service in package `docsapi` at
-  `/docs-api`), security config, OpenAPI config.
+  `ManagementController` at `/api/management`, the docs API for the jEAP Doc Service at `/docs-api` in package
+  `ch.admin.bit.jeap.governance.web.api.docs`), security config, OpenAPI config.
 - `jeap-governance-service-instance/` - POM-only module; downstream projects inherit from this to create their own
   governance service instances.
 

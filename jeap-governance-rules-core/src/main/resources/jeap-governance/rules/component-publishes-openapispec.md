@@ -20,3 +20,7 @@ The rule only applies to backend services and self-contained systems; other comp
 ## Exemptions
 
 The rule has no parameters. A component that does not provide a REST API can be exempted from the rule (permanently or until a given date) by the governance service instance's configuration.
+
+## See
+
+- [jEAP OpenAPI Specification Publisher](https://jeap-admin-ch.github.io/docs/building-blocks/spring-boot-starters/jeap-open-api-publisher-starter/)

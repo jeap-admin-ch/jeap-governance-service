@@ -25,3 +25,7 @@ The instance can configure the following parameters:
 ## Exemptions
 
 Besides the parameters above, a component can be exempted from the rule as a whole (permanently or until a given date) by the governance service instance's configuration.
+
+## See
+
+- [Consumer-Driven Contract Tests](https://jeap-admin-ch.github.io/docs/concepts/testing/consumer-driven-contract-tests/)

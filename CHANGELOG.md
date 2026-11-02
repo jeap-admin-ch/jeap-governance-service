@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [10.0.0] - 2026-11-02
+## [10.0.0] - 2026-11-03
 
 ### Added
 - A docs API for the jEAP Doc Service under `/docs-api`: `GET /docs-api/systems`, `/docs-api/systems/{system}`,
@@ -41,7 +41,9 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - The time of a recorded scheduler run is kept in whole seconds.
 - `RuleRepository.getActiveRuleWeights()` skips a rule configured as active that has no rule bean, like the other
   methods of the rule repository. The scoring is unaffected, as it never evaluated such a rule.
-- The trend period is configured with `jeap.governance.report-data.trend-period-days` (default 30).
+- The trend period is configured with `jeap.governance.report-data.trend-period-days` (default 30). It now covers
+  exactly that many days, up to and including the day of the reporting or scoring run - one day less than before, so
+  the histories of the Confluence reports and of the docs API are one day shorter on upgrade.
 - The OpenAPI group of the management API is renamed from `Governance-Service-API` to
   `Governance-Service-Management-API`; the docs API has its own group `Governance-Service-Docs-API`. Swagger UI links
   and clients fetching `/api-docs/Governance-Service-API` must be updated.

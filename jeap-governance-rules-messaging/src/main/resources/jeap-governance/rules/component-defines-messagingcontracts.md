@@ -22,3 +22,7 @@ The rule evaluates the metric `jeap_messaging_contract` reported by the jEAP mes
 ## Exemptions
 
 The rule has no parameters. A component can be exempted from the rule (permanently or until a given date) by the governance service instance's configuration.
+
+## See
+
+- [Messaging](https://jeap-admin-ch.github.io/docs/concepts/messaging/)

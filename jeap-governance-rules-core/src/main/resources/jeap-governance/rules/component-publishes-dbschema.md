@@ -25,3 +25,7 @@ The rule only applies to backend services and self-contained systems; other comp
 ## Exemptions
 
 Besides the `ignored-service-names` parameter, a component can be exempted from the rule as a whole (permanently or until a given date) by the governance service instance's configuration.
+
+## See
+
+- [jEAP DB Schema Publisher](https://jeap-admin-ch.github.io/docs/building-blocks/libraries/jeap-db-schema-publisher/)

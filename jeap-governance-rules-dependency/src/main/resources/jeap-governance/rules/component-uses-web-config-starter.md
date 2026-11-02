@@ -17,3 +17,7 @@ Add the `jeap-spring-boot-web-config-starter` dependency to the self-contained s
 ## Exemptions
 
 The rule has no parameters. A component can be exempted from the rule (permanently or until a given date) by the governance service instance's configuration.
+
+## See
+
+- [HTTP Header für Security und Caching](https://jeap-admin-ch.github.io/docs/concepts/frontend/http-headers-for-security-and-caching/)

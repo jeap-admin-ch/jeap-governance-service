@@ -23,3 +23,7 @@ All violations found are listed in the rule comment.
 ## Exemptions
 
 The rule has no parameters. If a component cannot be renamed, it can be exempted from the rule (permanently or until a given date) by the governance service instance's configuration.
+
+## See
+
+- [Naming Conventions](https://jeap-admin-ch.github.io/docs/concepts/naming-conventions/)

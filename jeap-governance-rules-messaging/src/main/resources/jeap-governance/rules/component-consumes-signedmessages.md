@@ -23,3 +23,7 @@ After signature enforcement has been disabled, the rule may only fail once the P
 ## Exemptions
 
 The rule has no parameters. A component can be exempted from the rule (permanently or until a given date) by the governance service instance's configuration.
+
+## See
+
+- [jEAP Messaging Library - Sign Messages](https://jeap-admin-ch.github.io/docs/building-blocks/libraries/jeap-messaging/signing-messages)

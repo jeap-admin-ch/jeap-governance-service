@@ -17,3 +17,7 @@ During the scheduled data import, the governance service queries Prometheus for 
 ## Exemptions
 
 The rule has no parameters. A component that cannot produce metrics can be exempted from the rule (permanently or until a given date) by the governance service instance's configuration.
+
+## See
+
+- [Metrics](https://jeap-admin-ch.github.io/docs/concepts/monitoring/metrics)
