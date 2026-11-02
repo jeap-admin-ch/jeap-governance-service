@@ -41,7 +41,7 @@ class ReportingServiceTest {
     @Test
     void generateSystemsReport() {
         List<ReportingSystemScore> reportingSystemScores = mock(List.class);
-        when(systemsPreparation.prepareAllSystemsScores(DAY.minusDays(TREND_PERIOD_DAYS), DAY)).thenReturn(reportingSystemScores);
+        when(systemsPreparation.prepareAllSystemsScores(DAY.minusDays(TREND_PERIOD_DAYS - 1L), DAY)).thenReturn(reportingSystemScores);
 
         reportingService.generateSystemsReport(DAY, true);
 
@@ -51,7 +51,7 @@ class ReportingServiceTest {
     @Test
     void generateRulesReport() {
         List<ReportingRule> reportingRules = mock(List.class);
-        when(reportingRulesPreparation.prepareAllRules(DAY.minusDays(TREND_PERIOD_DAYS), DAY)).thenReturn(reportingRules);
+        when(reportingRulesPreparation.prepareAllRules(DAY.minusDays(TREND_PERIOD_DAYS - 1L), DAY)).thenReturn(reportingRules);
 
         reportingService.generateRulesReport(DAY, false);
 

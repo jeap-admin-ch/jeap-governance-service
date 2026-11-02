@@ -31,6 +31,7 @@ Apache License Version 2.0
  * ch.admin.bit.jeap:jeap-governance-rules-messaging - [ch.admin.bit.jeap:jeap-governance-rules-messaging](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-rules-messaging)
  * ch.admin.bit.jeap:jeap-governance-rules-pact - [ch.admin.bit.jeap:jeap-governance-rules-pact](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-rules-pact)
  * ch.admin.bit.jeap:jeap-governance-secscan - [ch.admin.bit.jeap:jeap-governance-secscan](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-secscan)
+ * ch.admin.bit.jeap:jeap-governance-web - [ch.admin.bit.jeap:jeap-governance-web](https://github.com/jeap-admin-ch/jeap-governance-service/tree/main/jeap-governance-web)
  * ch.admin.bit.jeap:jeap-spring-boot-application-starter - [ch.admin.bit.jeap:jeap-spring-boot-application-starter](https://github.com/jeap-admin-ch/jeap-spring-boot-starters/tree/main/jeap-spring-boot-application-starter)
  * ch.admin.bit.jeap:jeap-spring-boot-logging-starter - [ch.admin.bit.jeap:jeap-spring-boot-logging-starter](https://github.com/jeap-admin-ch/jeap-spring-boot-starters/tree/main/jeap-spring-boot-logging-starter)
  * ch.admin.bit.jeap:jeap-spring-boot-monitoring-starter - [ch.admin.bit.jeap:jeap-spring-boot-monitoring-starter](https://github.com/jeap-admin-ch/jeap-spring-boot-starters/tree/main/jeap-spring-boot-monitoring-starter)
