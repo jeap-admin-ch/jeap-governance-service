@@ -68,6 +68,11 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   Confluence reporting, but is no longer delivered by the docs API.
 - `RuleResult.summarize(List<RuleResult>)`, which joins comments with `; `: use `RuleResult.summarize(String, List)`.
 
+## [9.17.1] - 2026-11-01
+
+### Dependencies
+- **ch.admin.bit.jeap:jeap-spring-boot-parent**: 41.29.0 → 41.29.1 (patch)
+
 ## [9.17.0] - 2026-10-29
 
 ### Changed
