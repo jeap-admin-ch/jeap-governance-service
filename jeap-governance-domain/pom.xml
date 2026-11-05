@@ -51,6 +51,11 @@
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
+                        <configuration>
+                            <!-- Always build the test-jar, even with -Dmaven.test.skip=true (e.g. the nightly Trivy
+                                 scan), so the rule modules can still resolve their test-scoped dependency on it -->
+                            <skip>false</skip>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
