@@ -41,7 +41,7 @@ public class ReportingRulesPreparation {
     }
 
     @TransactionalReadReplica
-    @Timed("jeap.governance.service.reporting.rules.preparation")
+    @Timed("jeap.governance.service.report-data.rules.preparation")
     public List<ReportingRule> prepareAllRules(LocalDate fromDay, LocalDate toDay) {
         List<RuleConformanceRate> latestRuleConformanceRatesPerRuleId = dataAccess.findAllRuleConformanceByDayBetweenInclusive(fromDay, toDay);
         List<SystemRuleConformanceRate> latestPerRuleIdAndSystemId = dataAccess.findLatestPerRuleIdAndSystemId();
@@ -63,7 +63,7 @@ public class ReportingRulesPreparation {
      * @return the rule, or empty if it is not active or has no conformance rate in the period
      */
     @TransactionalReadReplica
-    @Timed("jeap.governance.service.reporting.rule.preparation")
+    @Timed("jeap.governance.service.report-data.rule.preparation")
     public Optional<ReportingRule> prepareRule(String ruleId, LocalDate fromDay, LocalDate toDay) {
         List<RuleInfo> activeRuleInfos = dataAccess.findAllActiveRuleInfos().stream()
                 .filter(ruleInfo -> ruleInfo.ruleId().id().equals(ruleId))

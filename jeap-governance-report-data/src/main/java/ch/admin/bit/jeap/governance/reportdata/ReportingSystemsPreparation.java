@@ -30,7 +30,7 @@ public class ReportingSystemsPreparation {
     private final ReportingDataAccess dataAccess;
 
     @TransactionalReadReplica
-    @Timed("jeap.governance.service.reporting.systems.preparation")
+    @Timed("jeap.governance.service.report-data.systems.preparation")
     public List<ReportingSystemScore> prepareAllSystemsScores(LocalDate fromDay, LocalDate toDay) {
         List<SystemScore> systemScores = dataAccess.findAllSystemScoresByDayBetweenInclusive(fromDay, toDay);
         List<ComponentScore> componentScores = dataAccess.findAllComponentScoreByDayBetweenInclusive(fromDay, toDay);
@@ -46,7 +46,7 @@ public class ReportingSystemsPreparation {
      * @return the system, or empty if it has no score in the period
      */
     @TransactionalReadReplica
-    @Timed("jeap.governance.service.reporting.system.preparation")
+    @Timed("jeap.governance.service.report-data.system.preparation")
     public Optional<ReportingSystemScore> prepareSystemScores(String systemName, LocalDate fromDay, LocalDate toDay) {
         List<SystemScore> systemScores = dataAccess.findSystemScoresBySystemNameAndDayBetweenInclusive(systemName, fromDay, toDay);
         if (systemScores.isEmpty()) {

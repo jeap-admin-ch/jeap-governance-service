@@ -10,8 +10,6 @@ jeap:
       active:
         - id: docs-rule-a
           weight: 10
-          # The property is removed; an instance still setting it must start, and the link is not delivered
-          documentation-link: https://wiki.example.com/docs-rule-a
         - id: docs-rule-b
           weight: 5
           violation-delay: 7d

@@ -3,8 +3,10 @@ package ch.admin.bit.jeap.governance.rules;
 import ch.admin.bit.jeap.governance.domain.rule.RuleId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -52,6 +54,26 @@ class RuleConfigurationPropertiesTest {
 
         assertThat(rule.getId()).isEqualTo(RuleId.of("some-special-rule"));
         assertThat(rule.getParameters()).containsEntry("threshold", "10");
+    }
+
+    @Test
+    void activeRule_withTheRemovedDocumentationLink_stillBinds() {
+        new ApplicationContextRunner()
+                .withConfiguration(AutoConfigurations.of(RefreshAutoConfiguration.class))
+                .withUserConfiguration(TestConfig.class)
+                .withPropertyValues(
+                        "jeap.governance.rules.active[0].id=enforce-oauth2",
+                        "jeap.governance.rules.active[0].weight=10",
+                        "jeap.governance.rules.active[0].documentation-link=https://wiki.example.com/enforce-oauth2")
+                .run(context -> {
+                    assertThat(context).hasNotFailed();
+                    assertThat(context.getBean(RuleConfigurationProperties.class).getActive())
+                            .singleElement()
+                            .satisfies(rule -> {
+                                assertThat(rule.getId()).isEqualTo(RuleId.of("enforce-oauth2"));
+                                assertThat(rule.getWeight()).isEqualTo(10);
+                            });
+                });
     }
 
     @Test

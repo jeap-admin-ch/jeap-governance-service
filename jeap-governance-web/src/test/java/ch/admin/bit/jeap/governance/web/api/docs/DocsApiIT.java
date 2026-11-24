@@ -12,6 +12,10 @@ import ch.admin.bit.jeap.governance.domain.scheduler.SchedulerRunRepository;
 import ch.admin.bit.jeap.governance.domain.score.ComponentScore;
 import ch.admin.bit.jeap.governance.domain.score.SystemScore;
 import ch.admin.bit.jeap.governance.web.api.docs.model.*;
+import io.micrometer.core.instrument.Meter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
+import io.micrometer.prometheusmetrics.PrometheusNamingConvention;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,6 +71,8 @@ class DocsApiIT extends DocsApiTestBase {
     private TransactionTemplate transactionTemplate;
     @Autowired
     private SchedulerRunRepository schedulerRunRepository;
+    @Autowired
+    private MeterRegistry meterRegistry;
 
     @BeforeEach
     void createTestData() {
@@ -203,8 +209,6 @@ class DocsApiIT extends DocsApiTestBase {
         assertThat(rule.nonCompliantComponents()).containsExactly(
                 new NonCompliantComponentDto("jme", "jme-b-service", B_FAILING_SINCE.toLocalDate()));
         assertThat(rule.gracePeriodComponents()).isEmpty();
-        // A documentation-link still configured for the rule is ignored, not delivered
-        assertThat(body).doesNotContain("documentation", "wiki.example.com");
     }
 
     @Test
@@ -295,6 +299,23 @@ class DocsApiIT extends DocsApiTestBase {
         // The scoring time is part of the indexes only, so a resource is not changed by it
         schedulerRunRepository.saveLastRunDateTime("scoring", SCORED_AT.plusMinutes(45));
         assertThat(etagOf("/docs-api/rules/" + RULE_B)).isEqualTo(rulesEtagBefore);
+    }
+
+    @Test
+    void everyRead_isTimedUnderTheReportDataMetrics() throws Exception {
+        read("/docs-api/systems", SystemIndexDto.class);
+        read("/docs-api/systems/jme", SystemDto.class);
+        read("/docs-api/rules", RuleIndexDto.class);
+        read("/docs-api/rules/" + RULE_A, RuleDto.class);
+
+        for (String preparation : List.of("systems", "system", "rules", "rule")) {
+            String name = "jeap.governance.service.report-data." + preparation + ".preparation";
+            Timer timer = meterRegistry.find(name).timer();
+            assertThat(timer).as(name).isNotNull();
+            assertThat(timer.count()).as(name).isPositive();
+            assertThat(new PrometheusNamingConvention().name(name, Meter.Type.TIMER, "seconds"))
+                    .isEqualTo("jeap_governance_service_report_data_" + preparation + "_preparation_seconds");
+        }
     }
 
     private <T> T read(String path, Class<T> type) throws Exception {

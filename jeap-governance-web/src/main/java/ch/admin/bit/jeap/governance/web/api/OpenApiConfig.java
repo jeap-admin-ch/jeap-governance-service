@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
         info = @Info(
                 title = "Governance service API",
                 description = "Governance service API",
-                contact = @Contact(name = "Margun")
+                contact = @Contact(name = "Margun", url = "https://github.com/jeap-admin-ch/jeap-governance-service")
         )
 )
 @Configuration

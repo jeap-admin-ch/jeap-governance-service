@@ -17,7 +17,7 @@ class TrendPeriodConfigurationTest {
     }
 
     @Test
-    void theNewProperty_setsIt() {
+    void trendPeriodDays_setsIt() {
         MockEnvironment environment = new MockEnvironment()
                 .withProperty("jeap.governance.report-data.trend-period-days", "14");
 

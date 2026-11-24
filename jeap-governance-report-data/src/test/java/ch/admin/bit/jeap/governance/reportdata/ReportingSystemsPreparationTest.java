@@ -58,7 +58,7 @@ class ReportingSystemsPreparationTest {
     private ReportingSystemsPreparation preparation;
 
     @Test
-    void testPrepareSystemsScoreReportModel_returnScores_ifOnlySystemScoreSet() {
+    void prepareAllSystemsScores_returnsScores_ifOnlySystemScoreSet() {
         List<SystemScore> systemScores = List.of(createSystemScore(SYSTEM_A, DAY2, 90), createSystemScore(SYSTEM_A, DAY3, 95), createSystemScore(SYSTEM_A, DAY1, 80));
         List<ComponentScore> componentScores = List.of();
         List<RuleInfo> activeRules = List.of();
@@ -83,7 +83,7 @@ class ReportingSystemsPreparationTest {
     }
 
     @Test
-    void testPrepareSystemsScoreReportModel_returnScores_ifSystemAndComponentScoreSet() {
+    void prepareAllSystemsScores_returnsScores_ifSystemAndComponentScoreSet() {
         List<SystemScore> systemScores = List.of(createSystemScore(SYSTEM_A, DAY2, 90), createSystemScore(SYSTEM_A, DAY3, 95), createSystemScore(SYSTEM_A, DAY1, 80));
         List<ComponentScore> componentScores = List.of(createComponentScore(COMPONENT_A_1, DAY2, 50), createComponentScore(COMPONENT_A_1, DAY3, 60), createComponentScore(COMPONENT_A_1, DAY1, 40));
         List<RuleInfo> activeRules = List.of();
@@ -111,7 +111,7 @@ class ReportingSystemsPreparationTest {
     }
 
     @Test
-    void testPrepareSystemsScoreReportModel_returnScores_ifSystemComponentScoreAndRulesSet() {
+    void prepareAllSystemsScores_returnsScores_ifSystemComponentScoreAndRulesSet() {
         List<SystemScore> systemScores = List.of(createSystemScore(SYSTEM_A, DAY2, 90), createSystemScore(SYSTEM_A, DAY3, 95), createSystemScore(SYSTEM_A, DAY1, 80));
         List<ComponentScore> componentScores = List.of(createComponentScore(COMPONENT_A_1, DAY2, 50), createComponentScore(COMPONENT_A_1, DAY3, 60), createComponentScore(COMPONENT_A_1, DAY1, 40));
         List<RuleInfo> activeRules = List.of(RULE_INFO_1, RULE_INFO_2);
@@ -165,7 +165,7 @@ class ReportingSystemsPreparationTest {
     }
 
     @Test
-    void testPrepareSystemsScoreReportModel_returnEmptyOutput_ifInputEmpty() {
+    void prepareAllSystemsScores_isEmpty_ifInputEmpty() {
         List<SystemScore> systemScores = List.of();
         List<ComponentScore> componentScores = List.of();
         List<RuleInfo> activeRules = List.of();

@@ -21,8 +21,7 @@ changed Java API, see *Migration*.
   explanation. Left in a configuration, it is ignored.
 - **Breaking:** the management API jobs `REPORTING` and `REPORTING_WITH_ORPHAN_CLEANUP`.
 - **Breaking:** the metrics of the reporting job: `jeap_governance_service_reporting_last_run_from_minutes` and
-  `jeap_governance_service_reporting_{systems,rules}_{generation,overall}_seconds_*`. The
-  `jeap_governance_service_reporting_*_preparation_seconds_*` metrics of the report data stay.
+  `jeap_governance_service_reporting_{systems,rules}_{generation,overall}_seconds_*`.
 - **Breaking (Java API):** `RuleInfo` loses `documentationLink`; its constructors are now
   `RuleInfo(RuleId, String, Duration)` and `RuleInfo(RuleId, String)`.
 - **Breaking (Java API):** the members of the report data that only the Confluence reporting used:
@@ -34,7 +33,11 @@ changed Java API, see *Migration*.
   `findAllComponentReferences()` are no longer public.
 
 ### Changed
+- **Breaking:** the timers of the docs API reads are named after the report data they time:
+  `jeap_governance_service_reporting_{systems,system,rules,rule}_preparation_seconds_*` is now
+  `jeap_governance_service_report_data_{systems,system,rules,rule}_preparation_seconds_*`.
 - The Flyway migration `V1_0_4` deletes the reporting job's last run (`scheduler_run`) and lock (`shedlock`).
+- The contact of the OpenAPI description links to the public repository instead of a Confluence space.
 
 ### Migration
 - Configuration: remove `jeap.governance.reporting.*`, including `enabled: false`, and the Confluence credentials
@@ -42,7 +45,9 @@ changed Java API, see *Migration*.
   entry. An instance that set `jeap.governance.reporting.trend-period-days` sets
   `jeap.governance.report-data.trend-period-days` instead; otherwise its trend period falls back to 30 days.
 - Operations: stop triggering the jobs `REPORTING` and `REPORTING_WITH_ORPHAN_CLEANUP`, remove alerts on the reporting
-  job's metrics, and delete the generated Confluence pages by hand; the service no longer touches them.
+  job's metrics, switch dashboards and alerts on `jeap_governance_service_reporting_*_preparation_seconds_*` to
+  `jeap_governance_service_report_data_*_preparation_seconds_*`, and delete the generated Confluence pages by hand;
+  the service no longer touches them.
 - Code built on the library: create `RuleInfo` without a documentation link. Take a latest score as the last element
   of `getScores()`, and identify systems and components in the report data by name.
 
