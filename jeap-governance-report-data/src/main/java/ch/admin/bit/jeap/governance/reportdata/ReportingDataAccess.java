@@ -93,11 +93,11 @@ public class ReportingDataAccess {
         return systemRuleConformanceRateRepository.findLatestPerSystemIdByRuleId(ruleId);
     }
 
-    public List<SystemReference> findAllSystemReferences() {
+    List<SystemReference> findAllSystemReferences() {
         return systemRepository.findAllSystemReferences();
     }
 
-    public List<SystemComponentReference> findAllComponentReferences() {
+    List<SystemComponentReference> findAllComponentReferences() {
         return systemComponentRepository.findAllSystemComponentReferences();
     }
 

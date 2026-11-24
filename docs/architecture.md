@@ -8,7 +8,7 @@ module layout, the domain model, and the database schema.
 
 A governance service instance is built from the `jeap-governance-service` starter, configured with governance
 config and rules (built-in and/or project-specific), imports data from various sources (Architecture Repository,
-Deployment Log, Reaction Observer, Prometheus, PACT Broker, and optionally a project-specific source), and
+Deployment Log, Reaction Observer, Prometheus, and optionally a project-specific source), and
 publishes its evaluation results to the jEAP Doc Service.
 
 ```mermaid
@@ -46,6 +46,7 @@ flowchart LR
     PSPEC -. "data" .-> GOV
 
     DOC -- "reads docs API" --> GOV
+    GOV -. "webhook after scoring" .-> DOC
 
 %% ---------- Styling ----------
     classDef jeap fill:#b4d3ef,stroke:#4a7ebb,stroke-width:1px,color:#1f3b57
@@ -59,7 +60,7 @@ flowchart LR
     class PSPEC optional
 
     linkStyle 0,1,2,3 stroke:#5a5a5a,stroke-width:1px
-    linkStyle 4,5,6,7,8,9 stroke:#4a7ebb,stroke-width:2px
+    linkStyle 4,5,6,7,8,9,10 stroke:#4a7ebb,stroke-width:2px
 ```
 
 ## Module Overview

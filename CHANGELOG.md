@@ -7,18 +7,44 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [11.0.0] - 2026-11-24
 
+**Breaking release.** The Confluence reporting is removed; the jEAP Doc Service publishes the reports, read from the
+docs API. Instances must update their configuration and operations, and code built on the library must adapt to the
+changed Java API, see *Migration*.
+
 ### Removed
-- **Confluence reporting.** The `jeap-governance-reporting` module, the Confluence client and the Confluence pages are gone. The reports are published by the jEAP Doc Service, which reads the docs API.
-- The `jeap.governance.reporting.*` properties, including the `confluence.*` settings, the cron and lock settings and the deprecated alias `jeap.governance.reporting.trend-period-days`.
-- The deprecated `jeap.governance.rules.active[].documentation-link` property. Each rule ships its own explanation.
-- The management API jobs `REPORTING` and `REPORTING_WITH_ORPHAN_CLEANUP`, and the reporting metrics.
+- **Breaking:** the Confluence reporting - the module `jeap-governance-reporting`, the Confluence client dependency,
+  the page templates and the reporting job. The service no longer creates, updates or deletes Confluence pages.
+- **Breaking:** the properties `jeap.governance.reporting.*` (switch, cron expressions, locks and `confluence.*`),
+  including the deprecated alias `jeap.governance.reporting.trend-period-days`. Left in a configuration, they are
+  ignored.
+- **Breaking:** the deprecated property `jeap.governance.rules.active[].documentation-link`: each rule ships its
+  explanation. Left in a configuration, it is ignored.
+- **Breaking:** the management API jobs `REPORTING` and `REPORTING_WITH_ORPHAN_CLEANUP`.
+- **Breaking:** the metrics of the reporting job: `jeap_governance_service_reporting_last_run_from_minutes` and
+  `jeap_governance_service_reporting_{systems,rules}_{generation,overall}_seconds_*`. The
+  `jeap_governance_service_reporting_*_preparation_seconds_*` metrics of the report data stay.
+- **Breaking (Java API):** `RuleInfo` loses `documentationLink`; its constructors are now
+  `RuleInfo(RuleId, String, Duration)` and `RuleInfo(RuleId, String)`.
+- **Breaking (Java API):** the members of the report data that only the Confluence reporting used:
+  `ReportingRule.getDocumentationLink()`, `ReportingRuleState.documentationLink()`, `getLatestScore()` of
+  `ReportingSystemScore` and `ReportingComponentScore`, the system and component IDs of `ReportingSystemScore`,
+  `ReportingComponentScore`, `ReportingRuleSystemConformanceRate`, `ReportingRuleNonCompliantComponent` and
+  `ReportingRuleGracePeriodComponent`, and the public constructors `ReportingScore(LocalDate, int)` and
+  `ReportingRuleConformanceRate(LocalDate, int)`. `ReportingDataAccess.findAllSystemReferences()` and
+  `findAllComponentReferences()` are no longer public.
+
+### Changed
+- The Flyway migration `V1_0_4` deletes the reporting job's last run (`scheduler_run`) and lock (`shedlock`).
 
 ### Migration
-- Remove `jeap.governance.reporting.*` (including `enabled: false`) and the Confluence secrets from the service configuration.
-- Remove `documentation-link` from every `jeap.governance.rules.active[]` entry.
-- Use `jeap.governance.report-data.trend-period-days` instead of `jeap.governance.reporting.trend-period-days`.
-- Stop calling the management jobs `REPORTING` and `REPORTING_WITH_ORPHAN_CLEANUP`.
-- Delete the generated Confluence pages by hand. The service no longer touches them.
+- Configuration: remove `jeap.governance.reporting.*`, including `enabled: false`, and the Confluence credentials
+  from the configuration and the secret store. Remove `documentation-link` from every `jeap.governance.rules.active[]`
+  entry. An instance that set `jeap.governance.reporting.trend-period-days` sets
+  `jeap.governance.report-data.trend-period-days` instead; otherwise its trend period falls back to 30 days.
+- Operations: stop triggering the jobs `REPORTING` and `REPORTING_WITH_ORPHAN_CLEANUP`, remove alerts on the reporting
+  job's metrics, and delete the generated Confluence pages by hand; the service no longer touches them.
+- Code built on the library: create `RuleInfo` without a documentation link. Take a latest score as the last element
+  of `getScores()`, and identify systems and components in the report data by name.
 
 ## [10.5.0] - 2026-11-22
 

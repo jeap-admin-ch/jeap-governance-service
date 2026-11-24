@@ -2,11 +2,9 @@ package ch.admin.bit.jeap.governance.reportdata;
 
 import ch.admin.bit.jeap.governance.domain.rule.RuleConformanceRate;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 
-@RequiredArgsConstructor
 public class ReportingRuleConformanceRate implements Comparable<ReportingRuleConformanceRate>, TrendValueHolder {
     @Getter
     private final LocalDate day;

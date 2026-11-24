@@ -15,8 +15,6 @@ import static ch.admin.bit.jeap.governance.reportdata.TrendIndicatorUtility.calc
 @RequiredArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class ReportingSystemScore {
     @Getter
-    private final Long systemId;
-    @Getter
     private final String systemName;
     private final Map<Long, ReportingComponentScore> componentScoreContainers;
     private final List<ReportingScore> scores = new ArrayList<>();
@@ -35,10 +33,6 @@ public class ReportingSystemScore {
 
     public TrendIndicator getScoringTrend() {
         return calculateTrendIndicator(scores);
-    }
-
-    public int getLatestScore() {
-        return scores.isEmpty() ? 0 : scores.getLast().getScore();
     }
 
     public List<ReportingComponentScore> getComponentScores() {

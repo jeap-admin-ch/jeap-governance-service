@@ -228,11 +228,8 @@ class ReportingRulesPreparationTest {
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().getNonCompliantComponents())
-                .singleElement()
-                .satisfies(component -> {
-                    assertThat(component.getComponentId()).isEqualTo(COMPONENT_ID);
-                    assertThat(component.getComponentName()).isEqualTo(COMPONENT_NAME);
-                });
+                .extracting(ReportingRuleNonCompliantComponent::getComponentName)
+                .containsExactly(COMPONENT_NAME);
     }
 
     @Test
@@ -304,8 +301,8 @@ class ReportingRulesPreparationTest {
                 Set.of(ignoredComponentId));
 
         assertThat(result.getFirst().getGracePeriodComponents())
-                .extracting(ReportingRuleGracePeriodComponent::getComponentId)
-                .containsExactly(urgentComponentId, COMPONENT_ID);
+                .extracting(ReportingRuleGracePeriodComponent::getComponentName)
+                .containsExactly("Urgent Component", COMPONENT_NAME);
     }
 
     @Test

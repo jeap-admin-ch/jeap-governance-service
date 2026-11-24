@@ -6,7 +6,6 @@ rule the governance service knows, with its explanation, weight, share and exemp
 renders the reports as a documentation site of its own. The scoring and the trends stay in the governance service;
 the Doc Service only renders them.
 
-
 ## Availability and access
 
 The docs API is always available under `/docs-api`, without a setting to switch it on. It is secured like

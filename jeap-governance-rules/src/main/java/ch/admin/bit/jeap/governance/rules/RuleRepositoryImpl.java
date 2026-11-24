@@ -74,8 +74,7 @@ class RuleRepositoryImpl implements RuleRepository {
                         return null;
                     }
                     RuleMetadata metadata = rule.metadata();
-                    return new RuleInfo(metadata.ruleId(), metadata.label(),
-                            activeRule.getViolationDelay());
+                    return new RuleInfo(metadata.ruleId(), metadata.label(), activeRule.getViolationDelay());
                 })
                 .filter(Objects::nonNull)
                 .toList();

@@ -22,11 +22,6 @@ public class ReportingScore implements Comparable<ReportingScore>, TrendValueHol
         this.score = componentScore.getScore();
     }
 
-    public ReportingScore(LocalDate day, int score) {
-        this.day = day;
-        this.score = score;
-    }
-
     @Override
     public int getValue() {
         return getScore();

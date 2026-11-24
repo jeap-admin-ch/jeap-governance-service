@@ -95,9 +95,6 @@ Built on Java 25 and the `jeap-spring-boot-parent` (Spring Boot 4).
 - `jeap-governance-service-instance/` - POM-only module; downstream projects inherit from this to create their own
   governance service instances.
 
-`jeap-governance-docgen/` directory exists but is NOT registered in the root `<modules>` and is not built.
-`jeap-governance-pactbroker/` and `jeap-governance-reporting/` (Confluence) have been removed entirely.
-
 **Core Flows**:
 
 1. **Data Import**: Scheduled cron -> `DataImportScheduler.update()` -> `DataImporter.importData()` -> each
@@ -247,8 +244,8 @@ Defined in `ImportOrder` classes within archrepo and deploymentlog modules:
   `rules.md`, `plugin-mechanism.md`, `metrics.md`). When changing public behaviour, update the
   matching focused file and, if needed, the documentation index/link table in README.md. Keep README.md short —
   orientation and links only, no depth. The docs API and the webhook are documented in `docs-api.md`.
-- Internal, BIT-only documentation (e.g. GovDashboard rule explanations tied to the BAZG Governance Dashboard) stays
-  on Confluence, not in `docs/`.
+- Internal, BIT-only documentation (e.g. about a single instance such as the BAZG Governance Dashboard) belongs
+  neither in `docs/` nor in the rule explanations.
 - Pages must be valid MDX (Docusaurus renders every `.md` as MDX) and any Mermaid diagrams must use correct
   Mermaid syntax — see the [writing principles](https://github.com/jeap-admin-ch/jeap/blob/master/docs/documenting-jeap.md#writing-principles).
   There is no standalone linter for this; validate by actually building the docs site locally against this

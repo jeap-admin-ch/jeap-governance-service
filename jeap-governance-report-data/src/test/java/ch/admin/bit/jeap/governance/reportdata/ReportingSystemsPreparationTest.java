@@ -158,7 +158,7 @@ class ReportingSystemsPreparationTest {
         assertEquals(1, result.size());
         assertEquals(1, result.getFirst().getComponentScores().size());
         ReportingComponentScore componentScore = result.getFirst().getComponentScores().getFirst();
-        assertEquals(COMPONENT_A_1.getId(), componentScore.getComponentId());
+        assertEquals(COMPONENT_A_1.getName(), componentScore.getComponentName());
         assertEquals(1, componentScore.getScores().size());
         assertEquals(1, componentScore.getRuleStates().size());
         assertEquals(RULE_INFO_1.ruleId().id(), componentScore.getRuleStates().getFirst().ruleId());
@@ -200,7 +200,7 @@ class ReportingSystemsPreparationTest {
         assertEquals(List.of(DAY1, DAY3), systemScore.getScores().stream().map(ReportingScore::getDay).toList());
         assertEquals(1, systemScore.getComponentScores().size());
         ReportingComponentScore componentScore = systemScore.getComponentScores().getFirst();
-        assertEquals(COMPONENT_A_1.getId(), componentScore.getComponentId());
+        assertEquals(COMPONENT_A_1.getName(), componentScore.getComponentName());
         assertEquals(State.FAIL, componentScore.getRuleStates().getFirst().state());
         verify(dataAccess, never()).findAllSystemScoresByDayBetweenInclusive(any(), any());
         verify(dataAccess, never()).findAllComponentScoreByDayBetweenInclusive(any(), any());

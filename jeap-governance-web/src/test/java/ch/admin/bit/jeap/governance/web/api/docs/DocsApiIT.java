@@ -203,7 +203,7 @@ class DocsApiIT extends DocsApiTestBase {
         assertThat(rule.nonCompliantComponents()).containsExactly(
                 new NonCompliantComponentDto("jme", "jme-b-service", B_FAILING_SINCE.toLocalDate()));
         assertThat(rule.gracePeriodComponents()).isEmpty();
-        // The deprecated documentation link of the configuration is not delivered
+        // A documentation-link still configured for the rule is ignored, not delivered
         assertThat(body).doesNotContain("documentation", "wiki.example.com");
     }
 

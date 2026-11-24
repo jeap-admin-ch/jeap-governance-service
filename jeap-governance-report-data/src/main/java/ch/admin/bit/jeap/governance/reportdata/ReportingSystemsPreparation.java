@@ -80,7 +80,6 @@ public class ReportingSystemsPreparation {
                     .computeIfAbsent(systemId, _ -> new HashMap<>())
                     .computeIfAbsent(systemComponent.getId(),
                             _ -> new ReportingComponentScore(
-                                    systemComponent.getId(),
                                     systemComponent.getName(),
                                     ruleStatesPerComponentId.getOrDefault(systemComponent.getId(), new ArrayList<>())
                             )
@@ -125,7 +124,7 @@ public class ReportingSystemsPreparation {
             Long systemId = system.getId();
             String systemName = system.getName();
             systemScoreContainerPerSystem
-                    .computeIfAbsent(systemId, _ -> new ReportingSystemScore(systemId, systemName, componentScoresPerSystem.getOrDefault(systemId, new HashMap<>())))
+                    .computeIfAbsent(systemId, _ -> new ReportingSystemScore(systemName, componentScoresPerSystem.getOrDefault(systemId, new HashMap<>())))
                     .addScore(systemScore);
         }
         return systemScoreContainerPerSystem;

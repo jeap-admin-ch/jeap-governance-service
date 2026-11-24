@@ -32,13 +32,13 @@ public class ReportingRule {
         Collections.sort(conformanceRates);
     }
 
-    void addSystemConformanceRate(long systemId, String systemName, int latestConformanceRate) {
-        systemConformanceRates.add(new ReportingRuleSystemConformanceRate(systemId, systemName, latestConformanceRate));
+    void addSystemConformanceRate(String systemName, int latestConformanceRate) {
+        systemConformanceRates.add(new ReportingRuleSystemConformanceRate(systemName, latestConformanceRate));
         systemConformanceRates.sort(Comparator.comparing(ReportingRuleSystemConformanceRate::getSystemName));
     }
 
-    void addNonCompliantComponents(long systemId, String systemName, long componentId, String componentName, ZonedDateTime nonComplianceSince) {
-        nonCompliantComponents.add(new ReportingRuleNonCompliantComponent(systemId, systemName, componentId, componentName, nonComplianceSince));
+    void addNonCompliantComponent(String systemName, String componentName, ZonedDateTime nonComplianceSince) {
+        nonCompliantComponents.add(new ReportingRuleNonCompliantComponent(systemName, componentName, nonComplianceSince));
         // sort by systemName, then componentName
         nonCompliantComponents.sort(
                 Comparator.comparing(ReportingRuleNonCompliantComponent::getSystemName)
@@ -46,11 +46,10 @@ public class ReportingRule {
         );
     }
 
-    void addGracePeriodComponent(long systemId, String systemName, long componentId, String componentName,
-                                 String stateComment, ZonedDateTime violationDetectedAt,
-                                 ZonedDateTime gracePeriodEndsAt) {
-        gracePeriodComponents.add(new ReportingRuleGracePeriodComponent(systemId, systemName, componentId,
-                componentName, stateComment, violationDetectedAt, gracePeriodEndsAt));
+    void addGracePeriodComponent(String systemName, String componentName, String stateComment,
+                                 ZonedDateTime violationDetectedAt, ZonedDateTime gracePeriodEndsAt) {
+        gracePeriodComponents.add(new ReportingRuleGracePeriodComponent(systemName, componentName, stateComment,
+                violationDetectedAt, gracePeriodEndsAt));
         gracePeriodComponents.sort(Comparator
                 .comparing(ReportingRuleGracePeriodComponent::getGracePeriodEndsAt)
                 .thenComparing(ReportingRuleGracePeriodComponent::getSystemName, String.CASE_INSENSITIVE_ORDER)

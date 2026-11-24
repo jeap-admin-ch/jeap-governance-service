@@ -163,9 +163,7 @@ public class ReportingRulesPreparation {
                 continue;
             }
             reportingRule.addGracePeriodComponent(
-                    systemReference.getId(),
                     systemReference.getName(),
-                    componentReference.getId(),
                     componentReference.getName(),
                     entry.getStateComment(),
                     violationDetectedAt,
@@ -184,7 +182,7 @@ public class ReportingRulesPreparation {
             if (systemReference == null) {
                 log.warn("Could not find any system reference for system id: {}, system rule conformance rate: {}", systemRuleConformanceRate.getSystemId(), systemRuleConformanceRate);
             } else {
-                reportingRule.addSystemConformanceRate(systemRuleConformanceRate.getSystemId(), systemReference.getName(), systemRuleConformanceRate.getConformanceRate());
+                reportingRule.addSystemConformanceRate(systemReference.getName(), systemRuleConformanceRate.getConformanceRate());
             }
 
         }
@@ -232,10 +230,8 @@ public class ReportingRulesPreparation {
                     nonCompliantComponentEntry);
             return;
         }
-        reportingRule.addNonCompliantComponents(
-                systemReference.getId(),
+        reportingRule.addNonCompliantComponent(
                 systemReference.getName(),
-                componentReference.getId(),
                 componentReference.getName(),
                 nonCompliantComponentEntry.getNonCompliantSince()
         );
