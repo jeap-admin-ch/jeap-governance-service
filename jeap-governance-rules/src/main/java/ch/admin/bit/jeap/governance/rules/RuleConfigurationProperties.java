@@ -4,7 +4,6 @@ import ch.admin.bit.jeap.governance.domain.rule.RuleId;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 
 import java.time.LocalDate;
@@ -88,31 +87,12 @@ public class RuleConfigurationProperties {
         private Duration violationDelay = Duration.ZERO;
 
         /**
-         * Optional link to the documentation for this rule. Used only by the Confluence reporting.
-         *
-         * @deprecated each rule now ships its explanation next to it, see {@code docs/rules.md}
-         */
-        @Deprecated(since = "10.0.0")
-        private String documentationLink;
-
-        /**
          * Optional parameters for the rule.
          */
         private Map<String, String> parameters = new HashMap<>();
 
         public RuleId getId() {
             return RuleId.of(id);
-        }
-
-        /**
-         * @deprecated each rule now ships its explanation next to it; the docs API does not deliver this link
-         */
-        @Deprecated(since = "10.0.0")
-        @DeprecatedConfigurationProperty(since = "10.0.0",
-                reason = "Each rule ships its explanation as the resource jeap-governance/rules/<rule-id>.md. "
-                         + "The link is only used by the Confluence reporting and is removed with it.")
-        public String getDocumentationLink() {
-            return documentationLink;
         }
 
         @Override

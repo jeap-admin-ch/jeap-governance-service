@@ -426,11 +426,11 @@ class ReportingRulesPreparationTest {
     }
 
     private RuleInfo ruleInfo(String ruleId, String label) {
-        return new RuleInfo(RuleId.of(ruleId), label, label + " documentation link");
+        return new RuleInfo(RuleId.of(ruleId), label);
     }
 
     private RuleInfo ruleInfo(String ruleId, String label, Duration violationDelay) {
-        return new RuleInfo(RuleId.of(ruleId), label, label + " documentation link", violationDelay);
+        return new RuleInfo(RuleId.of(ruleId), label, violationDelay);
     }
 
     private RuleConformanceRate conformanceRate(String ruleId, ZonedDateTime createdAt, int rate) {

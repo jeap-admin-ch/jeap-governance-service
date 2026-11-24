@@ -24,8 +24,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Reads the report data the docs API delivers, from the same preparation the Confluence reporting uses, so that
- * both show the same values.
+ * Reads the report data the docs API delivers.
  * <p>
  * Each read is one read-only transaction on the read replica, retried once after a database failover. The
  * annotations sit here, on the methods that open the transaction, since the retry only repeats a transaction it

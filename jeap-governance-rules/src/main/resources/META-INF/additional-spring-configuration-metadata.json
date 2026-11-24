@@ -17,15 +17,6 @@
       "description": "Maximum duration for which the lock can be held during the scoring job",
       "defaultValue": "PT15M",
       "type": "java.lang.String"
-    },
-    {
-      "name": "jeap.governance.rules.active[].documentation-link",
-      "description": "Optional link to the documentation of a rule. Used only by the Confluence reporting; not delivered by the docs API.",
-      "type": "java.lang.String",
-      "deprecation": {
-        "level": "warning",
-        "reason": "Each rule ships its explanation as the classpath resource jeap-governance/rules/<rule-id>.md. The link is removed with the Confluence reporting."
-      }
     }
   ]
 }

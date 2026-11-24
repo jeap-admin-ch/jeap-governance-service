@@ -9,7 +9,7 @@ module layout, the domain model, and the database schema.
 A governance service instance is built from the `jeap-governance-service` starter, configured with governance
 config and rules (built-in and/or project-specific), imports data from various sources (Architecture Repository,
 Deployment Log, Reaction Observer, Prometheus, PACT Broker, and optionally a project-specific source), and
-publishes its evaluation results to Confluence.
+publishes its evaluation results to the jEAP Doc Service.
 
 ```mermaid
 flowchart LR
@@ -30,8 +30,7 @@ flowchart LR
     GOV["jEAP Governance Service"]
 
 %% ---------- Output ----------
-    CONF["Confluence"]
-    PAGE["Confluence Page"]
+    DOC["jEAP Doc Service"]
 
 %% ---------- Relations ----------
     GOV -. "instance of" .-> STARTER
@@ -46,8 +45,7 @@ flowchart LR
     PROM -- "data" --> GOV
     PSPEC -. "data" .-> GOV
 
-    GOV -- "writes" --> CONF
-    CONF --- PAGE
+    DOC -- "reads docs API" --> GOV
 
 %% ---------- Styling ----------
     classDef jeap fill:#b4d3ef,stroke:#4a7ebb,stroke-width:1px,color:#1f3b57
@@ -55,13 +53,13 @@ flowchart LR
     classDef external fill:#e2e2e2,stroke:#5a5a5a,stroke-width:1px,color:#2b2b2b
     classDef optional fill:#f7f7f7,stroke:#9a9a9a,stroke-width:1px,stroke-dasharray:5 4,color:#5a5a5a
 
-    class CONFIG,RULES,STARTER,GOV,PAGE jeap
-    class ARCH,DEPLOY,REACT service
-    class CONF,PROM external
+    class CONFIG,RULES,STARTER,GOV jeap
+    class ARCH,DEPLOY,REACT,DOC service
+    class PROM external
     class PSPEC optional
 
     linkStyle 0,1,2,3 stroke:#5a5a5a,stroke-width:1px
-    linkStyle 4,5,6,7,8,9,10 stroke:#4a7ebb,stroke-width:2px
+    linkStyle 4,5,6,7,8,9 stroke:#4a7ebb,stroke-width:2px
 ```
 
 ## Module Overview
@@ -71,8 +69,7 @@ flowchart LR
 | `jeap-governance-archrepo`         | Handles integration with the Architecture Repository. Loads the core model and persists it to the database. Can optionally load and persist: ApiDocVersion, DatabaseSchemaVersion, RestApiRelationWithoutPact | See [Configuration](configuration.md)                                                      |
 | `jeap-governance-dataimport`       | Schedules the data import process                                                                                                                                                                             | See [Plugin mechanism](plugin-mechanism.md) and [Configuration](configuration.md)          |
 | `jeap-governance-deploymentlog`    | Handles integration with the Deployment Log. Loads the deployment log component versions and persists it to the database.                                                                                     | See [Configuration](configuration.md)                                                      |
-| `jeap-governance-reporting`        | Generates governance rule evaluation outcomes to Confluence                                                                                                                                                   | See [Reporting](reporting.md)                                                              |
-| `jeap-governance-report-data`      | Prepares the data of the governance reports - scores, trends, histories, rule states and conformance - for the Confluence reporting and the docs API                                                         | See [Docs API](docs-api.md)                                                                |
+| `jeap-governance-report-data`      | Prepares the data of the governance reports - scores, trends, histories, rule states and conformance - for the docs API                                                                                      | See [Docs API](docs-api.md)                                                                |
 | `jeap-governance-domain`           | Contains the core model, specifically System and SystemComponent, including data access interfaces                                                                                                            | -                                                                                          |
 | `jeap-governance-persistence`      | Provides flyway migration scripts and JPA repositories                                                                                                                                                        | -                                                                                          |
 | `jeap-governance-prometheus`       | Handles integration with a Prometheus server. Queries the latest samples of selected standard jEAP metrics for the system's service components and persists them to the database.                             | See [Configuration](configuration.md)                                                      |
@@ -492,8 +489,7 @@ Notes:
 
 ### Scheduler Run Table
 
-The `scheduler_run` table persists the last successful run timestamp per scheduler job (data-import, scoring,
-reporting).
+The `scheduler_run` table persists the last successful run timestamp per scheduler job (data-import, scoring).
 This ensures that the `jeap_governance_service_*_last_run_from` metrics report correctly even after application restarts
 or redeployments.
 
@@ -644,6 +640,5 @@ erDiagram
 - [Configuration](configuration.md) — configuration properties for the modules described above.
 - [Rules](rules.md) — the built-in governance rules and how to write custom ones.
 - [Plugin mechanism](plugin-mechanism.md) — data import and data deletion extension points.
-- [Reporting](reporting.md) — Confluence report generation.
 - [Docs API](docs-api.md) — the report data for the jEAP Doc Service.
 - [Metrics](metrics.md) — Prometheus metrics and recommended alerts.

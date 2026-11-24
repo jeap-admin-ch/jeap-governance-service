@@ -111,7 +111,7 @@ public class ReportingSystemsPreparation {
         }
 
         Long componentId = ruleState.getSystemComponent().getId();
-        ReportingRuleState reportingRuleState = new ReportingRuleState(ruleState.getRuleId(), ruleInfo.label(), ruleInfo.documentationLink(),
+        ReportingRuleState reportingRuleState = new ReportingRuleState(ruleState.getRuleId(), ruleInfo.label(),
                 ruleState.getState(), ruleState.getStateComment(), ruleState.getModifiedAt());
         ruleStatesPerComponentId
                 .computeIfAbsent(componentId, _ -> new ArrayList<>())

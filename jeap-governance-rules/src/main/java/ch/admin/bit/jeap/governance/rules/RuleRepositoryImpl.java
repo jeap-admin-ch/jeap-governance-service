@@ -66,7 +66,6 @@ class RuleRepositoryImpl implements RuleRepository {
     }
 
     @Override
-    @SuppressWarnings("deprecation") // the documentation link is still delivered to the Confluence reporting
     public List<RuleInfo> getActiveRuleInfos() {
         return properties.getActive().stream()
                 .map(activeRule -> {
@@ -75,7 +74,7 @@ class RuleRepositoryImpl implements RuleRepository {
                         return null;
                     }
                     RuleMetadata metadata = rule.metadata();
-                    return new RuleInfo(metadata.ruleId(), metadata.label(), activeRule.getDocumentationLink(),
+                    return new RuleInfo(metadata.ruleId(), metadata.label(),
                             activeRule.getViolationDelay());
                 })
                 .filter(Objects::nonNull)

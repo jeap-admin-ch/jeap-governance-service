@@ -11,12 +11,6 @@ import ch.admin.bit.jeap.governance.domain.rule.SystemRuleConformanceRate;
 import ch.admin.bit.jeap.governance.domain.scheduler.SchedulerRunRepository;
 import ch.admin.bit.jeap.governance.domain.score.ComponentScore;
 import ch.admin.bit.jeap.governance.domain.score.SystemScore;
-import ch.admin.bit.jeap.governance.reportdata.ReportingRulesPreparation;
-import ch.admin.bit.jeap.governance.reportdata.ReportingSystemsPreparation;
-import ch.admin.bit.jeap.governance.reporting.confluence.model.ComponentScoreReportModel;
-import ch.admin.bit.jeap.governance.reporting.confluence.model.ModelTransformer;
-import ch.admin.bit.jeap.governance.reporting.confluence.model.RuleReportModel;
-import ch.admin.bit.jeap.governance.reporting.confluence.model.SystemScoreReportModel;
 import ch.admin.bit.jeap.governance.web.api.docs.model.*;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,7 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * The docs API on test data in a real database: every field of every resource, the entity tags and conditional
- * requests, and that the values equal the ones of the Confluence reports, which are prepared from the same data.
+ * requests.
  */
 class DocsApiIT extends DocsApiTestBase {
 
@@ -73,10 +67,6 @@ class DocsApiIT extends DocsApiTestBase {
     private TransactionTemplate transactionTemplate;
     @Autowired
     private SchedulerRunRepository schedulerRunRepository;
-    @Autowired
-    private ReportingSystemsPreparation systemsPreparation;
-    @Autowired
-    private ReportingRulesPreparation rulesPreparation;
 
     @BeforeEach
     void createTestData() {
@@ -305,49 +295,6 @@ class DocsApiIT extends DocsApiTestBase {
         // The scoring time is part of the indexes only, so a resource is not changed by it
         schedulerRunRepository.saveLastRunDateTime("scoring", SCORED_AT.plusMinutes(45));
         assertThat(etagOf("/docs-api/rules/" + RULE_B)).isEqualTo(rulesEtagBefore);
-    }
-
-    @Test
-    void theValuesEqualThoseOfTheConfluenceReports() throws Exception {
-        ModelTransformer confluence = new ModelTransformer("", "");
-        SystemScoreReportModel confluenceSystem = systemsPreparation.prepareAllSystemsScores(TODAY.minusDays(30), TODAY)
-                .stream().map(confluence::toConfluenceModel).findFirst().orElseThrow();
-        SystemDto system = read("/docs-api/systems/jme", SystemDto.class);
-
-        assertThat(system.score()).isEqualTo(confluenceSystem.getScore());
-        assertThat(system.trend().name()).isEqualTo(trendName(confluenceSystem.getTrend().name()));
-        assertThat(system.history()).extracting(DailyScoreDto::score)
-                .containsExactlyElementsOf(confluenceSystem.getScores().stream().map(s -> s.getScore()).toList());
-        for (ComponentScoreReportModel confluenceComponent : confluenceSystem.getComponentScores()) {
-            ComponentDto component = system.components().stream()
-                    .filter(c -> c.name().equals(confluenceComponent.getComponentName())).findFirst().orElseThrow();
-            assertThat(component.score()).isEqualTo(confluenceComponent.getScore());
-            assertThat(component.trend().name()).isEqualTo(trendName(confluenceComponent.getTrend().name()));
-            assertThat(component.ruleStates()).extracting(RuleStateDto::ruleId).containsExactlyInAnyOrderElementsOf(
-                    confluenceComponent.getRuleStates().stream().map(s -> s.getRuleId()).toList());
-        }
-
-        for (RuleReportModel confluenceRule : rulesPreparation.prepareAllRules(TODAY.minusDays(30), TODAY).stream()
-                .map(confluence::toConfluenceModel).toList()) {
-            RuleDto rule = read("/docs-api/rules/" + confluenceRule.getRuleId(), RuleDto.class);
-            assertThat(rule.name()).isEqualTo(confluenceRule.getName());
-            assertThat(rule.conformanceRate()).isEqualTo(confluenceRule.getConformanceRate());
-            assertThat(rule.trend().name()).isEqualTo(trendName(confluenceRule.getTrend().name()));
-            assertThat(rule.gracePeriodConfigured()).isEqualTo(confluenceRule.isViolationGracePeriodConfigured());
-            assertThat(rule.systems()).extracting(SystemConformanceDto::conformanceRate).containsExactlyInAnyOrderElementsOf(
-                    confluenceRule.getSystems().stream().map(s -> s.getConformanceRate()).toList());
-            assertThat(rule.nonCompliantComponents()).extracting(NonCompliantComponentDto::component)
-                    .containsExactlyInAnyOrderElementsOf(confluenceRule.getNonCompliantComponents().stream().map(c -> c.getName()).toList());
-            assertThat(rule.gracePeriodComponents()).extracting(GracePeriodComponentDto::component)
-                    .containsExactlyInAnyOrderElementsOf(confluenceRule.getGracePeriodComponents().stream().map(c -> c.getName()).toList());
-        }
-    }
-
-    /**
-     * The Confluence reports call a stable trend "even".
-     */
-    private static String trendName(String confluenceTrend) {
-        return confluenceTrend.equals("EVEN") ? "STABLE" : confluenceTrend;
     }
 
     private <T> T read(String path, Class<T> type) throws Exception {

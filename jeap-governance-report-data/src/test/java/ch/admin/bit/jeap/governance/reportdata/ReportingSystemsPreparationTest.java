@@ -35,8 +35,8 @@ class ReportingSystemsPreparationTest {
     private static final SystemComponent COMPONENT_A_1 = SystemComponent.builder().name("Component A1").type(ComponentType.BACKEND_SERVICE).build();
     private static final SystemComponent COMPONENT_A_2 = SystemComponent.builder().name("Component A2").type(ComponentType.BACKEND_SERVICE).build();
     private static final SystemComponent GATEWAY_A = SystemComponent.builder().name("Gateway A").type(ComponentType.GATEWAY).build();
-    private static final RuleInfo RULE_INFO_1 = new RuleInfo(new RuleId("Rule_1"), "Rule 1 label", "Rule 1 link");
-    private static final RuleInfo RULE_INFO_2 = new RuleInfo(new RuleId("Rule_2"), "Rule 2 label", "Rule 2 link");
+    private static final RuleInfo RULE_INFO_1 = new RuleInfo(new RuleId("Rule_1"), "Rule 1 label");
+    private static final RuleInfo RULE_INFO_2 = new RuleInfo(new RuleId("Rule_2"), "Rule 2 label");
 
     private static final LocalDate DAY1 = LocalDate.now().minusDays(2);
     private static final LocalDate DAY2 = LocalDate.now().minusDays(1);

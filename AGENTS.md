@@ -8,7 +8,7 @@ library in a consuming service, read [README.md](README.md) and the [docs/](docs
 jEAP Governance Service is a library for building governance dashboards that track system and service compliance with
 defined policies. It imports data from external sources (Architecture Repository, Deployment Log, Prometheus, Reaction
 Observer, security API scans) on a schedule, evaluates governance rules against components, calculates compliance
-scores, persists results in PostgreSQL, exposes them via REST API, and reports trends to Confluence. Downstream projects
+scores, persists results in PostgreSQL, exposes them via REST API, and feeds the jEAP Doc Service. Downstream projects
 create their own service instances by depending on `jeap-governance-service-instance` and implementing plugins via the
 plugin API.
 
@@ -83,12 +83,9 @@ Built on Java 25 and the `jeap-spring-boot-parent` (Spring Boot 4).
   via `ReactionObserverConnector` and provides `ComponentObservesReactionsRule`. Own Flyway migration (`V1400_0_0`).
 - `jeap-governance-messagecontract/` - Message Contract adapter. Imports deployed/latest message versions into a shared
   database snapshot and provides `ComponentUsesLatestMessageVersionsRule`. Own Flyway migration (`V1500_0_0`).
-- `jeap-governance-report-data/` - The report data shared by the Confluence reporting and the docs API (package
+- `jeap-governance-report-data/` - The report data behind the docs API (package
   `reportdata`): `ReportingSystemsPreparation`, `ReportingRulesPreparation`, `TrendIndicatorUtility`, the trend period
   (`TrendPeriod`, `jeap.governance.report-data.trend-period-days`) and `LastScoringRun`. Always active.
-- `jeap-governance-reporting/` - Generates governance rule/score reports with trend indicators to Confluence (
-  `ReportingScheduler` -> `ReportingService` -> `ConfluenceAdapter`), from the report data. Replaces the former
-  `docgen` placeholder.
 - `jeap-governance-docservice/` - Outbound connection to the jEAP Doc Service (`DocServiceAutoConfiguration`): the
   webhook call after every completed scoring run (package `docservice.webhook`), like the other connector modules.
   Its end-to-end test `DocServiceWebhookIT` lives in `jeap-governance-web`, as it needs the whole application.
@@ -98,8 +95,8 @@ Built on Java 25 and the `jeap-spring-boot-parent` (Spring Boot 4).
 - `jeap-governance-service-instance/` - POM-only module; downstream projects inherit from this to create their own
   governance service instances.
 
-`jeap-governance-docgen/` directory exists but is NOT registered in the root `<modules>` and is not built (replaced by
-`jeap-governance-reporting/`). `jeap-governance-pactbroker/` has been removed entirely.
+`jeap-governance-docgen/` directory exists but is NOT registered in the root `<modules>` and is not built.
+`jeap-governance-pactbroker/` and `jeap-governance-reporting/` (Confluence) have been removed entirely.
 
 **Core Flows**:
 
@@ -168,8 +165,7 @@ Each module registers via `META-INF/spring/org.springframework.boot.autoconfigur
   `DocServiceAutoConfiguration`,
   `CoreRulesAutoConfiguration`,
   `DependencyRulesAutoConfiguration`, `MessagingRulesAutoConfiguration`, `PactRulesAutoConfiguration`,
-  `PrometheusAutoconfiguration`, `SecscanAutoconfiguration`, `ReactionObserverConfiguration`,
-  `ReportingAutoConfiguration`
+  `PrometheusAutoconfiguration`, `SecscanAutoconfiguration`, `ReactionObserverConfiguration`
 
 `DeploymentLogConfiguration` uses
 `@ConditionalOnProperty(name="jeap.governance.deploymentlog.enabled", havingValue="true", matchIfMissing=true)`.
@@ -248,7 +244,7 @@ Defined in `ImportOrder` classes within archrepo and deploymentlog modules:
 ## Documentation
 
 - User-facing documentation lives under [docs/](docs/) (one topic per file: `architecture.md`, `configuration.md`,
-  `rules.md`, `plugin-mechanism.md`, `reporting.md`, `metrics.md`). When changing public behaviour, update the
+  `rules.md`, `plugin-mechanism.md`, `metrics.md`). When changing public behaviour, update the
   matching focused file and, if needed, the documentation index/link table in README.md. Keep README.md short —
   orientation and links only, no depth. The docs API and the webhook are documented in `docs-api.md`.
 - Internal, BIT-only documentation (e.g. GovDashboard rule explanations tied to the BAZG Governance Dashboard) stays

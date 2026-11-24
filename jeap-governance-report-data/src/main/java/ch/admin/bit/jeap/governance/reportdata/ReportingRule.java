@@ -20,8 +20,6 @@ public class ReportingRule {
     private final String ruleId;
     @Getter
     private final String ruleName;
-    @Getter
-    private final String documentationLink;
     private final Duration violationDelay;
 
     private final List<ReportingRuleConformanceRate> conformanceRates = new ArrayList<>();

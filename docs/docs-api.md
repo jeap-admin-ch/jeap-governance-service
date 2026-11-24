@@ -6,8 +6,6 @@ rule the governance service knows, with its explanation, weight, share and exemp
 renders the reports as a documentation site of its own. The scoring and the trends stay in the governance service;
 the Doc Service only renders them.
 
-The docs API reads the same report data as the Confluence reporting (see [Reporting](reporting.md)), so both show the
-same values while they run in parallel.
 
 ## Availability and access
 
@@ -54,8 +52,7 @@ to `<system-name>_@governance-documentation_#read` with the system name configur
   only the exemptions in force, not the expired ones.
 - **The explanation** is the rule's Markdown resource (see [Rules](rules.md#rule-explanations)), delivered unchanged,
   or `null` for a rule that ships none. It is not sanitized: render it with raw HTML shown as text.
-- **The parameters** are the rule's configured `parameters`, as name and value. The deprecated `documentation-link` is
-  not delivered.
+- **The parameters** are the rule's configured `parameters`, as name and value.
 - **The scoring time** `scoredAt` is the end of the last completed scoring run. It is part of both indexes only, so the
   indexes change with every scoring run while a system or rule resource changes only with its content.
 
@@ -90,4 +87,3 @@ See [Configuration](configuration.md#doc-service) for the properties and the cli
 
 - [Configuration](configuration.md) — the webhook and report data properties.
 - [Rules](rules.md) — rule explanations and the rule comment format.
-- [Reporting](reporting.md) — the Confluence reporting, which reads the same report data.

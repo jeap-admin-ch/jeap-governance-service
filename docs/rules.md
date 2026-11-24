@@ -33,14 +33,10 @@ renders it on the rule's page.
 - Describe what differs between instances by the rule's parameters, which the rule page shows, rather than by naming
   an instance.
 
-The former `jeap.governance.rules.active[].documentation-link` is deprecated: it is only used by the Confluence
-reporting and is not delivered by the docs API.
-
 ## Rule comments
 
 A rule state's comment is plain text, not Markdown. Its first line is the summary, and every further non-blank line is
-one item, for instance one violation. The Doc Service shows the summary as text and the items as a bullet list, the
-Confluence reporting as a list too.
+one item, for instance one violation. The Doc Service shows the summary as text and the items as a bullet list.
 
 Build such comments with `RuleResult` instead of joining the items yourself:
 

@@ -25,23 +25,6 @@ class TrendPeriodConfigurationTest {
     }
 
     @Test
-    void theDeprecatedAlias_setsIt() {
-        MockEnvironment environment = new MockEnvironment()
-                .withProperty("jeap.governance.reporting.trendPeriodDays", "7");
-
-        assertThat(trendPeriodOf(environment)).isEqualTo(new TrendPeriod(7));
-    }
-
-    @Test
-    void theDeprecatedAlias_winsOverTheNewProperty() {
-        MockEnvironment environment = new MockEnvironment()
-                .withProperty("jeap.governance.report-data.trend-period-days", "14")
-                .withProperty("jeap.governance.reporting.trend-period-days", "7");
-
-        assertThat(trendPeriodOf(environment)).isEqualTo(new TrendPeriod(7));
-    }
-
-    @Test
     void fromDay_includesTheGivenNumberOfDays() {
         LocalDate untilDay = LocalDate.of(2026, 10, 31);
 
@@ -57,6 +40,6 @@ class TrendPeriodConfigurationTest {
     private static TrendPeriod trendPeriodOf(MockEnvironment environment) {
         ReportDataProperties properties = Binder.get(environment)
                 .bindOrCreate("jeap.governance.report-data", ReportDataProperties.class);
-        return new ReportDataAutoConfiguration().trendPeriod(properties, environment);
+        return new ReportDataAutoConfiguration().trendPeriod(properties);
     }
 }

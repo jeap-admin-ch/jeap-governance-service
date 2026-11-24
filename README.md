@@ -27,7 +27,6 @@ for how to configure an instance.
 | Configuration reference (`jeap.governance.*`)      | [docs/configuration.md](docs/configuration.md)       |
 | Built-in and custom rules                          | [docs/rules.md](docs/rules.md)                       |
 | Plugin mechanism (data import, data deletion)       | [docs/plugin-mechanism.md](docs/plugin-mechanism.md) |
-| Reporting to Confluence                            | [docs/reporting.md](docs/reporting.md)               |
 | Docs API for the jEAP Doc Service, webhook after scoring | [docs/docs-api.md](docs/docs-api.md)           |
 | Metrics and recommended alerts                     | [docs/metrics.md](docs/metrics.md)                   |
 

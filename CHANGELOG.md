@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [11.0.0] - 2026-11-24
+
+### Removed
+- **Confluence reporting.** The `jeap-governance-reporting` module, the Confluence client and the Confluence pages are gone. The reports are published by the jEAP Doc Service, which reads the docs API.
+- The `jeap.governance.reporting.*` properties, including the `confluence.*` settings, the cron and lock settings and the deprecated alias `jeap.governance.reporting.trend-period-days`.
+- The deprecated `jeap.governance.rules.active[].documentation-link` property. Each rule ships its own explanation.
+- The management API jobs `REPORTING` and `REPORTING_WITH_ORPHAN_CLEANUP`, and the reporting metrics.
+
+### Migration
+- Remove `jeap.governance.reporting.*` (including `enabled: false`) and the Confluence secrets from the service configuration.
+- Remove `documentation-link` from every `jeap.governance.rules.active[]` entry.
+- Use `jeap.governance.report-data.trend-period-days` instead of `jeap.governance.reporting.trend-period-days`.
+- Stop calling the management jobs `REPORTING` and `REPORTING_WITH_ORPHAN_CLEANUP`.
+- Delete the generated Confluence pages by hand. The service no longer touches them.
+
 ## [10.5.0] - 2026-11-22
 
 ### Dependencies

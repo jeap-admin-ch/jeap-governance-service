@@ -14,10 +14,7 @@ import org.springframework.context.annotation.Configuration;
         info = @Info(
                 title = "Governance service API",
                 description = "Governance service API",
-                contact = @Contact(
-                        name = "Margun",
-                        url = "https://confluence.eap.bit.admin.ch/display/BLUE"
-                )
+                contact = @Contact(name = "Margun")
         )
 )
 @Configuration

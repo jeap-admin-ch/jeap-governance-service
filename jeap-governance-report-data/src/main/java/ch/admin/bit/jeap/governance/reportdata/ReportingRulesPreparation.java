@@ -125,7 +125,6 @@ public class ReportingRulesPreparation {
             ReportingRule reportingRule = new ReportingRule(
                      ruleId,
                      ruleInfo.label(),
-                     ruleInfo.documentationLink(),
                      ruleInfo.violationDelay()
              );
             ruleConformanceRates.forEach(reportingRule::addConformanceRate);

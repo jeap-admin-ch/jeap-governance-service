@@ -7,7 +7,6 @@ import java.time.ZonedDateTime;
 public record ReportingRuleState(
         String ruleId,
         String label,
-        String documentationLink,
         State state,
         String stateComment,
         ZonedDateTime modifiedAt) {
