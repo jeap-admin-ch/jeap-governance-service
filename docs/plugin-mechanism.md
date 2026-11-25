@@ -39,6 +39,31 @@ public class CustomDataImporter implements DataSourceImporter {
 }
 ```
 
+**Long-running importers:** when the service shuts down, the import stops before the next importer and releases its
+lock (see [Job Locks](configuration.md#job-locks)). An importer that works through many items for minutes should stop
+too, or the shutdown waits for it only until the shutdown phase timeout (30 seconds by default), and its lock is left
+behind. Inject `JobStopSignal` and check it between items, at a point where the data written so far is consistent:
+
+```java
+@Component
+@RequiredArgsConstructor
+public class CustomDataImporter implements DataSourceImporter {
+
+    private final JobStopSignal stopSignal;
+    private final SystemComponentRepository systemComponentRepository;
+
+    @Override
+    public void importData() {
+        for (SystemComponentReference component : systemComponentRepository.findAllSystemComponentReferences()) {
+            if (stopSignal.isStopRequested()) {
+                return; // the remaining components keep their data until the next import
+            }
+            // import the data of one component, in a transaction of its own
+        }
+    }
+}
+```
+
 ## Data Deletion
 
 If you hold data in instances of the governance service that reference SystemComponents, you can be notified before a

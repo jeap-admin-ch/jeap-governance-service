@@ -55,7 +55,8 @@ Built on Java 25 and the `jeap-spring-boot-parent` (Spring Boot 4).
   adapter wrappers.
 - `jeap-governance-dataimport/` - Scheduled import orchestration. `DataImportScheduler` runs on a cron schedule with
   ShedLock for distributed locking. `DataImporter` iterates all `DataSourceImporter` beans in `@Order` sequence with
-  per-importer error handling and Micrometer metrics.
+  per-importer error handling and Micrometer metrics. `DataImportScheduler.startImport(Executor)` is the manual start:
+  it takes the same lock on the calling thread and returns `false` if it is held.
 - `jeap-governance-rules/` - Rule evaluation and scoring infrastructure. `ScoringScheduler` runs on a cron schedule with
   ShedLock, evaluates all rules for each system's components, calculates component/system scores, and updates
   conformance rates. `RuleConfigurationProperties` defines active rules, weights, and component exemptions via YAML.
@@ -142,6 +143,11 @@ Plugin interfaces live in `jeap-governance-domain/.../domain/plugin/`. Downstrea
 beans:
 
 - `DataSourceImporter` - `void importData()`. Use `@Order` to control execution sequence.
+- **Shutdown of running jobs**: `JobStopSignal` (`domain.scheduler`, a `SmartLifecycle` stopping right before the task
+  executors) tells the data import and the scoring that the service shuts down. `DataImporter` checks it between
+  importers, `PrometheusImporter` and `Secscan` between components, `ScoringScheduler` between systems; the job then
+  returns, ShedLock releases the lock while the database is still reachable, and the run is not recorded. Any loop
+  over many items in a job or importer must check it at a consistent point (`DataImportShutdownIT`).
 - `ComponentDeletionListener` - `void preComponentDeletion(long systemComponentId)`. Called before component removal.
   Optional `@Order`.
 - `Rule` - `RuleMetadata metadata()` + `RuleResult evaluate(SystemComponent, RuleParameters)`. Automatically included in
@@ -212,8 +218,9 @@ Defined in `ImportOrder` classes within archrepo and deploymentlog modules:
 
 ## REST API
 
-- `POST /api/management` - Triggers jobs (`DATA_IMPORT` or `SCORING`). Requires role `governance:admin`. Async and
-  transactional.
+- `POST /api/management` - Triggers jobs (`DATA_IMPORT` or `SCORING`). Requires role `governance:admin`. Takes the
+  job's lock on the request thread (`startImport` / `startScoring`) and runs the job in the background
+  (`AsyncJobRunner`, `@Async`, enabled by `GovernanceWebConfig`); `409` if the lock is held, `400` without a job type.
 - `GET /docs-api/systems`, `/docs-api/systems/{system}`, `/docs-api/rules`, `/docs-api/rules/{ruleId}` - Docs API for
   the jEAP Doc Service, always present. Secured by the default jEAP resource server chain plus method security: every
   handler needs `@RequiresGovernanceDocumentationRead` (`governance-documentation` / `read`, enforced by

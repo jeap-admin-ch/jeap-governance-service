@@ -7,6 +7,7 @@ import ch.admin.bit.jeap.governance.domain.plugin.datasource.DataSourceImporter;
 import ch.admin.bit.jeap.governance.domain.plugin.security.api.HttpApi;
 import ch.admin.bit.jeap.governance.domain.plugin.security.api.HttpEndpoint;
 import ch.admin.bit.jeap.governance.domain.plugin.security.api.SystemComponentHttpApi;
+import ch.admin.bit.jeap.governance.domain.scheduler.JobStopSignal;
 import ch.admin.bit.jeap.governance.secscan.domain.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,12 +34,19 @@ public class Secscan implements DataSourceImporter {
     private final SecscanTransactions secscanTransactions;
     private final SecscanFlaggedEndpointRepository flaggedEndpointRepository;
     private final SecscanStateRepository secscanStateRepository;
+    private final JobStopSignal stopSignal;
 
     @Override
     public void importData() {
         GovernanceServiceEnvironment environment = configProperties.getTargetEnvironment();
         log.info("Starting the security scan of the system components in the environment '{}'.", environment);
-        systemComponentRepository.findAllSystemComponentReferences().forEach(componentRef -> {
+        for (SystemComponentReference componentRef : systemComponentRepository.findAllSystemComponentReferences()) {
+            // Each component's scan data is replaced in a transaction of its own: stopping between two leaves consistent data
+            if (stopSignal.isStopRequested()) {
+                log.warn("The security scan of the system components in the environment '{}' stopped as the service is " +
+                        "shutting down. The remaining system components keep their existing scan data.", environment);
+                return;
+            }
             String systemComponentName = componentRef.getName();
             try {
                 SystemComponentSecscanResult result = scanSystemComponent(componentRef, environment);
@@ -49,7 +57,7 @@ public class Secscan implements DataSourceImporter {
                 log.error("Failed to scan and update the system component '{}' in the environment '{}'. " +
                         "Leaving the existing security scan data unchanged.", systemComponentName, environment, e);
             }
-        });
+        }
         log.info("Finished the security scan of the system components in the environment '{}'.", environment);
     }
 

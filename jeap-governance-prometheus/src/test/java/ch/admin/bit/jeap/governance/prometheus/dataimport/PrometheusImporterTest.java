@@ -2,6 +2,7 @@ package ch.admin.bit.jeap.governance.prometheus.dataimport;
 
 import ch.admin.bit.jeap.governance.domain.*;
 import ch.admin.bit.jeap.governance.domain.System;
+import ch.admin.bit.jeap.governance.domain.scheduler.JobStopSignal;
 import ch.admin.bit.jeap.governance.prometheus.PrometheusAutoconfiguration;
 import ch.admin.bit.jeap.governance.prometheus.amp.AmazonManagedPromClient;
 import ch.admin.bit.jeap.governance.prometheus.datadeletion.PrometheusComponentDeletionListener;
@@ -33,6 +34,8 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -56,6 +59,9 @@ class PrometheusImporterTest {
 
     @MockitoBean
     private GovernanceProperties governanceProperties;
+
+    @MockitoBean
+    private JobStopSignal stopSignal;
 
     // not needed by this test of the importer
     @MockitoBean
@@ -112,6 +118,26 @@ class PrometheusImporterTest {
                 .allMatch(ts -> ts.getSample().value().equals(List.of("1770812157.00", "2.00")));
         assertThat(serviceBData.stream().map(PromTimeSeries::getPrometheusQueryType).collect(Collectors.toSet()))
                 .isEqualTo(allQueryTypes());
+    }
+
+    @Test
+    void importData_stopsBetweenSystemComponentsOnceTheServiceIsShuttingDown() {
+        SystemComponent componentA = createSystemComponentInNewTransaction("service-a");
+        SystemComponent componentB = createSystemComponentInNewTransaction("service-b");
+        persistTimeSeriesInNewTransaction(componentB, PromQueryType.JEAP_JAVA_VERSION, ZonedDateTime.now().minusDays(1), "99.00");
+        when(systemComponentRepository.findAllSystemComponentReferences())
+                .thenReturn(List.of(toReference(componentA), toReference(componentB)));
+        when(amazonManagedPromClient.query(any(PromQueryType.class), eq(GovernanceServiceEnvironment.DEV), any()))
+                .thenReturn(List.of(new PromTimeSeriesSample(Map.of(), List.of("1770812157.00", "1.00"))));
+        when(stopSignal.isStopRequested()).thenReturn(false, true);
+
+        prometheusImporter.importData();
+
+        List<PromTimeSeries> allTimeSeries = findAllTimeSeriesInNewTransaction();
+        assertThat(filterByComponent(allTimeSeries, "service-a")).hasSize(PromQueryType.values().length);
+        assertThat(filterByComponent(allTimeSeries, "service-b")).singleElement()
+                .satisfies(ts -> assertThat(ts.getSample().value()).isEqualTo(List.of("1770812157.00", "99.00")));
+        verify(amazonManagedPromClient, never()).query(any(), any(), eq("service-b"));
     }
 
     @Test

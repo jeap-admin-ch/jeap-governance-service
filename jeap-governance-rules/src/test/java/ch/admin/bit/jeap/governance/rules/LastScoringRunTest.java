@@ -2,11 +2,13 @@ package ch.admin.bit.jeap.governance.rules;
 
 import ch.admin.bit.jeap.governance.domain.SystemRepository;
 import ch.admin.bit.jeap.governance.domain.rule.RuleConformanceRateService;
+import ch.admin.bit.jeap.governance.domain.scheduler.JobStopSignal;
 import ch.admin.bit.jeap.governance.domain.scheduler.SchedulerRunRepository;
 import ch.admin.bit.jeap.governance.domain.score.ScoringService;
 import ch.admin.bit.jeap.governance.reportdata.LastScoringRun;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import net.javacrumbs.shedlock.core.LockAssert;
+import net.javacrumbs.shedlock.core.LockProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -36,6 +38,7 @@ class LastScoringRunTest {
     private final ScoringService scoringService = mock(ScoringService.class);
     private final SystemRepository systemRepository = mock(SystemRepository.class);
     private final LastScoringRun lastScoringRun = new LastScoringRun(schedulerRunRepository);
+    private final JobStopSignal stopSignal = new JobStopSignal();
     private ScoringScheduler scoringScheduler;
 
     @BeforeEach
@@ -44,7 +47,7 @@ class LastScoringRunTest {
         schedulerRunRepository.saveLastRunDateTime("scoring", PREVIOUS_RUN);
         scoringScheduler = new ScoringScheduler(scoringService, systemRepository, mock(RuleConformanceRateService.class),
                 schedulerRunRepository, new SimpleMeterRegistry(), _ -> {
-        });
+        }, stopSignal, mock(LockProvider.class), new ScoringProperties());
         scoringScheduler.init();
         when(systemRepository.findAllIds()).thenReturn(List.of(1L));
     }
@@ -72,6 +75,19 @@ class LastScoringRunTest {
                 assertThat(completedAt).isAfter(atSystemZone(PREVIOUS_RUN)));
         assertThat(lastScoringRun.completedAt())
                 .contains(atSystemZone(schedulerRunRepository.findLastRunDateTime("scoring").orElseThrow()));
+    }
+
+    @Test
+    void aRunStoppedByTheShutdown_doesNotChangeIt() {
+        when(systemRepository.findAllIds()).thenReturn(List.of(1L, 2L));
+        when(scoringService.updateSystemScore(anyLong(), any())).thenAnswer(_ -> {
+            stopSignal.stop();
+            return List.of();
+        });
+
+        scoringScheduler.updateScores();
+
+        assertThat(lastScoringRun.completedAt()).contains(atSystemZone(PREVIOUS_RUN));
     }
 
     @Test

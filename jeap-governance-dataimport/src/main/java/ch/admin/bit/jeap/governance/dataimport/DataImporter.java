@@ -2,6 +2,7 @@ package ch.admin.bit.jeap.governance.dataimport;
 
 import ch.admin.bit.jeap.governance.domain.plugin.datasource.DataSourceImporter;
 import ch.admin.bit.jeap.governance.domain.plugin.datasource.DataSourceUnavailableException;
+import ch.admin.bit.jeap.governance.domain.scheduler.JobStopSignal;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import jakarta.annotation.PostConstruct;
@@ -19,6 +20,7 @@ public class DataImporter {
 
     private final List<DataSourceImporter> dataSourceImporters;
     private final MeterRegistry meterRegistry;
+    private final JobStopSignal stopSignal;
 
     @PostConstruct
     void init() {
@@ -28,12 +30,30 @@ public class DataImporter {
         log.info("Registered DataSourceConnectorImports: {}", allConnectors);
     }
 
-    public void importData() {
+    /**
+     * Runs every importer in turn, or stops before the next one once the service is shutting down.
+     *
+     * @return true if the import ran to its end, false if it stopped because the service is shutting down
+     */
+    public boolean importData() {
         log.info("Importing governance data...");
 
-        dataSourceImporters.forEach(this::importData);
+        for (int i = 0; i < dataSourceImporters.size(); i++) {
+            if (stopSignal.isStopRequested()) {
+                log.warn("Importing governance data stopped as the service is shutting down, {} of {} importers not run",
+                        dataSourceImporters.size() - i, dataSourceImporters.size());
+                return false;
+            }
+            importData(dataSourceImporters.get(i));
+        }
 
+        // The last importer may itself have stopped early
+        if (stopSignal.isStopRequested()) {
+            log.warn("Importing governance data stopped as the service is shutting down");
+            return false;
+        }
         log.info("Importing governance data done");
+        return true;
     }
 
     private void importData(DataSourceImporter dataSourceImporter) {

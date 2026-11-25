@@ -2,6 +2,7 @@ package ch.admin.bit.jeap.governance.rules;
 
 import ch.admin.bit.jeap.governance.domain.SystemRepository;
 import ch.admin.bit.jeap.governance.domain.rule.RuleConformanceRateService;
+import ch.admin.bit.jeap.governance.domain.scheduler.JobStopSignal;
 import ch.admin.bit.jeap.governance.domain.scheduler.SchedulerRunRepository;
 import ch.admin.bit.jeap.governance.domain.score.ScoringService;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -9,6 +10,7 @@ import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.core.SimpleLock;
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -24,13 +26,14 @@ import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = {ScoringSchedulerIT.TestConfig.class, ScoringScheduler.class})
+@SpringBootTest(classes = {ScoringSchedulerIT.TestConfig.class, ScoringScheduler.class, JobStopSignal.class})
 @ActiveProfiles("scheduler-it")
 class ScoringSchedulerIT {
 
     @TestConfiguration
     @EnableScheduling
     @EnableSchedulerLock(defaultLockAtMostFor = "PT10S")
+    @EnableConfigurationProperties(ScoringProperties.class)
     static class TestConfig {
         @Bean
         LockProvider lockProvider() {

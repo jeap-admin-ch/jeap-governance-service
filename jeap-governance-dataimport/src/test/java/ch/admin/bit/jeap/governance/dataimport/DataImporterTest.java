@@ -2,6 +2,7 @@ package ch.admin.bit.jeap.governance.dataimport;
 
 import ch.admin.bit.jeap.governance.domain.plugin.datasource.DataSourceImporter;
 import ch.admin.bit.jeap.governance.domain.plugin.datasource.DataSourceUnavailableException;
+import ch.admin.bit.jeap.governance.domain.scheduler.JobStopSignal;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.MockClock;
 import io.micrometer.core.instrument.Timer;
@@ -22,21 +23,50 @@ import static org.mockito.Mockito.*;
 class DataImporterTest {
 
     private MeterRegistry meterRegistry;
+    private final JobStopSignal stopSignal = new JobStopSignal();
 
     @Test
     void importData_callEveryDataSourceConnectorImport() {
         DataSourceImporter connector1 = mock(DataSourceImporter.class);
         DataSourceImporter connector2 = mock(DataSourceImporter.class);
 
-        DataImporter dataImporter = new DataImporter(
-                List.of(connector1, connector2),
-                meterRegistry
-        );
+        DataImporter dataImporter = new DataImporter(List.of(connector1, connector2), meterRegistry, stopSignal);
 
-        dataImporter.importData();
+        boolean completed = dataImporter.importData();
 
         verify(connector1).importData();
         verify(connector2).importData();
+        assertThat(completed).isTrue();
+    }
+
+    @Test
+    void importData_stopsBeforeTheNextImporterOnceTheServiceIsShuttingDown(CapturedOutput output) {
+        DataSourceImporter connector1 = mock(DataSourceImporter.class);
+        doAnswer(_ -> {
+            stopSignal.stop();
+            return null;
+        }).when(connector1).importData();
+        DataSourceImporter connector2 = mock(DataSourceImporter.class);
+
+        boolean completed = new DataImporter(List.of(connector1, connector2), meterRegistry, stopSignal).importData();
+
+        verify(connector1).importData();
+        verifyNoInteractions(connector2);
+        assertThat(completed).isFalse();
+        assertThat(output.getAll()).containsPattern("WARN.*stopped as the service is shutting down, 1 of 2 importers not run");
+    }
+
+    @Test
+    void importData_notCompletedWhenTheLastImporterIsInterruptedByTheShutdown() {
+        DataSourceImporter connector = mock(DataSourceImporter.class);
+        doAnswer(_ -> {
+            stopSignal.stop();
+            return null;
+        }).when(connector).importData();
+
+        boolean completed = new DataImporter(List.of(connector), meterRegistry, stopSignal).importData();
+
+        assertThat(completed).isFalse();
     }
 
     @Test
@@ -45,10 +75,7 @@ class DataImporterTest {
         doThrow(new RuntimeException("Uiuiui")).when(connector1).importData();
         DataSourceImporter connector2 = mock(DataSourceImporter.class);
 
-        DataImporter dataImporter = new DataImporter(
-                List.of(connector1, connector2),
-                meterRegistry
-        );
+        DataImporter dataImporter = new DataImporter(List.of(connector1, connector2), meterRegistry, stopSignal);
 
         dataImporter.importData();
 
@@ -62,10 +89,7 @@ class DataImporterTest {
         doThrow(new RuntimeException("Uiuiui")).when(connector1).importData();
         DataSourceImporter connector2 = mock(DataSourceImporter.class);
 
-        DataImporter dataImporter = new DataImporter(
-                List.of(connector1, connector2),
-                meterRegistry
-        );
+        DataImporter dataImporter = new DataImporter(List.of(connector1, connector2), meterRegistry, stopSignal);
 
         dataImporter.importData();
 
@@ -80,10 +104,7 @@ class DataImporterTest {
                 .when(connector1).importData();
         DataSourceImporter connector2 = mock(DataSourceImporter.class);
 
-        DataImporter dataImporter = new DataImporter(
-                List.of(connector1, connector2),
-                meterRegistry
-        );
+        DataImporter dataImporter = new DataImporter(List.of(connector1, connector2), meterRegistry, stopSignal);
 
         dataImporter.importData();
 
@@ -99,7 +120,7 @@ class DataImporterTest {
         DataSourceImporter connector1 = mock(DataSourceImporter.class);
         doThrow(new RuntimeException("Uiuiui")).when(connector1).importData();
 
-        new DataImporter(List.of(connector1), meterRegistry).importData();
+        new DataImporter(List.of(connector1), meterRegistry, stopSignal).importData();
 
         assertThat(output.getAll()).containsPattern("ERROR.*Import data with .* failed");
     }

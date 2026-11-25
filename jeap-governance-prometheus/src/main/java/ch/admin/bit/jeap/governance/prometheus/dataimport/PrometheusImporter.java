@@ -5,6 +5,7 @@ import ch.admin.bit.jeap.governance.domain.GovernanceServiceEnvironment;
 import ch.admin.bit.jeap.governance.domain.SystemComponentReference;
 import ch.admin.bit.jeap.governance.domain.SystemComponentRepository;
 import ch.admin.bit.jeap.governance.domain.plugin.datasource.DataSourceImporter;
+import ch.admin.bit.jeap.governance.domain.scheduler.JobStopSignal;
 import ch.admin.bit.jeap.governance.prometheus.domain.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,19 +25,26 @@ public class PrometheusImporter implements DataSourceImporter {
     private final PromTimeSeriesRepository promTimeSeriesRepository;
     private final Transactions transactions;
     private final SystemComponentRepository systemComponentRepository;
+    private final JobStopSignal stopSignal;
 
     @Override
     public void importData() {
         GovernanceServiceEnvironment environment = governanceProperties.getEnvironment();
         log.info("Starting import of Prometheus data from environment '{}'.", environment);
-        systemComponentRepository.findAllSystemComponentReferences().forEach(componentRef -> {
+        for (SystemComponentReference componentRef : systemComponentRepository.findAllSystemComponentReferences()) {
+            // Each component's data is replaced in a transaction of its own: stopping between two leaves consistent data
+            if (stopSignal.isStopRequested()) {
+                log.warn("Import of Prometheus data from environment '{}' stopped as the service is shutting down. " +
+                        "The remaining system components keep their existing data.", environment);
+                return;
+            }
             try {
                 importDataForSystemComponent(componentRef, environment);
             } catch (Exception e) {
                 log.error("Failed to import new data from Prometheus for the environment '{}' and the system component '{}'. " +
                         "Leaving the existing data unchanged.", environment, componentRef.getName(), e);
             }
-        });
+        }
         log.info("Finished import of Prometheus data from environment '{}'.", environment);
     }
 

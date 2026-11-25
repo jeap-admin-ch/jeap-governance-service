@@ -5,21 +5,28 @@ import ch.admin.bit.jeap.governance.domain.rule.RuleConformanceRateService;
 import ch.admin.bit.jeap.governance.domain.rule.RuleEvaluationResult;
 import ch.admin.bit.jeap.governance.domain.rule.RuleId;
 import ch.admin.bit.jeap.governance.domain.rule.State;
+import ch.admin.bit.jeap.governance.domain.scheduler.JobStopSignal;
 import ch.admin.bit.jeap.governance.domain.scheduler.SchedulerRunRepository;
 import ch.admin.bit.jeap.governance.domain.score.ScoringRunCompletedEvent;
 import ch.admin.bit.jeap.governance.domain.score.ScoringService;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import net.javacrumbs.shedlock.core.LockAssert;
+import net.javacrumbs.shedlock.core.LockConfiguration;
+import net.javacrumbs.shedlock.core.LockProvider;
+import net.javacrumbs.shedlock.core.SimpleLock;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Executor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,12 +40,84 @@ class ScoringSchedulerTest {
     private final RuleConformanceRateService ruleConformanceRateService = mock(RuleConformanceRateService.class);
     private final SchedulerRunRepository schedulerRunRepository = mock(SchedulerRunRepository.class);
     private final List<Object> publishedEvents = new ArrayList<>();
-    private final ScoringScheduler scheduler = new ScoringScheduler(scoringService, systemRepository, ruleConformanceRateService, schedulerRunRepository, new SimpleMeterRegistry(), publishedEvents::add);
+    private final JobStopSignal stopSignal = new JobStopSignal();
+    private final LockProvider lockProvider = mock(LockProvider.class);
+    private final SimpleLock lock = mock(SimpleLock.class);
+    private ScoringScheduler scheduler;
 
     @BeforeEach
     void setUp() {
+        ScoringProperties properties = new ScoringProperties();
+        properties.setLockAtLeast(Duration.ofMinutes(1));
+        properties.setLockAtMost(Duration.ofMinutes(15));
+        scheduler = new ScoringScheduler(scoringService, systemRepository, ruleConformanceRateService, schedulerRunRepository,
+                new SimpleMeterRegistry(), publishedEvents::add, stopSignal, lockProvider, properties);
         LockAssert.TestHelper.makeAllAssertsPass(true);
         when(schedulerRunRepository.findLastRunDateTime("scoring")).thenReturn(Optional.empty());
+    }
+
+    @AfterEach
+    void tearDown() {
+        LockAssert.TestHelper.makeAllAssertsPass(false);
+    }
+
+    @Test
+    void updateScores_stopsBetweenSystemsOnceTheServiceIsShuttingDown_withoutRecordingTheRun() {
+        when(systemRepository.findAllIds()).thenReturn(List.of(1L, 2L));
+        when(scoringService.updateSystemScore(eq(1L), any())).thenAnswer(_ -> {
+            stopSignal.stop();
+            return List.of();
+        });
+
+        scheduler.updateScores();
+
+        verify(scoringService).updateSystemScore(eq(1L), any());
+        verify(scoringService, never()).updateSystemScore(eq(2L), any());
+        verifyNoInteractions(ruleConformanceRateService);
+        verify(schedulerRunRepository, never()).saveLastRunDateTime(any(), any());
+        assertThat(publishedEvents).isEmpty();
+    }
+
+    @Test
+    void startScoring_runsUnderTheLockOfTheScheduledRun() {
+        when(lockProvider.lock(any())).thenReturn(Optional.of(lock));
+        when(systemRepository.findAllIds()).thenReturn(List.of(1L));
+        when(scoringService.updateSystemScore(any(Long.class), any())).thenReturn(List.of());
+
+        boolean started = scheduler.startScoring(Runnable::run);
+
+        assertThat(started).isTrue();
+        var config = ArgumentCaptor.forClass(LockConfiguration.class);
+        verify(lockProvider).lock(config.capture());
+        assertThat(config.getValue().getName()).isEqualTo("scoring");
+        assertThat(config.getValue().getLockAtLeastFor()).isEqualTo(Duration.ofMinutes(1));
+        assertThat(config.getValue().getLockAtMostFor()).isEqualTo(Duration.ofMinutes(15));
+        var inOrder = inOrder(scoringService, schedulerRunRepository, lock);
+        inOrder.verify(scoringService).updateSystemScore(eq(1L), any());
+        inOrder.verify(schedulerRunRepository).saveLastRunDateTime(eq("scoring"), any(LocalDateTime.class));
+        inOrder.verify(lock).unlock();
+        assertThat(publishedEvents).hasSize(1);
+    }
+
+    @Test
+    void startScoring_returnsFalseWithoutScoringWhenTheLockIsHeld() {
+        when(lockProvider.lock(any())).thenReturn(Optional.empty());
+        Executor executor = mock(Executor.class);
+
+        boolean started = scheduler.startScoring(executor);
+
+        assertThat(started).isFalse();
+        verifyNoInteractions(executor, scoringService, systemRepository);
+    }
+
+    @Test
+    void startScoring_releasesTheLockWhenTheRunFails() {
+        when(lockProvider.lock(any())).thenReturn(Optional.of(lock));
+        when(systemRepository.findAllIds()).thenThrow(new IllegalStateException("boom"));
+
+        scheduler.startScoring(Runnable::run);
+
+        verify(lock).unlock();
     }
 
     @Test

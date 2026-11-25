@@ -6,6 +6,7 @@ import ch.admin.bit.jeap.governance.domain.SystemComponentRepository;
 import ch.admin.bit.jeap.governance.domain.plugin.security.api.HttpApi;
 import ch.admin.bit.jeap.governance.domain.plugin.security.api.HttpEndpoint;
 import ch.admin.bit.jeap.governance.domain.plugin.security.api.SystemComponentHttpApi;
+import ch.admin.bit.jeap.governance.domain.scheduler.JobStopSignal;
 import ch.admin.bit.jeap.governance.secscan.domain.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,6 +51,8 @@ class SecscanTest {
     private SecscanFlaggedEndpointRepository flaggedEndpointRepository;
     @Mock
     private SecscanStateRepository secscanStateRepository;
+    @Mock
+    private JobStopSignal stopSignal;
 
     @InjectMocks
     private Secscan secscan;
@@ -63,6 +66,22 @@ class SecscanTest {
     @BeforeEach
     void setUp() {
         when(configProperties.getTargetEnvironment()).thenReturn(ENV);
+    }
+
+    @Test
+    void importData_stopsBetweenSystemComponentsOnceTheServiceIsShuttingDown() {
+        mockExecuteInTransactions();
+        when(systemComponentRepository.findAllSystemComponentReferences())
+                .thenReturn(List.of(componentReference(COMPONENT_A), componentReference(COMPONENT_B)));
+        when(apiDiscoveryClient.discover(COMPONENT_A, ENV)).thenReturn(null);
+        when(stopSignal.isStopRequested()).thenReturn(false, true);
+
+        secscan.importData();
+
+        verify(secscanStateRepository).deleteBySystemComponentId(COMPONENT_A_ID);
+        verify(apiDiscoveryClient, never()).discover(eq(COMPONENT_B), any());
+        verify(secscanStateRepository, never()).deleteBySystemComponentId(COMPONENT_B_ID);
+        verify(flaggedEndpointRepository, never()).deleteBySystemComponentId(COMPONENT_B_ID);
     }
 
     @Test

@@ -8,8 +8,8 @@ environment variables, etc.).
 | `jeap.governance.environment`                                        | Environment of the service(DEV, REF, ABN, PROD).                                                                                                       | -                             | Yes                              |
 | `jeap.governance.archrepo.url`                                       | URL of the Architecture Repository                                                                                                                     | -                             | Yes                              |
 | `jeap.governance.dataimport.cron-expression`                         | Cron expression to schedule the data import job                                                                                                        | `0 15 6,10,14,18 * * MON-FRI` | No                               |
-| `jeap.governance.dataimport.lock-at-least`                           | Minimum duration for which the lock should be held during the data import job                                                                          | `PT30M`                       | No                               |
-| `jeap.governance.dataimport.lock-at-most`                            | Maximum lock duration for the data import job                                                                                                          | `PT2H`                        | No                               |
+| `jeap.governance.dataimport.lock-at-least`                           | Minimum duration the lock of the data import job is held, also when the import ends sooner                                                             | `PT15M`                       | No                               |
+| `jeap.governance.dataimport.lock-at-most`                            | Maximum lock duration of the data import job: how long a lock left behind by an instance that did not end the import stays                             | `PT1H`                        | No                               |
 | `jeap.governance.archrepo.timeout`                                   | Connection timeout for Architecture Repository integration                                                                                             | `PT5M`                        | No                               |
 | `jeap.governance.archrepo.import.apidocversion.enabled`              | Enable/disable import of API documentation versions from ArchRepo                                                                                      | `true`                        | No                               |
 | `jeap.governance.archrepo.import.databaseschemaversion.enabled`      | Enable/disable import of database schema versions from ArchRepo                                                                                        | `true`                        | No                               |
@@ -45,13 +45,24 @@ environment variables, etc.).
 | `jeap.governance.rules.component-exemptions[].until`                 | Expiry date (ISO-8601 `yyyy-MM-dd`), exclusive: the rule applies again from that day on. If absent, the exemption is permanent                         | -                             | No                               |
 | `jeap.governance.rules.component-exemptions[].parameters`            | Optional key-value parameters to further scope the exemption                                                                                           | `{}`                          | No                               |
 | `jeap.governance.scoring.cron-expression`                            | Cron expression to schedule the rule evaluation and scoring of components/systems                                                                      | `0 0,45 6-20 * * MON-FRI`     | No                               |
-| `jeap.governance.scoring.lock-at-least`                              | Minimum duration for which the lock should be held during the data import job                                                                          | `PT1M`                        | No                               |
-| `jeap.governance.scoring.lock-at-most`                               | Maximum lock duration for the data import job                                                                                                          | `PT15M`                       | No                               |
+| `jeap.governance.scoring.lock-at-least`                              | Minimum duration the lock of the scoring job is held, also when the scoring ends sooner                                                                | `PT1M`                        | No                               |
+| `jeap.governance.scoring.lock-at-most`                               | Maximum lock duration of the scoring job: how long a lock left behind by an instance that did not end the scoring stays                                | `PT15M`                       | No                               |
 | `jeap.governance.report-data.trend-period-days`                      | Number of days the trends are calculated over and the score histories cover, including the day of the report                                           | `30`                          | No                               |
 | `jeap.governance.doc-service.webhook.enabled`                        | Calls the Doc Service's webhook after every completed scoring run, see [Docs API](docs-api.md#webhook-after-scoring)                                   | `false`                       | No                               |
 | `jeap.governance.doc-service.webhook.url`                            | URL of the Doc Service's governance webhook, e.g. `https://doc.example.com/doc-service/api/governance/webhook`                                         | -                             | Yes, if the webhook is enabled   |
 | `jeap.governance.doc-service.webhook.client-registration`            | Spring Security OAuth2 client registration the webhook is called with                                                                                  | -                             | Yes, if the webhook is enabled   |
 | `jeap.governance.doc-service.webhook.timeout`                        | Connect and read timeout of the webhook call                                                                                                           | `PT10S`                       | No                               |
+
+## Job Locks
+
+The data import and the scoring each hold a lock (ShedLock, table `shedlock`) while they run, so that only one instance
+runs a job at a time. A run started through the management API (`POST /api/management`) takes the same lock as the
+scheduled run. If the lock is held, the API answers `409 Conflict` and does not start the job.
+
+When an instance shuts down while a job is running, the job stops at its next consistent point - between two data
+source importers, between two system components of the Prometheus import and the security scan, between two systems of
+the scoring - and releases its lock. The stopped run is not recorded as a completed run. Only a lock left behind by an
+instance that did not shut down cleanly, for example one that was killed, stays until `lock-at-most` runs out.
 
 ## Prometheus Query Lookback
 
@@ -81,8 +92,8 @@ jeap:
     environment: DEV
     dataimport:
       cron-expression: "0 15 6,10,14,18 * * MON-FRI"
-      lock-at-least: PT30M
-      lock-at-most: PT2H
+      lock-at-least: PT15M
+      lock-at-most: PT1H
     scoring:
       cron-expression: "0 0,45 6-20 * * MON-FRI"
       lock-at-least: PT1M

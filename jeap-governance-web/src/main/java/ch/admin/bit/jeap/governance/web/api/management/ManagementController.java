@@ -9,9 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,27 +25,32 @@ public class ManagementController {
 
     private final DataImportScheduler dataImportScheduler;
     private final ScoringScheduler scoringScheduler;
+    private final AsyncJobRunner asyncJobRunner;
 
     @PostMapping
     @Operation(
             summary = "Create a new job",
-            description = "Create a new job to trigger rule update or imports",
+            description = "Starts a data import or a scoring run in the background, under the same lock as the scheduled job",
             security = {@SecurityRequirement(name = "OIDC")}
     )
-    @ApiResponse(responseCode = "200", description = "Job successfully created and started asynchronously")
-    @Async
-    @Transactional
+    @ApiResponse(responseCode = "200", description = "Job started, it runs in the background")
+    @ApiResponse(responseCode = "400", description = "No job type given")
+    @ApiResponse(responseCode = "409", description = "Job not started: its lock is held, as the job is running on an " +
+                                                     "instance or a run that did not end still holds it")
     @PreAuthorize("hasRole('governance','admin')")
     public void triggerUpdate(@RequestBody JobDto jobDto) {
-        if (jobDto == null) {
+        if (jobDto == null || jobDto.type() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Job type must be provided");
         }
 
-        switch (jobDto.type()) {
-            case DATA_IMPORT -> dataImportScheduler.update();
-            case SCORING -> scoringScheduler.updateScores();
-            default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Unsupported job type: " + jobDto.type());
+        boolean started = switch (jobDto.type()) {
+            case DATA_IMPORT -> dataImportScheduler.startImport(asyncJobRunner::run);
+            case SCORING -> scoringScheduler.startScoring(asyncJobRunner::run);
+        };
+        if (!started) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Job " + jobDto.type() + " not started: its lock is held, the job is already running");
         }
+        log.info("Job {} started", jobDto.type());
     }
 }

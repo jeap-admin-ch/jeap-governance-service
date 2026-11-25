@@ -8,6 +8,6 @@ import org.springframework.context.annotation.PropertySource;
 @AutoConfiguration
 @ComponentScan
 @PropertySource("classpath:scoringDefaultProperties.properties")
-@EnableConfigurationProperties(RuleConfigurationProperties.class)
+@EnableConfigurationProperties({RuleConfigurationProperties.class, ScoringProperties.class})
 public class RulesAutoConfiguration {
 }

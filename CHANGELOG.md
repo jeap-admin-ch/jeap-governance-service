@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [11.1.0] - 2026-11-25
+
+### Fixed
+- A data import or scoring run still going on when its instance shut down kept its lock until `lock-at-most` ran out
+  (one hour for the data import), and every run in the meantime, scheduled or started through the management API, was
+  skipped without notice. On shutdown, a running job now stops at its next consistent point - between two data source
+  importers, between two system components of the Prometheus import and the security scan, between two systems of the
+  scoring - and releases its lock. A stopped run is not recorded as a completed run.
+- `POST /api/management` ran its job on the request thread unless another starter happened to enable `@Async`. The
+  governance service now enables it itself.
+- The documented defaults of `jeap.governance.dataimport.lock-at-least` and `lock-at-most` (`PT15M`, `PT1H`).
+
+### Changed
+- `POST /api/management` takes the job's lock before it answers, and answers `409 Conflict` without starting the job
+  if the lock is held, instead of `200` for a job that was then skipped. It answers `400` without a job type, which
+  the background execution used to swallow.
+- New for data source importers: `JobStopSignal` (`ch.admin.bit.jeap.governance.domain.scheduler`). An importer that
+  loops over many items for minutes should check it between items, see [Plugin Mechanism](docs/plugin-mechanism.md).
+- Java API: `DataImporter.importData()` returns whether the import ran to its end. `DataImportScheduler` and
+  `ScoringScheduler` have the manual start `startImport(Executor)` / `startScoring(Executor)` and take the lock
+  provider, their lock properties (new: `ScoringProperties`) and the `JobStopSignal` in their constructors.
+
 ## [11.0.0] - 2026-11-24
 
 **Breaking release.** The Confluence reporting is removed; the jEAP Doc Service publishes the reports, read from the
